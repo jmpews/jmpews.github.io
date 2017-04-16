@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.3.4 -->
+
+    <!-- Title -->
+    
+    <title>
+        
+            漏洞之堆触发 | 
+        
+        Zz
+    </title>
+
+    <!-- Meta & Info -->
+    <meta charset="utf-8">
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+    
+    
+    
+    
+    
+    
+
+    <meta http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0097A7">
+    <meta name="author" content="jmpews">
+    <meta name="description" content="pwn &amp; dev &amp; reverse">
+    <meta name="keywords" content="null,pwn,malloc,heap">
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" sizes="192x192" href="/img/favicon.png">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!--iOS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-title" content="Title">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="480">
+
+    <!-- Add to homescreen for Chrome on Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- Add to homescreen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Zz">
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="http://jmpews.github.com">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="漏洞之堆触发 | Zz">
+    <meta property="og:description" content="pwn &amp; dev &amp; reverse">
+    <meta property="og:article:tag" content="pwn"> <meta property="og:article:tag" content="malloc"> <meta property="og:article:tag" content="heap"> 
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.en.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import CSS & jQuery -->
+    
+        <link rel="stylesheet" href="/css/material.min.css">
+        <link rel="stylesheet" href="/css/style.min.css">
+        <!-- Config CSS -->
+
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #607D8B !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #607D8B !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #607D8B !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-color: #F5F5F5;
+      }
+
+      /* blog_info bottom background */
+      #scheme-Paradox .material-layout .something-else .mdl-card__supporting-text{
+        background-color: #fff;
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/queue.js"></script>
+    
+
+    <!-- UC Browser Compatible -->
+    <script>
+        var agent = navigator.userAgent.toLowerCase();
+        if(agent.indexOf('ucbrowser')>0) {
+            document.write("<link rel=\"stylesheet\" href=\"/css/uc.css\">");
+            alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+        }
+    </script>
+
+    
+
+    
+
+
+    <!-- Bing Background -->
+    
+
+    <!-- Custom Head -->
+    
+</head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+    <!-- Left aligned menu below button -->
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#前言"><span class="post-toc-number">1.</span> <span class="post-toc-text">前言</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#参考资料"><span class="post-toc-number">1.0.1.</span> <span class="post-toc-text">参考资料</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#0x00-堆利用综述"><span class="post-toc-number">2.</span> <span class="post-toc-text">0x00 堆利用综述</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#对于用户主动发起操作的思考"><span class="post-toc-number">2.0.1.</span> <span class="post-toc-text">对于用户主动发起操作的思考:</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#对于借助-glibc-函数本身类似的操作的思考"><span class="post-toc-number">2.0.2.</span> <span class="post-toc-text">对于借助 glibc 函数本身类似的操作的思考:</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#0x00-The-House-of-Prime"><span class="post-toc-number">3.</span> <span class="post-toc-text">0x00 The House of Prime</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#参考链接"><span class="post-toc-number">3.0.1.</span> <span class="post-toc-text">参考链接</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#导致-最终结果"><span class="post-toc-number">3.0.2.</span> <span class="post-toc-text">导致(最终结果):</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#原理和思考"><span class="post-toc-number">3.0.3.</span> <span class="post-toc-text">原理和思考</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#利用过程"><span class="post-toc-number">3.0.4.</span> <span class="post-toc-text">利用过程:</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#触发前提-限制"><span class="post-toc-number">3.0.5.</span> <span class="post-toc-text">触发前提(限制):</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#保护机制"><span class="post-toc-number">3.0.6.</span> <span class="post-toc-text">保护机制:</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#0x00-House-of-Mind"><span class="post-toc-number">4.</span> <span class="post-toc-text">0x00 House of Mind</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#参考链接-1"><span class="post-toc-number">4.0.1.</span> <span class="post-toc-text">参考链接</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#导致-最终结果-1"><span class="post-toc-number">4.0.2.</span> <span class="post-toc-text">导致(最终结果):</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#原理-触发原因"><span class="post-toc-number">4.0.3.</span> <span class="post-toc-text">原理(触发原因):</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#利用思路"><span class="post-toc-number">4.0.4.</span> <span class="post-toc-text">利用思路:</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#触发前提-限制-1"><span class="post-toc-number">4.0.5.</span> <span class="post-toc-text">触发前提(限制):</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#保护机制-1"><span class="post-toc-number">4.0.6.</span> <span class="post-toc-text">保护机制:</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#利用实践"><span class="post-toc-number">4.0.7.</span> <span class="post-toc-text">利用实践</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#0x00-House-of-Force"><span class="post-toc-number">5.</span> <span class="post-toc-text">0x00 House of Force</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#参考资料-1"><span class="post-toc-number">5.0.1.</span> <span class="post-toc-text">参考资料</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#导致-最终结果-2"><span class="post-toc-number">5.0.2.</span> <span class="post-toc-text">导致(最终结果):</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#触发前提-限制-2"><span class="post-toc-number">5.0.3.</span> <span class="post-toc-text">触发前提(限制):</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#保护机制-2"><span class="post-toc-number">5.0.4.</span> <span class="post-toc-text">保护机制:</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#利用实践-1"><span class="post-toc-number">5.0.5.</span> <span class="post-toc-text">利用实践</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#0x00-unlink"><span class="post-toc-number">6.</span> <span class="post-toc-text">0x00 unlink</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#导致-最终结果-3"><span class="post-toc-number">6.0.1.</span> <span class="post-toc-text">导致(最终结果):</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#原理-触发原因-1"><span class="post-toc-number">6.0.2.</span> <span class="post-toc-text">原理(触发原因):</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#触发前提-限制-3"><span class="post-toc-number">6.0.3.</span> <span class="post-toc-text">触发前提(限制):</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#保护机制-3"><span class="post-toc-number">6.0.4.</span> <span class="post-toc-text">保护机制:</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#绕过保护机制"><span class="post-toc-number">6.0.5.</span> <span class="post-toc-text">绕过保护机制:</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#利用思路-1"><span class="post-toc-number">6.0.6.</span> <span class="post-toc-text">利用思路:</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#0x00-unlink-过保护机制"><span class="post-toc-number">7.</span> <span class="post-toc-text">0x00 unlink(过保护机制)</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#导致-最终结果-4"><span class="post-toc-number">7.0.1.</span> <span class="post-toc-text">导致(最终结果):</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#原理-触发原因-2"><span class="post-toc-number">7.0.2.</span> <span class="post-toc-text">原理(触发原因):</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#触发前提-限制-4"><span class="post-toc-number">7.0.3.</span> <span class="post-toc-text">触发前提(限制):</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#保护机制-4"><span class="post-toc-number">7.0.4.</span> <span class="post-toc-text">保护机制:</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#利用思路-2"><span class="post-toc-number">7.0.5.</span> <span class="post-toc-text">利用思路:</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#0x00-off-by-one"><span class="post-toc-number">8.</span> <span class="post-toc-text">0x00 off-by-one</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Null-Byte-Off-by-one"><span class="post-toc-number">9.</span> <span class="post-toc-text">Null Byte Off-by-one</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#PlaidDB-pwn-550"><span class="post-toc-number">9.0.1.</span> <span class="post-toc-text">PlaidDB(pwn 550)</span></a></li></ol></li></ol></li></ol>
+
+        <!--
+        <li class="mdl-menu__item">
+            Some Action
+        </li>
+        -->
+    </ul>
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        
+            <!-- Random Thumbnail -->
+            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+            <script>
+    var randomNum = Math.floor(Math.random() * 19 + 1);
+
+    $('.post_thumbnail-random').attr('data-original', '/img/random/material-' + randomNum + '.png');
+    $('.post_thumbnail-random').addClass('lazy');
+</script>
+
+        
+    
+            <p class="article-headline-p">
+                漏洞之堆触发
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.jpeg" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>jmpews</strong>
+        <span>Feb 23, 2017</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/heap/">heap</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/malloc/">malloc</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/pwn/">pwn</a>
+    </ul>
+    
+
+    <!-- Share -->
+    <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=漏洞之堆触发&url=http://jmpews.github.com//2017/02/23/pwn/PWN之堆触发/index.html&pic=&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Weibo
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+        <a class="post_share-link" href="https://twitter.com/intent/tweet?text=漏洞之堆触发&url=http://jmpews.github.com//2017/02/23/pwn/PWN之堆触发/index.html&via=jmpews" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Twitter
+            </li>
+        </a>
+    
+
+    <!-- Share Facebook -->
+    
+        <a class="post_share-link" href="https://www.facebook.com/sharer/sharer.php?u=http://jmpews.github.com//2017/02/23/pwn/PWN之堆触发/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Facebook
+            </li>
+        </a>
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://jmpews.github.com//2017/02/23/pwn/PWN之堆触发/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><h4 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"># 最好按照参考资料顺序查看</div><div class="line"></div><div class="line"># malloc理解</div><div class="line">&lt;PWN之堆内存管理.md&gt;</div><div class="line"></div><div class="line"># 关于堆相关利用的一些示例程序, 以及参考文档, 这个强力推荐, 建议把其中列举的所有参考文档都阅读并理解</div><div class="line">https://github.com/shellphish/how2heap</div><div class="line"></div><div class="line"># 介绍常用漏洞, 如何由 BUG 到 Primitive, 再如何到 Exploit</div><div class="line">2002.gera.About_Exploits_Writing.pdf</div><div class="line"></div><div class="line"># unlink参考资料</div><div class="line"># 都是讲unlink 和 unlink 的绕过的, 但是总感觉对于 unlink 绕过保护机制那块没有讲出原理.</div><div class="line"># 因该是free@plt, 而不是 free@got, 因为 ELF 将 got 表拆分为两部分 `.got`, `.got.plt`, 详细查看 &lt;PWN之ELF解析.md&gt;</div><div class="line">http://static.hx99.net/static/drops/tips-7326.html</div><div class="line">http://www.ms509.com/?p=49</div><div class="line">#只讲到 unlink, 没有提及绕过, 但是讲到一些检测机制.</div><div class="line">https://jaq.alibaba.com/community/art/show?articleid=360</div><div class="line"></div><div class="line"># 感觉这作者好厉害, 有自己的一个对漏洞的全方位理解, 很透彻.</div><div class="line">http://www.freebuf.com/articles/system/91527.html</div><div class="line"></div><div class="line">https://googleprojectzero.blogspot.jp/2014/08/the-poisoned-nul-byte-2014-edition.html(Project Zero)</div><div class="line">https://www.contextis.com/documents/120/Glibc_Adventures-The_Forgotten_Chunks.pdf (off-by-one 总结)</div><div class="line">http://angelboy.logdown.com/posts/262325-plaid-ctf-2015-write-up (shrink free chunk size)</div><div class="line">http://blog.frizn.fr/pctf-2015/pwn-550-plaiddb (shrink free chunk size)</div><div class="line">http://netsec.ccert.edu.cn/wp-content/uploads/2015/10/2015-1029-yangkun-Gold-Mining-CTF.pdf (内存pwn总结)</div></pre></td></tr></table></figure>
+<h2 id="0x00-堆利用综述"><a href="#0x00-堆利用综述" class="headerlink" title="0x00 堆利用综述"></a>0x00 堆利用综述</h2><p>在这里我们仅讨论 <code>Turning bugs into primitives</code> 的过程, 关注更多的利用方法背后的原理, 而不是利用方法本身. 这里仅仅是个人看法, 个人的一些理解.</p>
+<p>下面的很多漏洞是实现 aa4bmo ‘almost arbitrary 4 bytes mirrored overwrite’  (任意 4 字节写), 所以需要一个代码段来实现 <code>*x=y</code> 操作.</p>
+<p>要实现 <code>*x=y</code> 有几种思路, 从这个操作的发起者层面讲, 1. 用户主动发起修改操作 2. 借助 glibc 函数自带的类似操作. </p>
+<h4 id="对于用户主动发起操作的思考"><a href="#对于用户主动发起操作的思考" class="headerlink" title="对于用户主动发起操作的思考:"></a>对于用户主动发起操作的思考:</h4><ol>
+<li>正常的 <code>x</code> 经过绕过后, 恶意修改为关键信息的地址, 比如存在 <code>*t=x</code> 类似操作就可能导致 <code>x</code> 指向的位被修改, 典型的例子就是 unlink 的绕过利用.</li>
+<li>恶意构造和修改 <code>malloc_state</code> 结构, 导致 malloc 的返回地址 <code>x</code> 为关键信息地址, 这里需要考虑到 malloc 可以哪些缓存取到空闲 chunk, 比如: fastbins ? bins ? top chunk ?  这是对 <code>malloc_state</code> 的一种利用场景, 借助再分配可控内存, 同时还有另一个种对 <code>malloc_state</code> 的利用在下面会提到.</li>
+</ol>
+<h4 id="对于借助-glibc-函数本身类似的操作的思考"><a href="#对于借助-glibc-函数本身类似的操作的思考" class="headerlink" title="对于借助 glibc 函数本身类似的操作的思考:"></a>对于借助 glibc 函数本身类似的操作的思考:</h4><p>就是找到类似 <code>*x=y</code> 的操作, 并且对于 <code>x</code> 和 <code>y</code> 都需要有一定的控制权, 比如 unlink 操作. 这里需要明白 <code>*x=y</code> 要表达的意思, 可以认为, 在地址 <code>x</code> 记录 <code>y</code> 值, 思考在 glibc 中哪里需要这样的操作. </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">#define unlink( P, BK, FD ) &#123;</div><div class="line">BK = P-&gt;bk;</div><div class="line">FD = P-&gt;fd;</div><div class="line">FD-&gt;bk = BK;</div><div class="line">BK-&gt;fd = FD;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>unlink 操作在没有加验证时时, 它的两个参数都是无限制, 可以容易实现 “任意地址写” 操作.</p>
+<p>根据 <code>*x=y</code> 要表达的意思, 并且类比 unlink, unlink 是拆除空闲节点, 这个操作通常是发生在分配和合并 chunk 时.</p>
+<p>分配操作发生在 <code>_int_malloc()</code>, 但是有个问题, 这时候的分配的内容使很难被控制的, 也就是很难 <code>craft a fake chunk</code></p>
+<p>合并操作多发在 <code>_int_free()</code> (在 <code>_int_malloc()</code> 也可能发生合并操作, 比如 <code>malloc_consolidate()</code>).</p>
+<p>以上是类比 unlink 操作, 如果熟悉 ptmalloc 的空闲内存管理以及如何进行回收, 可以想到, 在 chunk 被释放后需要将空闲 chunk 的地址插入到 Fastbins, Unsorted bin, Bins, 所以在这个过程中就会存在 <code>*x=y</code> 的类似操作, 这里也存在一个问题, Fastbins, Unsorted bin, Bins 是分配区结构体 <code>malloc_state</code> 的元素, 也就是静态全局变量 <code>main_arena</code> 变量, 地址固定, 所以这里 <code>x</code> 被限制, 同样由于 <code>_int_free()</code> 的检查以及具体代码的实现(正常的代码逻辑肯定不是瞎释放内存啊, 所以释放的地址也几乎不会被用户控制), 因此这里的 <code>y</code> 也被限制, 所以就希望找到绕过限制的方法, 比如对于 <code>x</code> 的限制, 可以通过尝试伪造 <code>malloc_state</code>, 借助 free 过程中向 <code>malloc_state</code> 的写过程, 完成 <code>*x=y</code> 操作, 这是对 <code>malloc_state</code> 的另一种利用, 是在两个不同的角度.</p>
+<p>所以很多时候是由于部分逻辑没有检查全, 感觉有点像 yuange 说的意思, 对于代码逻辑, 应该是什么样子,需要检查清楚, 妥协就又可能造成绕过.</p>
+<h2 id="0x00-The-House-of-Prime"><a href="#0x00-The-House-of-Prime" class="headerlink" title="0x00 The House of Prime"></a>0x00 The House of Prime</h2><p>该利用已经不再适用, <code>malloc_state</code> 不在包含 <code>max_fast</code>, 以及 在 <code>_int_free</code> 的过程中检查 了 chunk 的最小 size.</p>
+<h4 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">The Malloc Maleficarum (http://seclists.org/bugtraq/2005/Oct/118)</div><div class="line">https://gbmaster.wordpress.com/2014/08/24/x86-exploitation-101-this-is-the-first-witchy-house/</div></pre></td></tr></table></figure>
+<h4 id="导致-最终结果"><a href="#导致-最终结果" class="headerlink" title="导致(最终结果):"></a>导致(最终结果):</h4><p><strong>伪造 malloc 返回地址, 实现 aa4bmo. (针对 Fastbins 利用)</strong></p>
+<p><strong>借助 <code>_int_free()</code> 地址写操作, 实现 aa4bmo. (针对 Unstored bin 的利用)</strong></p>
+<h4 id="原理和思考"><a href="#原理和思考" class="headerlink" title="原理和思考"></a>原理和思考</h4><p>绕过 Fastbins 分配限制, 覆盖了 <code>arena_key</code>, 导致伪造了 <code>arena_key</code>, 从而伪造了空闲 chunk 地址, 通过再分配, 就可以得到之前伪造的空闲 chunk 地址的内容控制权, 最终导致 aa4bmo</p>
+<h4 id="利用过程"><a href="#利用过程" class="headerlink" title="利用过程:"></a>利用过程:</h4><p>Fastbins 的利用思路</p>
+<p>首先对第一个  chunk 进行释放操作, 这里需要修改 chunk size, <code>_int_free</code> 释放内存时没有检测 chunk size 的最小值, 导致 <code>fastbin_index</code> 结果为 -1, <code>max_fast</code> 恰好位于 <code>fastbins</code> 相邻, 进而 <code>max_fast</code> 被覆盖为有一个很大的值(空闲 chunk 地址), 此时对第二个 chunk 进行释放,  这里需要修改 chunk size, 以使释放后的 chunk 能恰好被放在 <code>arena_key</code> 位置, 此时会导致 arena_key 指向第二个 chunk, 由于这两个 chunk 都是可以控制的, 此时进行 malloc 操作, 我们可以通过 伪造 Fastbins 链表内容(空闲 chunk 的地址), 进而让 malloc 返回我们伪造的空闲 chunk 的地址, 以达到任意内存地址写内容</p>
+<p>Unsorted bin 利用思路</p>
+<p>根据上面, Fastbins 的前部分思路, <code>arena_key</code> 可以被控制, 因此我们伪造 Unstorted bin 链表内容, 在摘除 unsorted bin 节点时, 利用 glibc 函数内部操作, 达到任意地址写.</p>
+<h4 id="触发前提-限制"><a href="#触发前提-限制" class="headerlink" title="触发前提(限制):"></a>触发前提(限制):</h4><p>这里限制有点多了, 对于 Fastbins 利用, 需要能控制第一个 chunk 的 size, 需要能控制第二个 chunk 的内容. 对于 Unsorted bin 的利用, 也是如上, 在伪造 unsorted bin  步骤比较复杂.</p>
+<h4 id="保护机制"><a href="#保护机制" class="headerlink" title="保护机制:"></a>保护机制:</h4><p>已经在 <code>_int_free</code> 限制了 chunk 的最小 size.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">https://sourceware.org/git/?p=glibc.git;a=commitdiff;h=bf58906631af8fe0d57625988b1d003cc09ef01d;hp=04ec80e410b4efb0576a2ffd0d2f29ed1fdac451</div></pre></td></tr></table></figure>
+<h2 id="0x00-House-of-Mind"><a href="#0x00-House-of-Mind" class="headerlink" title="0x00 House of Mind"></a>0x00 House of Mind</h2><h4 id="参考链接-1"><a href="#参考链接-1" class="headerlink" title="参考链接"></a>参考链接</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">The Malloc Maleficarum (http://seclists.org/bugtraq/2005/Oct/118)</div><div class="line">https://sploitfun.wordpress.com/2015/03/04/heap-overflow-using-malloc-maleficarum/</div><div class="line">https://gbmaster.wordpress.com/2015/06/15/x86-exploitation-101-house-of-mind-undead-and-loving-it/</div><div class="line">http://phrack.org/issues/66/10.html</div></pre></td></tr></table></figure>
+<h4 id="导致-最终结果-1"><a href="#导致-最终结果-1" class="headerlink" title="导致(最终结果):"></a>导致(最终结果):</h4><p><strong>aa4bmo</strong></p>
+<h4 id="原理-触发原因"><a href="#原理-触发原因" class="headerlink" title="原理(触发原因):"></a>原理(触发原因):</h4><p>同一开始的 <strong>堆利用综述</strong> 做比较, 这里属于控制 <code>malloc_state</code> 分配区, 进而控制 <code>x</code> 但写入的 <code>y</code> 被限定为空闲 chunk 地址.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">#define HEAP_MAX_SIZE (1024*1024) /* must be a power of two */</div><div class="line"></div><div class="line">#define heap_for_ptr(ptr) \</div><div class="line"> ((heap_info *)((unsigned long)(ptr) &amp; ~(HEAP_MAX_SIZE-1)))</div><div class="line"></div><div class="line">/* check for chunk from non-main arena */</div><div class="line">#define chunk_non_main_arena(p) ((p)-&gt;size &amp; NON_MAIN_ARENA)</div><div class="line"></div><div class="line">#define arena_for_chunk(ptr) \</div><div class="line"> (chunk_non_main_arena(ptr) ? heap_for_ptr(ptr)-&gt;ar_ptr : &amp;main_arena)</div></pre></td></tr></table></figure>
+<p>chunk 所属分配区被伪造, 然后经过大量内存分配, 进而导致获取 <code>heap_info</code> 的过程被劫持, 得到的是我们伪造的 <code>heap_info</code>,进而伪造 <code>malloc_state</code>, 从而导致 <code>_int_free()</code> 传入的是伪造的 <code>malloc_state</code> , 最后利用 <code>_int_free()</code> 内的写操作, 实现任意地址写特定内容.</p>
+<h4 id="利用思路"><a href="#利用思路" class="headerlink" title="利用思路:"></a>利用思路:</h4><p>修改返回地址为 chunk 地址, chunk 内容为 shellcode</p>
+<h4 id="触发前提-限制-1"><a href="#触发前提-限制-1" class="headerlink" title="触发前提(限制):"></a>触发前提(限制):</h4><p>很显著的一个限制就是堆数据可执行</p>
+<p>详细的的限制条件在 <code>参考链接</code> 的文章指出, 具体的限制, 会在下面与 payload 对照指出, 这样可能更清楚.</p>
+<h4 id="保护机制-1"><a href="#保护机制-1" class="headerlink" title="保护机制:"></a>保护机制:</h4><p>堆数据可执行</p>
+<h4 id="利用实践"><a href="#利用实践" class="headerlink" title="利用实践"></a>利用实践</h4><p>下面是需要构造的内存布局, 当执行 <code>_int_free()</code> 会修改 <code>av-&gt;fastbins[0]</code> 地址为 chunk 的地址, 达到修改返回地址的目的, 这个返回地址是有限制的, 只能是被释放的 chunk 的地址, 需要进一步利用.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">STACK:   ^</div><div class="line">         |</div><div class="line">         |      0xRAND_VAL     av-&gt;system_mem (av + 1848)</div><div class="line">         |         ...</div><div class="line">         |      pushed EIP     av-&gt;fastbins[0]</div><div class="line">         |      pushed EBP     av-&gt;max_fast</div><div class="line">         |      0x00000000     av-&gt;mutex</div><div class="line">         |</div></pre></td></tr></table></figure>
+<p>具体测试程序在 <a href="http://github.com/jmpews/evilHEAP" target="_blank" rel="external">evilHEAP</a></p>
+<h2 id="0x00-House-of-Force"><a href="#0x00-House-of-Force" class="headerlink" title="0x00 House of Force"></a>0x00 House of Force</h2><h4 id="参考资料-1"><a href="#参考资料-1" class="headerlink" title="参考资料"></a>参考资料</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">https://sploitfun.wordpress.com/2015/03/04/heap-overflow-using-malloc-maleficarum/</div><div class="line">https://gbmaster.wordpress.com/2015/06/28/x86-exploitation-101-house-of-force-jedi-overflow/</div><div class="line">http://seclists.org/bugtraq/2005/Oct/118</div><div class="line">http://s0ngsari.tistory.com/entry/Heap-Exploit-House-of-Force</div><div class="line">`refs/heap/Bugtraq_The Malloc Maleficarum.pdf` 对一些关键语句做了标记</div></pre></td></tr></table></figure>
+<h4 id="导致-最终结果-2"><a href="#导致-最终结果-2" class="headerlink" title="导致(最终结果):"></a>导致(最终结果):</h4><p>控制 malloc 返回地址, 最终导致 <strong>aa4bmo</strong></p>
+<p><strong>原理(触发原因):</strong></p>
+<p>分配很大的内存, 导致恶意修改 top chunk 地址为关键信息地址.</p>
+<p>具体解释</p>
+<p>当 malloc 需要分配一块很大的内存时, 需要检查 top chunk 合适.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">static</span> <span class="keyword">void</span> *</div><div class="line">_int_malloc (mstate av, <span class="keyword">size_t</span> bytes)</div><div class="line">&#123;</div><div class="line">  INTERNAL_SIZE_T nb;               <span class="comment">/* normalized request size */</span></div><div class="line">  <span class="keyword">unsigned</span> <span class="keyword">int</span> idx;                 <span class="comment">/* associated bin index */</span></div><div class="line">  mbinptr bin;                      <span class="comment">/* associated bin */</span></div><div class="line"></div><div class="line">  mchunkptr victim;                 <span class="comment">/* inspected/selected chunk */</span></div><div class="line">  INTERNAL_SIZE_T size;             <span class="comment">/* its size */</span></div><div class="line">  <span class="keyword">int</span> victim_index;                 <span class="comment">/* its bin index */</span></div><div class="line"></div><div class="line">  mchunkptr remainder;              <span class="comment">/* remainder from a split */</span></div><div class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> remainder_size;     <span class="comment">/* its size */</span></div><div class="line"></div><div class="line">  <span class="keyword">unsigned</span> <span class="keyword">int</span> block;               <span class="comment">/* bit map traverser */</span></div><div class="line">  <span class="keyword">unsigned</span> <span class="keyword">int</span> bit;                 <span class="comment">/* bit map traverser */</span></div><div class="line">  <span class="keyword">unsigned</span> <span class="keyword">int</span> <span class="built_in">map</span>;                 <span class="comment">/* current word of binmap */</span></div><div class="line"></div><div class="line">  mchunkptr fwd;                    <span class="comment">/* misc temp for linking */</span></div><div class="line">  mchunkptr bck;                    <span class="comment">/* misc temp for linking */</span></div><div class="line"></div><div class="line">  <span class="keyword">const</span> <span class="keyword">char</span> *errstr = <span class="literal">NULL</span>;</div><div class="line"></div><div class="line">  <span class="comment">/*</span></div><div class="line">     Convert request size to internal form by adding SIZE_SZ bytes</div><div class="line">     overhead plus possibly more to obtain necessary alignment and/or</div><div class="line">     to obtain a size of at least MINSIZE, the smallest allocatable</div><div class="line">     size. Also, checked_request2size traps (returning 0) request sizes</div><div class="line">     that are so large that they wrap around zero when padded and</div><div class="line">     aligned.</div><div class="line">   */</div><div class="line"></div><div class="line">  checked_request2size (bytes, nb);</div><div class="line">  </div><div class="line">  [...]</div><div class="line">  </div><div class="line">  <span class="built_in">malloc</span>.c:<span class="number">3749</span>  </div><div class="line">  use_top:</div><div class="line">      victim = av-&gt;top;</div><div class="line">      size = chunksize (victim);</div><div class="line"></div><div class="line">      <span class="keyword">if</span> ((<span class="keyword">unsigned</span> <span class="keyword">long</span>) (size) &gt;= (<span class="keyword">unsigned</span> <span class="keyword">long</span>) (nb + MINSIZE))</div><div class="line">        &#123;</div><div class="line">          remainder_size = size - nb;</div><div class="line">          remainder = chunk_at_offset (victim, nb);</div><div class="line">          av-&gt;top = remainder;</div><div class="line">          set_head (victim, nb | PREV_INUSE |</div><div class="line">                    (av != &amp;main_arena ? NON_MAIN_ARENA : <span class="number">0</span>));</div><div class="line">          set_head (remainder, remainder_size | PREV_INUSE);</div><div class="line"></div><div class="line">          check_malloced_chunk (av, victim, nb);</div><div class="line">          <span class="keyword">void</span> *p = chunk2mem (victim);</div><div class="line">          alloc_perturb (p, bytes);</div><div class="line">          <span class="keyword">return</span> p;</div><div class="line">        &#125;</div></pre></td></tr></table></figure>
+<p>这里直接使用 chunk_at_offset 作为 top chunk 的地址.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">/* Treat space at ptr + offset as a chunk */</div><div class="line">#define chunk_at_offset(p, s)  ((mchunkptr) (((char *) (p)) + (s)))</div></pre></td></tr></table></figure>
+<p>所以假如可以任意指定 nb 值, 就可以 <code>任意</code> 控制 top chunk 的地址. 假如再通过 malloc 分配就可以获得需要控制的地址.</p>
+<h4 id="触发前提-限制-2"><a href="#触发前提-限制-2" class="headerlink" title="触发前提(限制):"></a>触发前提(限制):</h4><p>正常的逻辑应该是 当分配很大内存时在检查 top chunk 不够后, 主分配会调用 <code>brk()</code> 扩展 top chunk, 非主分配去会调用 <code>mmap()</code> 扩展 sub-heap.  这就需要控制 top chunk 的 size 假装 top chunk 所占空间很大, 以实现 memory overlap.</p>
+<p>另一个点, 在上面的提到 <code>任意</code> 控制 top chunk 的地址, 这个任意是有限制的, <code>nb</code> 只是相对于  <code>victim</code> 的任意地址, 所以按理来说还需要 leak heap address, 测试程序中直接给出.</p>
+<h4 id="保护机制-2"><a href="#保护机制-2" class="headerlink" title="保护机制:"></a>保护机制:</h4><p>如果开启 <code>RELRO</code> 无法修改 got 表.</p>
+<p>如果没有开启堆执行保护也可以修改返回栈中 EIP 的地址, 为 shellcode 地址, 前提是需要知道栈中 EIP 的位置.</p>
+<h4 id="利用实践-1"><a href="#利用实践-1" class="headerlink" title="利用实践"></a>利用实践</h4><p>具体测试程序在 <a href="http://github.com/jmpews/evilHEAP" target="_blank" rel="external">evilHEAP</a></p>
+<h2 id="0x00-unlink"><a href="#0x00-unlink" class="headerlink" title="0x00 unlink"></a>0x00 unlink</h2><h4 id="导致-最终结果-3"><a href="#导致-最终结果-3" class="headerlink" title="导致(最终结果):"></a>导致(最终结果):</h4><p><strong>实现任意内存地址写内容, 具体来说是借助 unlink 进行写, 我们只需要构造好数据即可.</strong></p>
+<h4 id="原理-触发原因-1"><a href="#原理-触发原因-1" class="headerlink" title="原理(触发原因):"></a>原理(触发原因):</h4><p>unlink 进行地址内容写操作没有进行检查. unlink 操作是从 chunk 双向环中摘除节点, 一般来说会在 malloc 时触发, 但是当需要 free 的 chunk 前后也有空闲 chunk, 会进行空闲 chunk 的合并, 这时需要 unlink 那个需要合并的空闲 chunk.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">#define unlink( P, BK, FD ) &#123;</div><div class="line">BK = P-&gt;bk;</div><div class="line">FD = P-&gt;fd;</div><div class="line">FD-&gt;bk = BK;</div><div class="line">BK-&gt;fd = FD;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>由于堆的内容是可以控制的, FD 和 BK 均为可以控制的, 由此导致任意地址写内容.</p>
+<h4 id="触发前提-限制-3"><a href="#触发前提-限制-3" class="headerlink" title="触发前提(限制):"></a>触发前提(限制):</h4><p>free 的 chunk 前后存在空闲 chunk, 也可以通过溢出值覆盖需要 free 的 chunk 的 <code>P</code> 位, 能控制需要 unlink 的 chunk 的内容.</p>
+<h4 id="保护机制-3"><a href="#保护机制-3" class="headerlink" title="保护机制:"></a>保护机制:</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">eglibc-2.19/malloc/malloc.c:1410</div><div class="line">if (__builtin_expect (FD-&gt;bk != P || BK-&gt;fd != P, 0))         \</div><div class="line">  malloc_printerr (check_action, &quot;corrupted double-linked list&quot;, P);      \</div></pre></td></tr></table></figure>
+<p>为什么这个判断可以防止 unlink 攻击, 首先很明确, <code>FD</code> 和 <code>BK</code>内容可控, 由于要求 <code>*(FD+24) == P &amp;&amp; *(BK+16) == P</code>, 对 <code>FD</code> 和 <code>BK</code> 进行了限定, 即使可以找到内存中某个地址 <code>(FD+24)</code> , 使 <code>*(FD+24) == P</code> 成立, 但是当进行 <code>FD-&gt;bk = BK; BK-&gt;fd = FD</code>, 也会出现写入的地址不是关键地址, 写入的内容也不是我们想要的, 因此 <code>任意地址写任意内容</code> 变为 <code>限制地址写限制内容</code>, 导致无法被利用, 更何况这还需要找一个泄露任意地址内容的方法.</p>
+<h4 id="绕过保护机制"><a href="#绕过保护机制" class="headerlink" title="绕过保护机制:"></a>绕过保护机制:</h4><p>下面思路是应该算是逆向保护机制, 之后会在下面提到另一个思路. 方法都是一样的, 只不过理解方式不一样.</p>
+<p>这个保护机制的绕过, 个人感觉不算是绕过, 应该是妥协了这个保护机制. </p>
+<p>下面讨论的 是针对 x64 而言, 字长 8 字节.</p>
+<p>既然保护机制要求 <code>FD-&gt;bk == P &amp;&amp; BK-&gt;fd == P</code>, 这里拿 <code>FD-&gt;bk ==P</code> 进行举例, 也就是说 <code>*(FD+24) == P</code>, 也就是 <code>*((P-&gt;fd) + 24) == P</code>, 所以我们需要一个已知地址的指针, 并且该指针指向 P, 下面作如下假设</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">mchunkptr * unlinks[<span class="number">1</span>] = &#123; P &#125;;</div><div class="line">P-&gt;fd = (<span class="keyword">void</span>*)(&amp;unlink[<span class="number">0</span>])<span class="number">-24</span></div><div class="line">P-&gt;bk = (<span class="keyword">void</span>*)(&amp;unlink[<span class="number">0</span>])<span class="number">-16</span></div></pre></td></tr></table></figure>
+<p>这样就可以通过保护机制. 但是我们找到这样一个指针只能算是 <strong>通过</strong> 了保护机制, 然而如何利用这个指针实现任意地址写的需要进一步利用, 将在下面介绍由此导致的利用</p>
+<h4 id="利用思路-1"><a href="#利用思路-1" class="headerlink" title="利用思路:"></a>利用思路:</h4><p>构造好 <code>P-&gt;bk</code> 和 <code>P-&gt;fd</code> 的值, 比如现在需要当调用 <code>free</code> 执行 <code>shellcode</code>, 这里需要的注意的因为 <code>free</code> 需要进行延迟绑定的, 所以 <code>.got.plt</code> 存放了解析后 <code>free</code> 函数的内存地址, 这也对应了 <code>*((P-&gt;fd) + 24) == P</code> 的 <code>*</code> 操作. 所以我们可以直接构造 <code>P-&gt;fd = &lt;free@plt&gt; + 24</code>, <code>P-&gt;bk = shellcode 地址</code>, 当进行 unlink 操作时, 触发 <code>FD-&gt;bk = BK</code>, 修改 <code>free@plt</code> 内容为 <code>shellcode</code> 地址, 同时为了避免 <code>BK-&gt;fd = FD</code> 的影响, 需要将 <code>shellcode</code> 的前面一小段字节设为 <code>nop</code>.</p>
+<h2 id="0x00-unlink-过保护机制"><a href="#0x00-unlink-过保护机制" class="headerlink" title="0x00 unlink(过保护机制)"></a>0x00 unlink(过保护机制)</h2><h4 id="导致-最终结果-4"><a href="#导致-最终结果-4" class="headerlink" title="导致(最终结果):"></a>导致(最终结果):</h4><p>实现任意内存地址写内容; 修改了 chunk 的起始地址, 写入操作无需借助原函数, 用户主动进行写操作 </p>
+<h4 id="原理-触发原因-2"><a href="#原理-触发原因-2" class="headerlink" title="原理(触发原因):"></a>原理(触发原因):</h4><p>构造一个特殊 chunk (craft a fake chunk) 和 内存覆盖(memory overlap)</p>
+<p>这里转化为 <code>void*</code> 可以思考下.</p>
+<p>在上面已经得到了如下的假设, 之前提到另一种理解方式, 其实需要找到指向 P 的已知地址的指针, 其实就是需要伪造一个 chunk, 这个 chunk 的 <code>chunk-&gt;bk == P</code>, 这个指针的地址就可以理解为 chunk 的地址, 其实就是 <code>(void*)(&amp;unlink[0])-24</code>, 所以上面的整个过程可以理解为伪造了两个 fake chunk, <code>(void*)(&amp;unlink[0])-24</code> 和 <code>(void*)(&amp;unlink[0])-18</code> 其实就是这两个 fake chunk 的起始地址.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">mchunkptr * unlinks[<span class="number">1</span>] = &#123; P &#125;;</div><div class="line">P-&gt;fd = (<span class="keyword">void</span>*)(&amp;unlink[<span class="number">0</span>])<span class="number">-24</span></div><div class="line">P-&gt;bk = (<span class="keyword">void</span>*)(&amp;unlink[<span class="number">0</span>])<span class="number">-16</span></div></pre></td></tr></table></figure>
+<p>之后进行 unlink 操作, 触发 <code>BK-&gt;fd = FD</code> 也就是</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">P-&gt;bk-&gt;fd = FD</div><div class="line">((<span class="keyword">void</span>*)(&amp;unlink[<span class="number">0</span>])<span class="number">-16</span>)-&gt;fd = FD</div><div class="line">*(<span class="keyword">void</span>*)(&amp;unlink[<span class="number">0</span>]) = FD</div><div class="line">unlink[<span class="number">0</span>] = FD</div><div class="line">unlink[<span class="number">0</span>] = (<span class="keyword">void</span>*)(&amp;unlink[<span class="number">0</span>])<span class="number">-24</span></div></pre></td></tr></table></figure>
+<p>经过 unlink 操作, <code>unlink[0]</code> 指向了 fake chunk, 但是这个 fake chunk 的地址是 <code>(void*)(&amp;unlink[0])-24</code> 很特殊, 也就是说这个 fake chunk 与 <code>unlink[0]</code> 重叠了, 贼恐怖. </p>
+<p>按照正常逻辑, 假如有个函数 <code>edit_chunk(mchunkptr *ptr, char *content)</code>, 第一次调用 <code>edit_chunk(unlink[0], &quot;A&quot;*24+free@plt)</code>, 如此一来 <code>unlink[0]</code> 就被覆盖为 <code>free@plt</code>. 当再次调用 <code>edit_chunk(unlink[0], shllcode_address)</code> , 因为此时 <code>unlink[0]</code> 已经被恶意覆盖, 所以直接造成修改 <code>free@plt</code> 为 shellcode 的地址.</p>
+<h4 id="触发前提-限制-4"><a href="#触发前提-限制-4" class="headerlink" title="触发前提(限制):"></a>触发前提(限制):</h4><ol>
+<li>能够触发 unlink</li>
+<li>一个指向 P 的已知地址的指针.</li>
+<li>可以重复修改 <code>unlink[0]</code> 指向的 chunk 的内容</li>
+</ol>
+<h4 id="保护机制-4"><a href="#保护机制-4" class="headerlink" title="保护机制:"></a>保护机制:</h4><p>这里主要是利用 unlink 修改了指向 chunk 的地址, 之后由用户进行主动写操作, 对于 unlink 的防护, 我们已经伪造了 fake chunk, 该防护失效.</p>
+<h4 id="利用思路-2"><a href="#利用思路-2" class="headerlink" title="利用思路:"></a>利用思路:</h4><p>见 <strong>原理(触发原因)**</strong></p>
+<h2 id="0x00-off-by-one"><a href="#0x00-off-by-one" class="headerlink" title="0x00 off-by-one"></a>0x00 off-by-one</h2><h2 id="Null-Byte-Off-by-one"><a href="#Null-Byte-Off-by-one" class="headerlink" title="Null Byte Off-by-one"></a>Null Byte Off-by-one</h2><h4 id="PlaidDB-pwn-550"><a href="#PlaidDB-pwn-550" class="headerlink" title="PlaidDB(pwn 550)"></a>PlaidDB(pwn 550)</h4>
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+
+
+
+
+
+
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2017/02/17/pwn/PWN之ELF以及so的加载和dlopen的过程/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            Newer
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2017/02/27/darwin/PWN之macho加载过程/" id="post_nav-older" class="next-content">
+            Older
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.jpeg" alt="jmpews's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        jmpews@email.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mailto: jmpews@gmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/" target="_self">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                Home
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    Archives
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2017/04/">April 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/03/">March 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/02/">February 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/01/">January 2017<span class="sidebar_archives-count">8</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/12/">December 2016<span class="sidebar_archives-count">3</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">chrome_reader_mode</i>
+                
+                Categories
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                <a class="sidebar_archives-link" href="/categories/darwin/">darwin<span class="sidebar_archives-count">6</span></a></li><li><a class="sidebar_archives-link" href="/categories/pwn/">pwn<span class="sidebar_archives-count">15</span></a></li><li><a class="sidebar_archives-link" href="/categories/test/">test<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="About">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                About
+            </a>
+        </li>
+        
+    
+        <li>
+            <a href="/tags" title="Tags">
+                
+                Tags
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+        <li>
+            <a href="/archives">
+                Number of articles
+                <span class="sidebar-badge">22</span>
+            </a>
+        </li>
+        
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+
+<!-- Theme Material -->
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+        <a href="https://twitter.com/jmpews" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-twitter.svg);">
+                <span class="visuallyhidden">Twitter</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+
+    <!-- Weibo -->
+    
+        <a href="https://weibo.com/winter1ife" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-weibo.svg);">
+                <span class="visuallyhidden">Weibo</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/jmpews" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-github.svg);">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;
+            <script type="text/javascript">
+                var fd = new Date();
+                document.write(fd.getFullYear());
+            </script>
+            &nbsp;Zz
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import File -->
+
+    <script src="/js/lazyload.min.js"></script>
+    <script src="/js/js.min.js"></script>
+
+
+
+    <script src="/js/nprogress.js"></script>
+
+
+<script type="text/javascript">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Window Load-->
+<script>
+    $(window).load(function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+</script>
+
+<!-- MathJax Load-->
+
+<script>
+    <!-- Offer LazyLoad -->
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    <!-- Start Queue -->
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+                </main>
+            </div>
+        </body>
+    
+</html>

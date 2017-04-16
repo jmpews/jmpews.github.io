@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.3.4 -->
+
+    <!-- Title -->
+    
+    <title>
+        
+            ELF解析 | 
+        
+        Zz
+    </title>
+
+    <!-- Meta & Info -->
+    <meta charset="utf-8">
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+    
+    
+    
+    
+    
+    
+
+    <meta http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0097A7">
+    <meta name="author" content="jmpews">
+    <meta name="description" content="pwn &amp; dev &amp; reverse">
+    <meta name="keywords" content="null,elf,pwn">
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" sizes="192x192" href="/img/favicon.png">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!--iOS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-title" content="Title">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="480">
+
+    <!-- Add to homescreen for Chrome on Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- Add to homescreen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Zz">
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="http://jmpews.github.com">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="ELF解析 | Zz">
+    <meta property="og:description" content="pwn &amp; dev &amp; reverse">
+    <meta property="og:article:tag" content="elf"> <meta property="og:article:tag" content="pwn"> 
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.en.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import CSS & jQuery -->
+    
+        <link rel="stylesheet" href="/css/material.min.css">
+        <link rel="stylesheet" href="/css/style.min.css">
+        <!-- Config CSS -->
+
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #607D8B !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #607D8B !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #607D8B !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-color: #F5F5F5;
+      }
+
+      /* blog_info bottom background */
+      #scheme-Paradox .material-layout .something-else .mdl-card__supporting-text{
+        background-color: #fff;
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/queue.js"></script>
+    
+
+    <!-- UC Browser Compatible -->
+    <script>
+        var agent = navigator.userAgent.toLowerCase();
+        if(agent.indexOf('ucbrowser')>0) {
+            document.write("<link rel=\"stylesheet\" href=\"/css/uc.css\">");
+            alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+        }
+    </script>
+
+    
+
+    
+
+
+    <!-- Bing Background -->
+    
+
+    <!-- Custom Head -->
+    
+</head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+    <!-- Left aligned menu below button -->
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#前言"><span class="post-toc-number">1.</span> <span class="post-toc-text">前言</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#参考资料"><span class="post-toc-number">1.0.1.</span> <span class="post-toc-text">参考资料</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#ELF-解析"><span class="post-toc-number">2.</span> <span class="post-toc-text">ELF 解析</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#ELF-Section"><span class="post-toc-number">3.</span> <span class="post-toc-text">ELF Section</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#got-plt-表"><span class="post-toc-number">3.0.1.</span> <span class="post-toc-text">.got.plt 表</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#plt-延迟绑定表-lt-程序员自我修养-gt-P201"><span class="post-toc-number">3.0.2.</span> <span class="post-toc-text">.plt 延迟绑定表(<程序员自我修养> P201)</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#dynsym-和-dynstr-symtab-和-strtab"><span class="post-toc-number">3.0.3.</span> <span class="post-toc-text">.dynsym 和 .dynstr (.symtab 和 .strtab)</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#rel-plt-重定位表"><span class="post-toc-number">3.0.4.</span> <span class="post-toc-text">.rel.plt 重定位表</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#gnu-hash-表"><span class="post-toc-number">3.0.5.</span> <span class="post-toc-text">.gnu.hash 表</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#调试命令相关"><span class="post-toc-number">3.0.6.</span> <span class="post-toc-text">调试命令相关</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#gdb-调试-glibc"><span class="post-toc-number">3.0.7.</span> <span class="post-toc-text">gdb 调试 glibc</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#参考链接"><span class="post-toc-number">3.0.8.</span> <span class="post-toc-text">参考链接</span></a></li></ol></li></ol></li></ol>
+
+        <!--
+        <li class="mdl-menu__item">
+            Some Action
+        </li>
+        -->
+    </ul>
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        
+            <!-- Random Thumbnail -->
+            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+            <script>
+    var randomNum = Math.floor(Math.random() * 19 + 1);
+
+    $('.post_thumbnail-random').attr('data-original', '/img/random/material-' + randomNum + '.png');
+    $('.post_thumbnail-random').addClass('lazy');
+</script>
+
+        
+    
+            <p class="article-headline-p">
+                ELF解析
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.jpeg" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>jmpews</strong>
+        <span>Dec 14, 2016</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/elf/">elf</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/pwn/">pwn</a>
+    </ul>
+    
+
+    <!-- Share -->
+    <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=ELF解析&url=http://jmpews.github.com//2016/12/14/pwn/PWN之ELF解析/index.html&pic=&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Weibo
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+        <a class="post_share-link" href="https://twitter.com/intent/tweet?text=ELF解析&url=http://jmpews.github.com//2016/12/14/pwn/PWN之ELF解析/index.html&via=jmpews" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Twitter
+            </li>
+        </a>
+    
+
+    <!-- Share Facebook -->
+    
+        <a class="post_share-link" href="https://www.facebook.com/sharer/sharer.php?u=http://jmpews.github.com//2016/12/14/pwn/PWN之ELF解析/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Facebook
+            </li>
+        </a>
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://jmpews.github.com//2016/12/14/pwn/PWN之ELF解析/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本文对于 ELF 的结构的解释知识更偏于实践, 需要对 ELF 的结构知识有一定的了解.</p>
+<h4 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&lt;程序员自我修养&gt;</div><div class="line">`refs/elf/*`</div></pre></td></tr></table></figure>
+<h2 id="ELF-解析"><a href="#ELF-解析" class="headerlink" title="ELF 解析"></a>ELF 解析</h2><p>在解释ELF结构时以下面源码为例子:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">#include &lt;stdio.h&gt;</div><div class="line"></div><div class="line">int helloWorld()&#123;</div><div class="line">    printf(&quot;HelloWorld, %d\n&quot;, 1);</div><div class="line">    return 0;</div><div class="line">&#125;</div><div class="line"></div><div class="line">int main()&#123;</div><div class="line">    helloWorld();</div><div class="line">    printf(&quot;HelloWorld, %d\n&quot;, 1);</div><div class="line">    return 0;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>查看ELF的 <code>section</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">➜  elf readelf -S test</div><div class="line">There are 30 section headers, starting at offset 0x1154:</div><div class="line"></div><div class="line">Section Headers:</div><div class="line">  [Nr] Name              Type            Addr     Off    Size   ES Flg Lk Inf Al</div><div class="line">  [ 0]                   NULL            00000000 000000 000000 00      0   0  0</div><div class="line">  [ 1] .interp           PROGBITS        08048154 000154 000013 00   A  0   0  1</div><div class="line">  [ 2] .note.ABI-tag     NOTE            08048168 000168 000020 00   A  0   0  4</div><div class="line">  [ 3] .note.gnu.build-i NOTE            08048188 000188 000024 00   A  0   0  4</div><div class="line">  [ 4] .gnu.hash         GNU_HASH        080481ac 0001ac 000020 04   A  5   0  4</div><div class="line">  [ 5] .dynsym           DYNSYM          080481cc 0001cc 000050 10   A  6   1  4</div><div class="line">  [ 6] .dynstr           STRTAB          0804821c 00021c 00004c 00   A  0   0  1</div><div class="line">  [ 7] .gnu.version      VERSYM          08048268 000268 00000a 02   A  5   0  2</div><div class="line">  [ 8] .gnu.version_r    VERNEED         08048274 000274 000020 00   A  6   1  4</div><div class="line">  [ 9] .rel.dyn          REL             08048294 000294 000008 08   A  5   0  4</div><div class="line">  [10] .rel.plt          REL             0804829c 00029c 000018 08   A  5  12  4</div><div class="line">  [11] .init             PROGBITS        080482b4 0002b4 000023 00  AX  0   0  4</div><div class="line">  [12] .plt              PROGBITS        080482e0 0002e0 000040 04  AX  0   0 16</div><div class="line">  [13] .text             PROGBITS        08048320 000320 0001a2 00  AX  0   0 16</div><div class="line">  [14] .fini             PROGBITS        080484c4 0004c4 000014 00  AX  0   0  4</div><div class="line">  [15] .rodata           PROGBITS        080484d8 0004d8 000018 00   A  0   0  4</div><div class="line">  [16] .eh_frame_hdr     PROGBITS        080484f0 0004f0 000034 00   A  0   0  4</div><div class="line">  [17] .eh_frame         PROGBITS        08048524 000524 0000d0 00   A  0   0  4</div><div class="line">  [18] .init_array       INIT_ARRAY      08049f08 000f08 000004 00  WA  0   0  4</div><div class="line">  [19] .fini_array       FINI_ARRAY      08049f0c 000f0c 000004 00  WA  0   0  4</div><div class="line">  [20] .jcr              PROGBITS        08049f10 000f10 000004 00  WA  0   0  4</div><div class="line">  [21] .dynamic          DYNAMIC         08049f14 000f14 0000e8 08  WA  6   0  4</div><div class="line">  [22] .got              PROGBITS        08049ffc 000ffc 000004 04  WA  0   0  4</div><div class="line">  [23] .got.plt          PROGBITS        0804a000 001000 000018 04  WA  0   0  4</div><div class="line">  [24] .data             PROGBITS        0804a018 001018 000008 00  WA  0   0  4</div><div class="line">  [25] .bss              NOBITS          0804a020 001020 000004 00  WA  0   0  1</div><div class="line">  [26] .comment          PROGBITS        00000000 001020 00002b 01  MS  0   0  1</div><div class="line">  [27] .shstrtab         STRTAB          00000000 00104b 000106 00      0   0  1</div><div class="line">  [28] .symtab           SYMTAB          00000000 001604 000440 10     29  45  4</div><div class="line">  [29] .strtab           STRTAB          00000000 001a44 00025c 00      0   0  1</div><div class="line">Key to Flags:</div><div class="line">  W (write), A (alloc), X (execute), M (merge), S (strings)</div><div class="line">  I (info), L (link order), G (group), T (TLS), E (exclude), x (unknown)</div><div class="line">  O (extra OS processing required) o (OS specific), p (processor specific)</div></pre></td></tr></table></figure>
+<p>下面对几个 <code>section</code> 具体解释. 这里有几点需要注意的是, 这里大部分讨论的是动态链接相关的 <code>section</code>, 很多是采用 <code>gdb</code> 查看相关内存, 这属于已经将 <code>ELF</code> 文件加载进入内存, 当加载 <code>ELF</code> 进入内存时, 属于以 <code>Segment</code> 的形式进行加载, 部分 <code>section</code> 并没有被加载. 具体文件内偏移与内存虚拟地址的对应可以参考, <code>readelf -l hello</code> 结果.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">➜  elf readelf -l hello</div><div class="line"></div><div class="line">Elf file type is EXEC (Executable file)</div><div class="line">Entry point 0x8048350</div><div class="line">There are 9 program headers, starting at offset 52</div><div class="line"></div><div class="line">Program Headers:</div><div class="line">  Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align</div><div class="line">  PHDR           0x000034 0x08048034 0x08048034 0x00120 0x00120 R E 0x4</div><div class="line">  INTERP         0x000154 0x08048154 0x08048154 0x00013 0x00013 R   0x1</div><div class="line">      [Requesting program interpreter: /lib/ld-linux.so.2]</div><div class="line">  LOAD           0x000000 0x08048000 0x08048000 0x0062c 0x0062c R E 0x1000</div><div class="line">  LOAD           0x000f08 0x08049f08 0x08049f08 0x0011c 0x00120 RW  0x1000</div><div class="line">  DYNAMIC        0x000f14 0x08049f14 0x08049f14 0x000e8 0x000e8 RW  0x4</div><div class="line">  NOTE           0x000168 0x08048168 0x08048168 0x00044 0x00044 R   0x4</div><div class="line">  GNU_EH_FRAME   0x000554 0x08048554 0x08048554 0x0002c 0x0002c R   0x4</div><div class="line">  GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RW  0x10</div><div class="line">  GNU_RELRO      0x000f08 0x08049f08 0x08049f08 0x000f8 0x000f8 R   0x1</div><div class="line"></div><div class="line"> Section to Segment mapping:</div><div class="line">  Segment Sections...</div><div class="line">   00</div><div class="line">   01     .interp</div><div class="line">   02     .interp .note.ABI-tag .note.gnu.build-id .gnu.hash .dynsym .dynstr .gnu.version .gnu.version_r .rel.dyn .rel.plt .init .plt .text .fini .rodata .eh_frame_hdr .eh_frame</div><div class="line">   03     .init_array .fini_array .jcr .dynamic .got .got.plt .data .bss</div><div class="line">   04     .dynamic</div><div class="line">   05     .note.ABI-tag .note.gnu.build-id</div><div class="line">   06     .eh_frame_hdr</div><div class="line">   07</div><div class="line">   08     .init_array .fini_array .jcr .dynamic .got</div></pre></td></tr></table></figure>
+<h2 id="ELF-Section"><a href="#ELF-Section" class="headerlink" title="ELF Section"></a>ELF Section</h2><h4 id="got-plt-表"><a href="#got-plt-表" class="headerlink" title=".got.plt 表"></a><code>.got.plt</code> 表</h4><blockquote>
+<p><code>ELF</code> 将 <code>GOT</code> 拆分为两个表, <code>.got</code> 和 <code>.got.plt</code>. 其中 <code>.got</code> 用来保存全局变量引用的地址, <code>.got.plt</code> 用来保存函数引用的地址, 对于外部函数的引用全部放在 <code>.got.plt</code> 中. <code>&lt;程序员的自我修养&gt; P201</code></p>
+</blockquote>
+<p><strong>结构</strong></p>
+<p>前三项是固定的, 第一项是 <code>.dynamic</code> 的地址, 第二项是 <code>link_map</code> 的地址, 第三项是 <code>_dl_runtime_resolve()</code> 的地址, 之后就是每个外部函数的引用的数据结构 <code>Elf32_Rel</code>, 下面是对应 <code>eglibc-2.19/elf/elf.h</code> 的具体结构.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">typedef struct</div><div class="line">&#123;</div><div class="line">  Elf32_Addr    r_offset;       /* Address */</div><div class="line">  Elf32_Word    r_info;         /* Relocation type and symbol index */</div><div class="line">&#125; Elf32_Rel</div></pre></td></tr></table></figure>
+<p>这里额外提一点, <code>link_map</code> 是一个很重要的数据结构, 记录了所有加载的动态链接库.</p>
+<p><strong>未执行前<code>.got.plt</code>结构</strong></p>
+<p><code>.got.plt</code> 中对应的前四项</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">#对应.got.plt</div><div class="line">gdb-peda$ x/4w 0x0804a000</div><div class="line">0x804a000:  0x08049f14  0x00000000  0x00000000  0x080482f6</div></pre></td></tr></table></figure>
+<p><code>.plt(延迟绑定)</code> 中对应的实现</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">gdb-peda$ x/4i 0x80482f0 #对应.plt</div><div class="line">   0x80482f0 &lt;printf@plt&gt;:    jmp    DWORD PTR ds:0x804a00c</div><div class="line">   0x80482f6 &lt;printf@plt+6&gt;:  push   0x0</div><div class="line">   0x80482fb &lt;printf@plt+11&gt;: jmp    0x80482e0</div></pre></td></tr></table></figure>
+<p>可以看到 <code>.dynamic</code> 对应的地址是 <code>0x08049f14</code>, 后两项由于未初始化为空, <code>0x080482f6</code> 为第一个外部函数的引用地址, 此时没有初始化, 会跳转到 <code>.plt</code> 表进行初始化, 初始化后会修改 <code>0x080482f6</code> 为 <code>printf</code> 的地址. (至于为什么是 <code>0x080482f6</code>, 而不是 <code>0x80482f0</code>, 因为没有初始化, 需要从 <code>0x80482f6</code> 地址开始进行初始化, 当初始化完毕后才会从 <code>0x80482f0</code> 直接跳转到 <code>printf</code> 地址继续执行)</p>
+<p><strong>初始化完毕 <code>.got.plt</code> 结构</strong></p>
+<p><code>.got.plt</code> 中对应的前四项</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">#.got.plt</div><div class="line">gdb-peda$ x/4w 0x0804a000</div><div class="line">0x804a000:  0x08049f14  0xb7fff938  0xb7ff24b0  0xb7e71410</div></pre></td></tr></table></figure>
+<p>此时 <code>.got.plt</code> 中的 <code>printf@plt</code> 已经被修改为查找到的 <code>printf</code> 内存地址.</p>
+<h4 id="plt-延迟绑定表-lt-程序员自我修养-gt-P201"><a href="#plt-延迟绑定表-lt-程序员自我修养-gt-P201" class="headerlink" title=".plt 延迟绑定表(&lt;程序员自我修养&gt; P201)"></a><code>.plt</code> 延迟绑定表(<code>&lt;程序员自我修养&gt; P201</code>)</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">gdb-peda$ disassemble helloWorld</div><div class="line">Dump of assembler code for function helloWorld:</div><div class="line">   0x0804841d &lt;+0&gt;:     push   ebp</div><div class="line">   0x0804841e &lt;+1&gt;:     mov    ebp,esp</div><div class="line">   0x08048420 &lt;+3&gt;:     sub    esp,0x18</div><div class="line">   0x08048423 &lt;+6&gt;:     mov    DWORD PTR [esp+0x4],0x1</div><div class="line">   0x0804842b &lt;+14&gt;:    mov    DWORD PTR [esp],0x80484e0</div><div class="line">   0x08048432 &lt;+21&gt;:    call   0x80482f0 &lt;printf@plt&gt;</div><div class="line">   0x08048437 &lt;+26&gt;:    mov    eax,0x0</div><div class="line">   0x0804843c &lt;+31&gt;:    leave</div><div class="line">   0x0804843d &lt;+32&gt;:    ret</div><div class="line">End of assembler dump.</div></pre></td></tr></table></figure>
+<p>负责延迟加载, 当第一次调用时, 会用 <code>_dl_runtime_resolve()</code> 去初始化 <code>.got.plt</code> 中的函数引用地址.</p>
+<p>这里以 <code>printf@plt</code> 对应的实现为例子.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">gdb-peda$ x/4i 0x80482f0</div><div class="line">   0x80482f0 &lt;printf@plt&gt;:  jmp    DWORD PTR ds:0x804a00c</div><div class="line">   0x80482f6 &lt;printf@plt+6&gt;:    push   0x0</div><div class="line">   0x80482fb &lt;printf@plt+11&gt;:   jmp    0x80482e0</div></pre></td></tr></table></figure></p>
+<h4 id="dynsym-和-dynstr-symtab-和-strtab"><a href="#dynsym-和-dynstr-symtab-和-strtab" class="headerlink" title=".dynsym 和 .dynstr (.symtab 和 .strtab)"></a><code>.dynsym</code> 和 <code>.dynstr</code> (<code>.symtab</code> 和 <code>.strtab</code>)</h4><p><code>.dynsym</code> 中保存的是 <code>Elf32_Sym</code> 结构, 下面对应的是 <code>eglibc-2.19/elf/elf.h</code> 具体结构.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">typedef struct</div><div class="line">&#123;</div><div class="line">  Elf32_Word    st_name;        /* Symbol name (string tbl index) */</div><div class="line">  Elf32_Addr    st_value;       /* Symbol value */</div><div class="line">  Elf32_Word    st_size;        /* Symbol size */</div><div class="line">  unsigned char st_info;        /* Symbol type and binding */</div><div class="line">  unsigned char st_other;       /* Symbol visibility */</div><div class="line">  Elf32_Section st_shndx;       /* Section index */</div><div class="line">&#125; Elf32_Sym</div></pre></td></tr></table></figure>
+<p><code>.dynstr</code> 保存的字符串, 具体存放格式 <code>&lt;Tool Interface Standard (TIS) Executable and Linking Format (ELF)&gt; 中 Book I: String Table</code> 或者 <code>&lt;程序员自我修养&gt; P80</code></p>
+<p>这里举一个例子实践, 通过 <code>readelf --dyn-syms test</code> 的结果与内存中 <code>Elf32_Sym</code> 对比观察 <code>_IO_stdin_used</code>.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">#下面需要用到这些计算结果</div><div class="line">#sizeof(Elf32_Sym) == 0x10</div><div class="line">#.dynstr == 0x00021c</div><div class="line">#.dynsym == 0x0001cc</div><div class="line">➜  elf python -c &apos;print int(5 * 0x10)&apos;;python -c &apos;print hex(0x00021c+0xb)&apos;</div><div class="line">80</div><div class="line">0x227</div><div class="line">➜  elf readelf --dyn-syms test</div><div class="line"></div><div class="line">Symbol table &apos;.dynsym&apos; contains 5 entries:</div><div class="line">   Num:    Value  Size Type    Bind   Vis      Ndx Name</div><div class="line">     0: 00000000     0 NOTYPE  LOCAL  DEFAULT  UND</div><div class="line">     1: 00000000     0 FUNC    GLOBAL DEFAULT  UND printf@GLIBC_2.0 (2)</div><div class="line">     2: 00000000     0 NOTYPE  WEAK   DEFAULT  UND __gmon_start__</div><div class="line">     3: 00000000     0 FUNC    GLOBAL DEFAULT  UND __libc_start_main@GLIBC_2.0 (2)</div><div class="line">     4: 080484fc     4 OBJECT  GLOBAL DEFAULT   15 _IO_stdin_used</div><div class="line">#从 0x0000020c 开始对应的是 _IO_stdin_used 的 Elf32_Sym.</div><div class="line">➜  elf hexdump -s 0x0001cc -n 80 -C test</div><div class="line">000001cc  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|</div><div class="line">000001dc  1a 00 00 00 00 00 00 00  00 00 00 00 12 00 00 00  |................|</div><div class="line">000001ec  33 00 00 00 00 00 00 00  00 00 00 00 20 00 00 00  |3........... ...|</div><div class="line">000001fc  21 00 00 00 00 00 00 00  00 00 00 00 12 00 00 00  |!...............|</div><div class="line">0000020c  0b 00 00 00 fc 84 04 08  04 00 00 00 11 00 0f 00  |................|</div><div class="line">0000021c</div><div class="line">#从 _IO_stdin_used 的 Elf32_Sym 结构可以发现对应的 .dynstr 的索引为 0xb.</div><div class="line">➜  elf hexdump -s 0x227 -n 15 -C test #根据 .dynsym 中的 Elf32_Sym 结构查找到对应字符串,</div><div class="line">00000227  5f 49 4f 5f 73 74 64 69  6e 5f 75 73 65 64 00     |_IO_stdin_used.|</div><div class="line">00000236</div></pre></td></tr></table></figure>
+<h4 id="rel-plt-重定位表"><a href="#rel-plt-重定位表" class="headerlink" title=".rel.plt 重定位表"></a><code>.rel.plt</code> 重定位表</h4><p>查看需要重定位的函数引用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">➜  elf readelf -r test</div><div class="line"></div><div class="line">Relocation section &apos;.rel.dyn&apos; at offset 0x294 contains 1 entries:</div><div class="line"> Offset     Info    Type            Sym.Value  Sym. Name</div><div class="line">08049ffc  00000206 R_386_GLOB_DAT    00000000   __gmon_start__</div><div class="line"></div><div class="line">Relocation section &apos;.rel.plt&apos; at offset 0x29c contains 3 entries:</div><div class="line"> Offset     Info    Type            Sym.Value  Sym. Name</div><div class="line">0804a00c  00000107 R_386_JUMP_SLOT   00000000   printf</div><div class="line">0804a010  00000207 R_386_JUMP_SLOT   00000000   __gmon_start__</div><div class="line">0804a014  00000307 R_386_JUMP_SLOT   00000000   __libc_start_main</div></pre></td></tr></table></figure>
+<p>这里通过一个例子实践. 查看 <code>printf</code> 对应的 <code>Elf32_Rel</code> 结构, <code>0x804a00c</code> 重定位的入口偏移(未初始化前存放的是对应 <code>.plt</code> 的初始化代码, 初始化后存放 <code>printf</code> 内存地址), <code>0x107</code> 低8位表示重定位入口类型为 <code>R_386_JUMP_SLOT(7)</code>, 高24位表示在 <code>.dynsym</code> 中的下标, 这里为 <code>0x10</code>.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">#.rel.plt == 0x0804829c</div><div class="line">gdb-peda$ x/6w 0x0804829c</div><div class="line">0x804829c:  0x804a00c   0x107   0x804a010   0x207</div><div class="line">0x80482ac:  0x804a014   0x307</div><div class="line">gdb-peda$ x/w 0x804a00c</div><div class="line">0x804a00c &lt;printf@got.plt&gt;: 0x80482f6</div><div class="line">➜  elf readelf -r test</div><div class="line"></div><div class="line">Relocation section &apos;.rel.dyn&apos; at offset 0x294 contains 1 entries:</div><div class="line"> Offset     Info    Type            Sym.Value  Sym. Name</div><div class="line">08049ffc  00000206 R_386_GLOB_DAT    00000000   __gmon_start__</div><div class="line"></div><div class="line">Relocation section &apos;.rel.plt&apos; at offset 0x29c contains 3 entries:</div><div class="line"> Offset     Info    Type            Sym.Value  Sym. Name</div><div class="line">0804a00c  00000107 R_386_JUMP_SLOT   00000000   printf</div><div class="line">0804a010  00000207 R_386_JUMP_SLOT   00000000   __gmon_start__</div><div class="line">0804a014  00000307 R_386_JUMP_SLOT   00000000   __libc_start_main</div><div class="line"></div><div class="line">#这里可以发现, printf@GLIBC_2.0 (2) 对应 Num 为 1, 正好对应之前的 0x10</div><div class="line">➜  elf readelf --dyn-syms test</div><div class="line"></div><div class="line">Symbol table &apos;.dynsym&apos; contains 5 entries:</div><div class="line">   Num:    Value  Size Type    Bind   Vis      Ndx Name</div><div class="line">     0: 00000000     0 NOTYPE  LOCAL  DEFAULT  UND</div><div class="line">     1: 00000000     0 FUNC    GLOBAL DEFAULT  UND printf@GLIBC_2.0 (2)</div><div class="line">     2: 00000000     0 NOTYPE  WEAK   DEFAULT  UND __gmon_start__</div><div class="line">     3: 00000000     0 FUNC    GLOBAL DEFAULT  UND __libc_start_main@GLIBC_2.0 (2)</div><div class="line">     4: 080484fc     4 OBJECT  GLOBAL DEFAULT   15 _IO_stdin_used</div></pre></td></tr></table></figure>
+<h4 id="gnu-hash-表"><a href="#gnu-hash-表" class="headerlink" title=".gnu.hash 表"></a><code>.gnu.hash</code> 表</h4><p>参考链接:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">#大致意思就是目前默认生成新的hash表, 也就是.gnu.hash</div><div class="line">http://pank.org/blog/2007/10/gcc-hashstylegnu.html</div><div class="line">#实例代码更接近实际</div><div class="line">https://sourceware.org/ml/binutils/2006-10/msg00377.html</div><div class="line">https://www.sourceware.org/ml/binutils/2006-06/msg00418.html</div><div class="line">#最为详细</div><div class="line">https://blogs.oracle.com/ali/entry/gnu_hash_elf_sections</div></pre></td></tr></table></figure>
+<p><code>.gnu.hash</code> 的作用, 主要是利用 <code>Bloom Filter</code>, 在常量时间内判断, 字符是否存在, 以及对应 <code>.dynsym</code> 的位置. 使用 <code>gcc -g -o hello -Wl,--hash-style=sysv(gnu) hello.c</code> 可以产生旧版本的 <code>hash</code> 表.</p>
+<p><code>.gnu.hash</code> 结构说明:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">Header</div><div class="line">    An array of (4) 32-bit words providing section parameters:</div><div class="line">    nbuckets</div><div class="line">        The number of hash buckets</div><div class="line">    symndx</div><div class="line">        The dynamic symbol table has dynsymcount symbols. symndx is the index of the first symbol in the dynamic symbol table that is to be accessible via the hash table. This implies that there are (dynsymcount - symndx) symbols accessible via the hash table.</div><div class="line">        第一个需要hash的symbol</div><div class="line">    maskwords</div><div class="line">        The number of ELFCLASS sized words in the Bloom filter portion of the hash table section. This value must be non-zero, and must be a power of 2 as explained below.</div><div class="line">        Note that a value of 0 could be interpreted to mean that no Bloom filter is present in the hash section. However, the GNU linkers do not do this — the GNU hash section always includes at least 1 mask word.</div><div class="line">        Bloom filter中掩码个数, 每个掩码可以为32位大小, 或者64位大小</div><div class="line">    shift2</div><div class="line">        A shift count used by the Bloom filter.</div><div class="line">        另一个hash函数</div><div class="line">Bloom Filter(32位大小)</div><div class="line">    GNU_HASH sections contain a Bloom filter. This filter is used to rapidly reject attempts to look up symbols that do not exist in the object. The Bloom filter words are 32-bit for ELFCLASS32 objects, and 64-bit for ELFCLASS64.</div><div class="line">    Bloom filter中的掩码</div><div class="line">Hash Buckets(32位大小)</div><div class="line">    An array of nbuckets 32-bit hash buckets</div><div class="line">    hash 桶</div><div class="line">Hash Values(32位大小)</div><div class="line">    An array of (dynsymcount - symndx) 32-bit hash chain values, one per symbol from the second part of the dynamic symbol table.</div><div class="line">    hash 值, 需要计算, 下文会有具体计算方法</div></pre></td></tr></table></figure>
+<p>查看 <code>.gnu.hash</code> 结构, 使用 <code>hexdump</code> 或者 <code>gdb</code> 都可以查看.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">➜  elf hexdump -s 0x0001ac -n 32 -e &apos;4/4 &quot;%04X &quot; &quot; | &quot;&apos; -e &apos;16/1 &quot;%_p&quot; &quot;\n&quot;&apos; test</div><div class="line">0002 0004 0001 0005 | ................</div><div class="line">20002000 0000 0004 C0E34BAD | . . .........K..</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">gdb-peda$ x/8w 0x080481ac</div><div class="line">0x80481ac:      0x2     0x5     0x1     0x5</div><div class="line">0x80481bc:      0x20002000      0x0     0x5     0xc0e34bad</div></pre></td></tr></table></figure>
+<p>查看动态符号表</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">➜  elf readelf --dyn-syms test</div><div class="line"></div><div class="line">Symbol table &apos;.dynsym&apos; contains 6 entries:</div><div class="line">   Num:    Value  Size Type    Bind   Vis      Ndx Name</div><div class="line">     0: 00000000     0 NOTYPE  LOCAL  DEFAULT  UND</div><div class="line">     1: 00000000     0 FUNC    GLOBAL DEFAULT  UND malloc@GLIBC_2.0 (2)</div><div class="line">     2: 00000000     0 FUNC    GLOBAL DEFAULT  UND puts@GLIBC_2.0 (2)</div><div class="line">     3: 00000000     0 NOTYPE  WEAK   DEFAULT  UND __gmon_start__</div><div class="line">     4: 00000000     0 FUNC    GLOBAL DEFAULT  UND __libc_start_main@GLIBC_2.0 (2)</div><div class="line">     5: 0804851c     4 OBJECT  GLOBAL DEFAULT   15 _IO_stdin_used</div></pre></td></tr></table></figure>
+<p>对应说明, <code>nbuckets == 2</code> 表明有两个 <code>dynsym</code> 需要hash, <code>symndx == 5</code> 表明第1个需要hash的<code>dymsym</code> 的 <code>num == 4</code>, <code>maskwords == 1</code> 表明有 <code>1</code> 个 <code>Bloom filter</code> 掩码, <code>shift2 == 5</code> 表明另一个 <code>hash</code> 函数为 <code>&gt;&gt;5</code> (查看 <code>Bloom filter</code> 算法结构定义, 这里使用了<code>k = 2</code> 个 <code>hash</code> 函数, 同时设置 <code>hash</code> 值对应位置为 <code>1</code>, 防止误判)</p>
+<p><code>20002000</code> 即为掩码, 初始为0, <code>bitmask</code> 怎么发生修改的? (这里其实就是 <code>hash</code> 算法中利用桶方法解决 <code>hash</code> 冲突的原理)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">本段内容来自 https://blogs.oracle.com/ali/entry/gnu_hash_elf_sections</div><div class="line">The hash function used by the GNU hash has this property. This fact is leveraged to produce both hash functions required by the Bloom filter from the single hash function described above:</div><div class="line">两个hash函数</div><div class="line">    H1 = dl_new_hash(name);</div><div class="line">    H2 = H1 &gt;&gt; shift2;</div><div class="line">As discussed above, the link editor determines how many mask words to use (maskwords) and the amount by which the first hash result is right shifted to produce the second (shift2). The more mask words used, the larger the hash section, but the lower the rate of false positives. I was told in private email that the GNU linker primarily derives shift2 from the base 2 log of the number of symbols entered into the hash table (dynsymcount - symndx), with a minimum value of 5 for ELFCLASS32, and 6 for ELFCLASS64. These values are explicitly recorded in the hash section in order to give the link editor the flexibility to change them in the future should better heuristics emerge.</div><div class="line">The Bloom filter mask sets one bit for each of the two hash values. Based on the Bloom filter reference, the word containing each bit, and the bit to set would be calculated as:</div><div class="line">这是根据Bloom filter定义给出的参考, 但实际gnu用了一个此算法的修改版. 这里C是上面提到的 Bloom filter 掩码大小. 这里是32位</div><div class="line">    N1 = ((H1 / C) % maskwords);</div><div class="line">    N2 = ((H2 / C) % maskwords);</div><div class="line"></div><div class="line">    B1 = H1 % C;</div><div class="line">    B2 = H2 % C;</div><div class="line">To populate the bits when building the filter:</div><div class="line">    bloom[N1] |= (1 &lt;&lt; B1);</div><div class="line">    bloom[N2] |= (1 &lt;&lt; B2);</div><div class="line">and to later test the filter:</div><div class="line">    (bloom[N1] &amp; (1 &lt;&lt; B1)) &amp;&amp; (bloom[N2] &amp; (1 &lt;&lt; B2))</div><div class="line"></div><div class="line">Therefore, in the GNU hash, the single mask word is actually calculated as:</div><div class="line">因此gnu的算法描述如下, 总体类似.</div><div class="line">    N = ((H1 / C) % maskwords);</div><div class="line">The two bits set in the Bloom filter mask word N are:</div><div class="line">    BITMASK = (1 &lt;&lt; (H1 % C)) | (1 &lt;&lt; (H2 % C));</div><div class="line">The link-editor sets these bits as</div><div class="line">    bloom[N] |= BITMASK;</div><div class="line">And the test used by the runtime linker is:</div><div class="line">    (bloom[N] &amp; BITMASK) == BITMASK;</div></pre></td></tr></table></figure>
+<p><strong>这里进行一个实例的计算:</strong></p>
+<p>使用这段代码计算 <code>_IO_stdin_used</code> 的hash值.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">#include &lt;stdio.h&gt;</div><div class="line">#include &lt;libelf/libelf.h&gt;</div><div class="line"></div><div class="line">uint32_t</div><div class="line">dl_new_hash (const char *s)</div><div class="line">&#123;</div><div class="line">        uint32_t h = 5381;</div><div class="line"></div><div class="line">        for (unsigned char c = *s; c != &apos;\0&apos;; c = *++s)</div><div class="line">                h = h * 33 + c;</div><div class="line"></div><div class="line">        return h;</div><div class="line">&#125;</div><div class="line">int main(int argc, char** argv) &#123;</div><div class="line">   printf(&quot;%zu&quot;, dl_new_hash(argv[1]));</div><div class="line">   return 0;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>对应 <code>.gnu.hash</code> 结构</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">gdb-peda$ x/8w 0x080481ac</div><div class="line">0x80481ac:      0x2     0x5     0x1     0x5</div><div class="line">0x80481bc:      0x20002000      0x0     0x5     0xc0e34bad</div></pre></td></tr></table></figure>
+<p>下面为计算过程:</p>
+<p>先计算掩码(<code>bitmask</code>).</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">➜  elf ./a.out _IO_stdin_used</div><div class="line">3236121517</div><div class="line">➜  elf python -c &apos;print int(3236121517%32)&apos; #Hash1算法, 对应B1</div><div class="line">13</div><div class="line">➜  elf python -c &apos;print int((3236121517&gt;&gt;5)%32)&apos; #Hash2算法, 对应B2</div><div class="line">29</div><div class="line">所以:</div><div class="line">    N = 0</div><div class="line">    BITMASK = (1 &lt;&lt; 13)) | (1 &lt;&lt; 29)) = 0x20002000</div><div class="line">    bloom[N] |= BITMASK</div><div class="line">所以:</div><div class="line">    bloom[0] = 0x20002000</div></pre></td></tr></table></figure>
+<p><code>0x0    0x5</code> 是 <code>Hash Buckets</code>, 关于hash中如何利用桶解决hash冲突 <code>http://www.cnblogs.com/xiekeli/archive/2012/01/16/2323391.html</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">Hash Buckets</div><div class="line"></div><div class="line">Following the Bloom filter are nbuckets 32-bit words. Each word N in the array contains the lowest index into the dynamic symbol table for which:</div><div class="line">    (dl_new_hash(symname) % nbuckets) == N</div><div class="line">Since the dynamic symbol table is sorted by the same key (hash % nbuckets), dynsym[buckets[N]] is the first symbol in the hash chain that will contain the desired symbol if it exists.</div><div class="line">A bucket element will contain the index 0 if there is no symbol in the hash table for the given value of N. As index 0 of the dynsym is a reserved value, this index cannot occur for a valid symbol, and is therefore non-ambiguous.</div></pre></td></tr></table></figure>
+<p>继续上面的实例计算 <code>Hash Buckets</code>:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">➜  elf python -c &apos;print int(3236121517%2)&apos;</div><div class="line"></div><div class="line">N = 1</div><div class="line">buckets[N] = 0x5</div><div class="line">dynsym[0x5] = _IO_stdin_used</div></pre></td></tr></table></figure>
+<p><code>0xc0e34bad</code> 是 <code>Hash Values</code>, 关于 <code>Hash Values</code> 请参考下面,</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">The final part of a GNU hash section contains (dynsymcount - symndx) 32-bit words, one entry for each symbol in the second part of the dynamic symbol table. The top 31 bits of each word contains the top 31 bits of the corresponding symbol&apos;s hash value. The least significant bit is used as a stopper bit. It is set to 1 when a symbol is the last symbol in a given hash chain:</div><div class="line">前31位作为hash值, 最后一位作为分割, 当symbol为最后一个或者两个桶的边界, 都要将最后一位置为1</div><div class="line">    lsb = (N == dynsymcount - 1) ||</div><div class="line">      ((dl_new_hash (name[N]) % nbuckets)</div><div class="line">       != (dl_new_hash (name[N + 1]) % nbuckets))</div><div class="line"></div><div class="line">    hashval = (dl_new_hash(name) &amp; ~1) | lsb;</div><div class="line"></div><div class="line">或者可以参考这个算法</div><div class="line">(dl_new_hash (&amp;.dynstr[.dynsym[N].st_name]) &amp; ~1)</div><div class="line">| (N == dynsymcount - 1</div><div class="line">   || (dl_new_hash (&amp;.dynstr[.dynsym[N].st_name]) % nbuckets)</div><div class="line">      != (dl_new_hash (&amp;.dynstr[.dynsym[N + 1].st_name]) % nbuckets))</div></pre></td></tr></table></figure>
+<p>这段一共有 <code>dynsymcount - symndx</code> 个 <code>32-bit</code> 的 <code>Hash Values</code>, 注意, 这个 <code>dynsymcount</code> 在运行时是未知的.</p>
+<p>最后分析一段 <code>GNU</code> 中利用 <code>name</code> 返回指向该 <code>symbol</code> 的索引, 这段算法在注入时是核心代码. 这里需要理解下 <code>hash</code> 算法中利用桶解决冲突的原理, 冲突后需要在桶内进行查找, 时间复杂度为 <code>O(1)+O(m)</code>, <code>m</code> 为桶的固定大小.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div></pre></td><td class="code"><pre><div class="line">Symbol Lookup Using GNU Hash</div><div class="line"></div><div class="line">The following shows how a symbol might be looked up in an object using the GNU hash section. We will assume the existence of an in memory record containing the information needed:</div><div class="line">typedef struct &#123;</div><div class="line">        const char      *os_dynstr;      /* Dynamic string table *//* .dynstr地址 */</div><div class="line">        Sym             *os_dynsym;      /* Dynamic symbol table *//* .dynsym地址 */</div><div class="line">        Word            os_nbuckets;     /* # hash buckets */</div><div class="line">        Word            os_symndx;       /* Index of 1st dynsym in hash */</div><div class="line">        Word            os_maskwords_bm; /* Bloom filter words, minus 1 */</div><div class="line">        Word            os_shift2;       /* Bloom filter hash shift */</div><div class="line">        const BloomWord *os_bloom;       /* Bloom filter words */</div><div class="line">        const Word      *os_buckets;     /* Hash buckets */</div><div class="line">        const Word      *os_hashval;     /* Hash value array */</div><div class="line">&#125; obj_state_t;</div><div class="line">To simplify matters, we elide the details of handling different ELF classes. In the above, Word is a 32-bit unsigned value, BloomWord is either 32 or 64-bit depending in the ELFCLASS, and Sym is either Elf32_Sym or Elf64_Sym.</div><div class="line">Given a variable containing the above information for an object, the following pseudo code returns a pointer to the desired symbol if it exists in the object, and NULL otherwise.</div><div class="line"></div><div class="line">Sym *</div><div class="line">symhash(obj_state_t *os, const char *symname)</div><div class="line">&#123;</div><div class="line">        Word            c;</div><div class="line">        Word            h1, h2;</div><div class="line">        Word            n;</div><div class="line">        Word            bitmask;</div><div class="line">        const Sym       *sym;</div><div class="line">        Word            *hashval;</div><div class="line"></div><div class="line">        /*</div><div class="line">         * Hash the name, generate the &quot;second&quot; hash</div><div class="line">         * from it for the Bloom filter.</div><div class="line">         */</div><div class="line">        /* 两个散列函数 */</div><div class="line">        h1 = dl_new_hash(symname);</div><div class="line">        h2 = h1 &gt;&gt; os-&gt;os_shift2;</div><div class="line"></div><div class="line">        /* Test against the Bloom filter */</div><div class="line">        /* BloomWord的位大小 */</div><div class="line">        c = sizeof (BloomWord) * 8;</div><div class="line">        n = (h1 / c) &amp; os-&gt;os_maskwords_bm;</div><div class="line">        bitmask = (1 &lt;&lt; (h1 % c)) | (1 &lt;&lt; (h2 % c));</div><div class="line">        if ((os-&gt;os_bloom[n] &amp; bitmask) != bitmask)</div><div class="line">                return (NULL);</div><div class="line"></div><div class="line">        /* Locate the hash chain, and corresponding hash value element */</div><div class="line">        /* 获取对应桶的第一个.dynsym索引 *</div><div class="line">        n = os-&gt;os_buckets[h1 % os-&gt;os_nbuckets];</div><div class="line">        if (n == 0)    /* Empty hash chain, symbol not present */</div><div class="line">                return (NULL);</div><div class="line">        /* Sym数据结构 */</div><div class="line">        sym = &amp;os-&gt;os_dynsym[n];</div><div class="line">        /* 获取对应桶的第一个hashval */</div><div class="line">        hashval = &amp;os-&gt;os_hashval[n - os-&gt;os_symndx];</div><div class="line"></div><div class="line">        /*</div><div class="line">         * Walk the chain until the symbol is found or</div><div class="line">         * the chain is exhausted.</div><div class="line">         */</div><div class="line">        for (h1 &amp;= ~1; 1; sym++) &#123;</div><div class="line">                /* 进行桶内遍历查询 */</div><div class="line">                h2 = *hashval++;</div><div class="line"></div><div class="line">                /*</div><div class="line">                 * Compare the strings to verify match. Note that</div><div class="line">                 * a given hash chain can contain different hash</div><div class="line">                 * values. We&apos;d get the right result by comparing every</div><div class="line">                 * string, but comparing the hash values first lets us</div><div class="line">                 * screen obvious mismatches at very low cost and avoid</div><div class="line">                 * the relatively expensive string compare.</div><div class="line">                 *</div><div class="line">         * We are intentionally glossing over some things here:</div><div class="line">             *</div><div class="line">         *    -  We could test sym-&gt;st_name for 0, which indicates</div><div class="line">         *   a NULL string, and avoid a strcmp() in that case.</div><div class="line">         *</div><div class="line">                 *    - The real runtime linker must also take symbol</div><div class="line">         *  versioning into account. This is an orthogonal</div><div class="line">         *  issue to hashing, and is left out of this</div><div class="line">         *  example for simplicity.</div><div class="line">         *</div><div class="line">         * A real implementation might test (h1 == (h2 &amp; ~1), and then</div><div class="line">         * call a (possibly inline) function to validate the rest.</div><div class="line">                 */</div><div class="line">                /* hash值相同并且name相同 */</div><div class="line">                if ((h1 == (h2 &amp; ~1)) &amp;&amp;</div><div class="line">                    !strcmp(symname, os-&gt;os_dynstr + sym-&gt;st_name))</div><div class="line">                        return (sym);</div><div class="line"></div><div class="line">                /* Done if at end of chain */</div><div class="line">                /* 桶内查询完毕,因为桶边界是最低位为1 */</div><div class="line">                if (h2 &amp; 1)</div><div class="line">                        break;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        /* This object does not have the desired symbol */</div><div class="line">        return (NULL);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>差不多把几个重要的section都介绍到了</p>
+<h4 id="调试命令相关"><a href="#调试命令相关" class="headerlink" title="调试命令相关"></a>调试命令相关</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"># 查看 `DYNAMIC`信息</div><div class="line">readelf -d test</div><div class="line"></div><div class="line"># 查看 `Section Headers`</div><div class="line">readelf -S test</div></pre></td></tr></table></figure>
+<h4 id="gdb-调试-glibc"><a href="#gdb-调试-glibc" class="headerlink" title="gdb 调试 glibc"></a>gdb 调试 glibc</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">http://hardenedlinux.org/toolchains/2016/08/25/build_debug_environment_for_dynamic_linker_of_glibc.html</div><div class="line">http://blog.nlogn.cn/trace-glibc-by-using-gdb/</div></pre></td></tr></table></figure>
+<h4 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;程序员自我修养&gt;</div><div class="line"></div><div class="line">docs/elf/*</div></pre></td></tr></table></figure>
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+
+
+
+
+
+
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2016/12/21/pwn/PWN之技巧与笔记/" id="post_nav-older" class="next-content">
+            Older
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.jpeg" alt="jmpews's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        jmpews@email.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mailto: jmpews@gmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/" target="_self">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                Home
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    Archives
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2017/04/">April 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/03/">March 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/02/">February 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/01/">January 2017<span class="sidebar_archives-count">8</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/12/">December 2016<span class="sidebar_archives-count">3</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">chrome_reader_mode</i>
+                
+                Categories
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                <a class="sidebar_archives-link" href="/categories/darwin/">darwin<span class="sidebar_archives-count">6</span></a></li><li><a class="sidebar_archives-link" href="/categories/pwn/">pwn<span class="sidebar_archives-count">15</span></a></li><li><a class="sidebar_archives-link" href="/categories/test/">test<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="About">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                About
+            </a>
+        </li>
+        
+    
+        <li>
+            <a href="/tags" title="Tags">
+                
+                Tags
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+        <li>
+            <a href="/archives">
+                Number of articles
+                <span class="sidebar-badge">22</span>
+            </a>
+        </li>
+        
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+
+<!-- Theme Material -->
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+        <a href="https://twitter.com/jmpews" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-twitter.svg);">
+                <span class="visuallyhidden">Twitter</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+
+    <!-- Weibo -->
+    
+        <a href="https://weibo.com/winter1ife" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-weibo.svg);">
+                <span class="visuallyhidden">Weibo</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/jmpews" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-github.svg);">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;
+            <script type="text/javascript">
+                var fd = new Date();
+                document.write(fd.getFullYear());
+            </script>
+            &nbsp;Zz
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import File -->
+
+    <script src="/js/lazyload.min.js"></script>
+    <script src="/js/js.min.js"></script>
+
+
+
+    <script src="/js/nprogress.js"></script>
+
+
+<script type="text/javascript">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Window Load-->
+<script>
+    $(window).load(function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+</script>
+
+<!-- MathJax Load-->
+
+<script>
+    <!-- Offer LazyLoad -->
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    <!-- Start Queue -->
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+                </main>
+            </div>
+        </body>
+    
+</html>

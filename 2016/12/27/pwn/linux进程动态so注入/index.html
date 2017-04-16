@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.3.4 -->
+
+    <!-- Title -->
+    
+    <title>
+        
+            linux进程动态so注入 | 
+        
+        Zz
+    </title>
+
+    <!-- Meta & Info -->
+    <meta charset="utf-8">
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+    
+    
+    
+    
+    
+    
+
+    <meta http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0097A7">
+    <meta name="author" content="jmpews">
+    <meta name="description" content="pwn &amp; dev &amp; reverse">
+    <meta name="keywords" content="null,hook,elf,代码注入,pwn">
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" sizes="192x192" href="/img/favicon.png">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!--iOS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-title" content="Title">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="480">
+
+    <!-- Add to homescreen for Chrome on Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- Add to homescreen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Zz">
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="http://jmpews.github.com">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="linux进程动态so注入 | Zz">
+    <meta property="og:description" content="pwn &amp; dev &amp; reverse">
+    <meta property="og:article:tag" content="hook"> <meta property="og:article:tag" content="elf"> <meta property="og:article:tag" content="代码注入"> <meta property="og:article:tag" content="pwn"> 
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.en.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import CSS & jQuery -->
+    
+        <link rel="stylesheet" href="/css/material.min.css">
+        <link rel="stylesheet" href="/css/style.min.css">
+        <!-- Config CSS -->
+
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #607D8B !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #607D8B !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #607D8B !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-color: #F5F5F5;
+      }
+
+      /* blog_info bottom background */
+      #scheme-Paradox .material-layout .something-else .mdl-card__supporting-text{
+        background-color: #fff;
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/queue.js"></script>
+    
+
+    <!-- UC Browser Compatible -->
+    <script>
+        var agent = navigator.userAgent.toLowerCase();
+        if(agent.indexOf('ucbrowser')>0) {
+            document.write("<link rel=\"stylesheet\" href=\"/css/uc.css\">");
+            alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+        }
+    </script>
+
+    
+
+    
+
+
+    <!-- Bing Background -->
+    
+
+    <!-- Custom Head -->
+    
+</head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+    <!-- Left aligned menu below button -->
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#前言"><span class="post-toc-number">1.</span> <span class="post-toc-text">前言</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#参考链接"><span class="post-toc-number">2.</span> <span class="post-toc-text">参考链接</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#ELF基础"><span class="post-toc-number">2.0.1.</span> <span class="post-toc-text">ELF基础</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#GDB-技巧"><span class="post-toc-number">2.0.2.</span> <span class="post-toc-text">GDB/*技巧</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#注入实例"><span class="post-toc-number">2.0.3.</span> <span class="post-toc-text">注入实例</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#注入理论"><span class="post-toc-number">3.</span> <span class="post-toc-text">注入理论</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#问题1：如何能够接触到正在执行进程的内存空间"><span class="post-toc-number">3.0.1.</span> <span class="post-toc-text">问题1：如何能够接触到正在执行进程的内存空间.</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#问题2-libc-dlopen-mode-的内存地址是多少-如何查找"><span class="post-toc-number">3.0.2.</span> <span class="post-toc-text">问题2: __libc_dlopen_mode 的内存地址是多少(如何查找)</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#问题3-如何找到-link-map-地址"><span class="post-toc-number">3.0.3.</span> <span class="post-toc-text">问题3: 如何找到 link_map 地址</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#问题4-如何根据-符号名字符串-和-link-map-找符号的内存地址"><span class="post-toc-number">3.0.4.</span> <span class="post-toc-text">问题4: 如何根据 符号名字符串 和 link_map 找符号的内存地址</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#问题5-如何调用-libc-dlopen-mode"><span class="post-toc-number">3.0.5.</span> <span class="post-toc-text">问题5: 如何调用 __libc_dlopen_mode?</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#附录"><span class="post-toc-number">4.</span> <span class="post-toc-text">附录</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#如何生成汇编对应16进制"><span class="post-toc-number">4.0.1.</span> <span class="post-toc-text">如何生成汇编对应16进制?</span></a></li></ol></li></ol></li></ol>
+
+        <!--
+        <li class="mdl-menu__item">
+            Some Action
+        </li>
+        -->
+    </ul>
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        
+            <!-- Random Thumbnail -->
+            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+            <script>
+    var randomNum = Math.floor(Math.random() * 19 + 1);
+
+    $('.post_thumbnail-random').attr('data-original', '/img/random/material-' + randomNum + '.png');
+    $('.post_thumbnail-random').addClass('lazy');
+</script>
+
+        
+    
+            <p class="article-headline-p">
+                linux进程动态so注入
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.jpeg" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>jmpews</strong>
+        <span>Dec 27, 2016</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/elf/">elf</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/hook/">hook</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/pwn/">pwn</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/代码注入/">代码注入</a>
+    </ul>
+    
+
+    <!-- Share -->
+    <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=linux进程动态so注入&url=http://jmpews.github.com//2016/12/27/pwn/linux进程动态so注入/index.html&pic=&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Weibo
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+        <a class="post_share-link" href="https://twitter.com/intent/tweet?text=linux进程动态so注入&url=http://jmpews.github.com//2016/12/27/pwn/linux进程动态so注入/index.html&via=jmpews" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Twitter
+            </li>
+        </a>
+    
+
+    <!-- Share Facebook -->
+    
+        <a class="post_share-link" href="https://www.facebook.com/sharer/sharer.php?u=http://jmpews.github.com//2016/12/27/pwn/linux进程动态so注入/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Facebook
+            </li>
+        </a>
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://jmpews.github.com//2016/12/27/pwn/linux进程动态so注入/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在学习 <code>hook</code> 过程中, 有一个种方法是 <code>PLT</code> 注入, <code>PLT</code> 注入前的必要工作是需恶意的 <code>so</code> 注入, 找了很多关于注入的资料发现绝大部分实现都已经不适用, 几个方面因素, 一部分是因为 <code>ELF</code> 文件结构变化, 一部分是因为 <code>glibc</code> 调用的函数改变, 另外有很多是由于注入位置不对导致不够通用, 下面会详细介绍几种情况.</p>
+<p><code>so</code> 注入是对学习 <code>ELF</code> 结构极好的实践.</p>
+<p>本文中大部分 refs 和 一起文档参考都在仓库 <a href="https://github.com/jmpews/pwn2exploit" target="_blank" rel="external">pwn2exploit</a>.</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><h4 id="ELF基础"><a href="#ELF基础" class="headerlink" title="ELF基础"></a>ELF基础</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">#包含新的.gnu.hash, 新的hash算法以及新的符号地址计算方法</div><div class="line">ELF文件知识</div><div class="line">#大部分ELF相关参考文档都在 `refs/elf` 有包含, 比较多所以这里不重述, 只提几个极为重要的参考文档</div><div class="line">#ELF标准文档, 不包含 `.gnu.hash` 相关知识</div><div class="line">https://refspecs.linuxbase.org/elf/elf.pdf</div><div class="line">#详细解释.gnu.hash 相关知识</div><div class="line">https://blogs.oracle.com/ali/entry/gnu_hash_elf_sections</div><div class="line">#__kernel_vsyscall 介绍(这个在后面的代码注入覆盖了系统调用, 会有一个坑)</div><div class="line">http://www.trilithium.com/johan/2005/08/linux-gate/</div><div class="line">#内核 hash 和 bucket 相关概念</div><div class="line">http://www.nowamagic.net/academy/detail/3008086</div></pre></td></tr></table></figure>
+<h4 id="GDB-技巧"><a href="#GDB-技巧" class="headerlink" title="GDB/*技巧"></a>GDB/*技巧</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">#查看哪里触发的 __kernel_vsyscall 系统函数调用(其中的2个地址为 __kernel_vsyscall 区间)</div><div class="line">watch ($eip &gt; 0xb770c418) &amp;&amp; ($eip &lt; 0xb770c42b)</div><div class="line">#必备插件</div><div class="line">peda</div><div class="line">#查看系统arch相关常量</div><div class="line">echo | gcc -E -dM - | grep 64</div><div class="line">#查看ld详细信息</div><div class="line">ld --verbose</div></pre></td></tr></table></figure>
+<h4 id="注入实例"><a href="#注入实例" class="headerlink" title="注入实例"></a>注入实例</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">#旧注入实例, 但是具有参考价值.</div><div class="line">http://phrack.org/issues/59/8.html#article(国内很多文章都是参考这篇)</div><div class="line">http://www.cnblogs.com/LittleHann/p/4594641.html(针对phrack的翻译)</div><div class="line">http://grip2.blogspot.jp/2006/12/blog-post.html(针对phrack的翻译)</div><div class="line"></div><div class="line">#可用注入实例, 但注入方法有限制, 并且注入位置不对只能在特定情况进行注入</div><div class="line">https://github.com/gaffe23/linux-inject</div><div class="line"></div><div class="line">#没有采用代码注入, 采用的是修改寄存器的eip到指定函数地址, 动态加载函数不再适用</div><div class="line">http://www.xfocus.net/articles/200208/438.html</div></pre></td></tr></table></figure>
+<h2 id="注入理论"><a href="#注入理论" class="headerlink" title="注入理论"></a>注入理论</h2><p>其实本质就一句话, “调用dlopen加载外部so文件”, 或者说就一句代码 <code>dlopen(&quot;evil.so&quot;,RTLD_LAZY);</code>. 但是显然不可能对正在执行的程序执行 <code>dlopen</code> 操作, 所以:</p>
+<h4 id="问题1：如何能够接触到正在执行进程的内存空间"><a href="#问题1：如何能够接触到正在执行进程的内存空间" class="headerlink" title="问题1：如何能够接触到正在执行进程的内存空间."></a>问题1：如何能够接触到正在执行进程的内存空间.</h4><p>通过 <code>ptrace</code>, <code>ptrace</code> 可以让目标 <code>pid</code> 进程成为当前进程的子进程, 进而可以访问目标进程的内存空间, 寄存器, 并且可以向目标内存空间写内容. 需要了解 <code>ptrace</code> 函数的几个关键宏.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">参考链接 https://linux.die.net/man/2/ptrace</div><div class="line">PTRACE_ATTACH 挂载目标pid</div><div class="line">PTRACE_CONT 让子程序继续运行</div><div class="line">PTRACE_PEEKTEXT 读取内容</div><div class="line">PTRACE_POKETEXT 写入内容</div></pre></td></tr></table></figure>
+<p>ok, 现在既然已经可以读写目标进程的内存空间了, 下一步已经就是在目标内存空间调用 <code>dlopen</code>.既然要调用 <code>dlopen</code>, 肯定需要 <code>dlopen</code> 函数符号的地址. 但是默认 <code>libc-2.19.so</code> 是不包含 <code>dlopen</code>, 只有 <code>__libc_dlopen_mode</code>.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">➜  elf readelf --dyn-syms /lib/i386-linux-gnu/libdl.so.2 | grep dlopen</div><div class="line">    29: 00000d30   101 FUNC    GLOBAL DEFAULT   13 dlopen@@GLIBC_2.1</div><div class="line">    30: 00001900   108 FUNC    GLOBAL DEFAULT   13 dlopen@GLIBC_2.0</div><div class="line">➜  elf readelf --dyn-syms /lib/i386-linux-gnu/libc-2.19.so | grep dlopen</div><div class="line">  2294: 00123ae0    91 FUNC    GLOBAL DEFAULT   12 __libc_dlopen_mode@@GLIBC_PRIVATE</div></pre></td></tr></table></figure>
+<p>这两个函数实现的是一样的效果, 其最终都是调用的 <code>_dl_open</code>, 可以通过 <code>glic</code> 源码查看相关调用过程, 因此可以通过 <code>void * __libc_dlopen_mode (const char *name, int mode)</code> 加载外部so. 所以现在现在的问题是:</p>
+<h4 id="问题2-libc-dlopen-mode-的内存地址是多少-如何查找"><a href="#问题2-libc-dlopen-mode-的内存地址是多少-如何查找" class="headerlink" title="问题2: __libc_dlopen_mode 的内存地址是多少(如何查找)"></a>问题2: <code>__libc_dlopen_mode</code> 的内存地址是多少(如何查找)</h4><p>有一种方法是, 通过查看 <code>cat /proc/1234/maps</code> 的加载地址, 加上函数符号在文件中的偏移来得到, 这里并不打算采用这种方法, 而是通过解析 <code>ELF</code> 文件结构得到 <code>__libc_dlopen_mode</code> 函数符号的地址. (这里需要比较多的 <code>ELF</code> 的文件结构的知识, 可以参考前面的\<elf文件知识\>)</elf文件知识\></p>
+<p>ok, 先介绍几个关于 <code>ELF</code> 的结构体, 这些结构体都在 <code>eglibc-2.19/elf/elf.h</code> 有相应的定义, 实在是不想贴所有结构体的定义, 但是如果不贴又对整个不太好理解.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">//eglibc-2.19/elf/link.h</div><div class="line"></div><div class="line">/* Structure describing a loaded shared object.  The `l_next&apos; and `l_prev&apos;</div><div class="line">   members form a chain of all the shared objects loaded at startup.</div><div class="line"></div><div class="line">   These data structures exist in space used by the run-time dynamic linker;</div><div class="line">   modifying them may have disastrous results.  */</div><div class="line"></div><div class="line">struct link_map</div><div class="line">  &#123;</div><div class="line">    /* These first few members are part of the protocol with the debugger.</div><div class="line">       This is the same format used in SVR4.  */</div><div class="line">    //共享库加载地址</div><div class="line">    ElfW(Addr) l_addr;      /* Difference between the address in the ELF</div><div class="line">                   file and the addresses in memory.  */</div><div class="line">    //共享库名称, 绝对路径</div><div class="line">    char *l_name;       /* Absolute file name object was found in.  */</div><div class="line">    //动态链接section的地址</div><div class="line">    ElfW(Dyn) *l_ld;        /* Dynamic section of the shared object.  */</div><div class="line">    struct link_map *l_next, *l_prev; /* Chain of loaded objects.  */</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<p><code>link_map</code> 的作用就是记录程序加载的所有共享库的链表, 当需要查找符号时就需要遍历该链表找到对应的共享库.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">//http://www.eglibc.org/cgi-bin/viewvc.cgi/branches/eglibc-2_19/libc/elf/elf.h?view=markup</div><div class="line">//eglibc-2.19/elf/elf.h</div><div class="line"></div><div class="line">ignore...</div></pre></td></tr></table></figure>
+<p><code>Elf32_Ehdr</code> 是 <code>ELF</code> 头, 注入需要使用 <code>Elf32_Ehdr-&gt;e_phoff</code> 取得正在执行进程的 <code>Program header table</code>.</p>
+<p><strong>这里需要注意的</strong>, <code>ELF</code> 文件是按照 <code>Segment</code> 加载到内存中, 只会加载 <code>$ readelf -l test</code> 中的对应 <code>section</code>, 而比如 <code>section header table</code> 是不会被加载的, 通过查看 <code>section header table</code> 并不在 <code>$ readelf -l test</code> 内存映射的区间之内验证, 所以是不能通过 <code>section header table</code> 对执行中的进程进行解析.</p>
+<p><code>Elf32_Phdr</code> 是 <code>ELF</code> 的 <code>Segment</code> 对应结构, <code>Segment</code> 是相似属性的 <code>section</code> 集合, 仅是概念性的划分. 关于 <code>segment</code> 的内存页对齐等细节, 这里不进行详细介绍, 如有兴趣请参考 \&lt;程序员自我修养>. 注入需要使用 <code>Elf32_Phdr-&gt;p_type</code> 和 <code>Elf32_Phdr-&gt;p_vaddr</code>, 判断并取得 <code>Dynamic Segment</code>.</p>
+<p><code>Elf32_Dyn</code> 是有关动态链接的 <code>section</code> 结构, 属于 <code>Dynamic Segment</code>, <code>so</code> 注入需要根据它取得所需要的 <code>section</code>.</p>
+<p><code>Elf32_Sym</code> 是符号表的结构体, 需要根据 <code>Elf32_Sym-&gt;st_name</code> 拿到该符号在 <code>.dynstr</code> 对应的位置.</p>
+<p>ok, 到目前为止几个我们需要使用的结构体都大致简单介绍了下. 下面开始具体的符号的地址查找过程.</p>
+<p>因为 <code>__libc_dlopen_mode</code> 是在 <code>libc.so.6</code> 动态库中, 所以需要先找到 <code>libc.so.6</code>, 在介绍 <code>link_map</code> 时说过, 它记录目标进程加载的所有的动态库, 所以只要遍历 <code>link_map</code> 就可以找到 <code>libc.so.6</code>. 所以现在的问题是:</p>
+<h4 id="问题3-如何找到-link-map-地址"><a href="#问题3-如何找到-link-map-地址" class="headerlink" title="问题3: 如何找到 link_map 地址"></a>问题3: 如何找到 <code>link_map</code> 地址</h4><p><code>link_map</code> 位于 <code>.got.plt</code> 表的第 2 位置(请查看关于 <code>ELF</code> 文件结构的知识), 而 <code>.got.plt</code> 表的地址位于 <code>Elf32_Dyn-&gt;d_tag == DT_PLTGOT</code> 的 <code>Elf32_Dyn</code> 中, ·而 <code>Dynamic Segment</code> 的地址位于 <code>Elf32_Phdr-&gt;p_type == PT_DYNAMIC</code> 的 <code>Elf32_Phdr</code> 中, 而 <code>Program header table</code> 的地址位于 <code>Elf32_Ehdr-&gt;e_phoff</code>, 这样就可以逆转整个过程, 以取得 <code>link_map</code> 的地址.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">struct link_map *</div><div class="line">locate_linkmap(int pid)</div><div class="line">&#123;</div><div class="line">    ElfW(Ehdr) ehdr;</div><div class="line">    ElfW(Phdr) phdr;</div><div class="line">    ElfW(Dyn) dyn;</div><div class="line">	struct link_map *l = malloc(sizeof(struct link_map));</div><div class="line">	ElfW(Addr) phdr_addr , dyn_addr , map_addr, gotplt_addr, text_addr;</div><div class="line"></div><div class="line">	ptrace_read(pid, PROGRAM_LOAD_ADDRESS, &amp;ehdr , sizeof(ElfW(Ehdr)));</div><div class="line"></div><div class="line">	phdr_addr = PROGRAM_LOAD_ADDRESS + ehdr.e_phoff;</div><div class="line"></div><div class="line">    ptrace_read(pid , phdr_addr, &amp;phdr , sizeof(ElfW(Phdr)));</div><div class="line"></div><div class="line">	while ( phdr.p_type != PT_DYNAMIC ) &#123;</div><div class="line">        ptrace_read(pid, phdr_addr += sizeof(ElfW(Phdr)), &amp;phdr, sizeof(ElfW(Phdr)));</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	/* now go through dynamic section until we find address of GOT.PLT */</div><div class="line">    ptrace_read(pid, phdr.p_vaddr, &amp;dyn, sizeof(ElfW(Dyn)));</div><div class="line"></div><div class="line">	dyn_addr = phdr.p_vaddr;</div><div class="line"></div><div class="line">	while ( dyn.d_tag != DT_PLTGOT ) &#123;</div><div class="line">		ptrace_read(pid, dyn_addr += sizeof(ElfW(Dyn)), &amp;dyn, sizeof(ElfW(Dyn)));</div><div class="line">	&#125;</div><div class="line"></div><div class="line">    /* link_map address, .got.plt address */</div><div class="line">	gotplt_addr = dyn.d_un.d_ptr;</div><div class="line"></div><div class="line">	/* now just read first link_map item and return it */</div><div class="line">	ptrace_read(pid, gotplt_addr + sizeof(ElfW(Addr)), &amp;map_addr , sizeof(ElfW(Addr)));</div><div class="line">	ptrace_read(pid , map_addr, l , sizeof(struct link_map));</div><div class="line"></div><div class="line">	return l;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>ok, 现在我们已经找到对应的动态库的 <code>link_map</code>, 现在我们就需要从 <code>link_map</code>, 找到 <code>__libc_dlopen_mode</code> 函数符号的地址, 所以现在的问题是:</p>
+<h4 id="问题4-如何根据-符号名字符串-和-link-map-找符号的内存地址"><a href="#问题4-如何根据-符号名字符串-和-link-map-找符号的内存地址" class="headerlink" title="问题4: 如何根据 符号名字符串 和 link_map 找符号的内存地址"></a>问题4: 如何根据 <code>符号名字符串</code> 和 <code>link_map</code> 找符号的内存地址</h4><p>当然可以通过 <code>$ readelf --dyn-syms /lib/i386-linux-gnu/libc-2.19.so | grep __libc_dlopen_mode</code> 找到函数符号在文件中的偏移加上动态库的加载地址, 就可以得到该符号的在内存中的地址. 这种方式并不通用, 比如: <code>so</code> 文件丢失, 不存在 <code>readelf</code> 命令.</p>
+<p>ok, 那么现在的方法就是遍历 <code>.dynsym</code> 表, 查找符号名称为 <code>__libc_dlopen_mode</code> 的 <code>Elf32_Sym</code>(其实是查找<code>Elf32_Sym-&gt;st_name</code> 在 <code>.dynstr</code> 中的索引对应的字符串). ** 然而 <code>.dynsym</code> 的长度是多少, 或者说遍历停止的条件? **.如果要得到 <code>.dynsym</code> 的长度, 也只能读 <code>so</code> 文件, 根据一些没有加载到内存中的但是存在于文件中的内容解析, 比如: 根据 <code>section header table</code> 找到 <code>.dynsym</code> 的 <code>Elf32_Shdr</code> 结构,  <code>Elf32_Shdr-&gt;sh_size /Elf32_Shdr-&gt;sh_entsize</code> 即为符号表的长度. 所以这种方法也不可行.</p>
+<p>ok, 另一种方法就是根据 <code>glibc</code> 中的方法进行查找符号地址, 这里需要用 <code>.gnu.hash</code> 表, 同时在 <code>glibc</code> 中 利用 <code>_dl_lookup_symbol_x -&gt; do_lookup_x</code> 进行函数符号的地址查找, 关于 <code>.gnu.hash</code> 的详细介绍, 请参考 <code>https://blogs.oracle.com/ali/entry/gnu_hash_elf_sections</code>, 这里简单提一下, <code>ELF</code> 在加载动态库时并不是直接全部解析出所有符号的地址, 而是通过 <code>PLT</code> 延迟加载的方式, 在执行的过程中通过查找符号的地址, 这需要利用 <code>.gnu.hash</code> 进行 <code>hash</code> 算法快速查找. 建议先阅读参考文档中关于 <code>.gnu.hash</code> 的介绍, 以及了解关于如何利用 <code>hash桶</code> 的方法解决 <code>hash</code> 冲突.</p>
+<p>下面是 <code>glibc</code> 在进行符号查找一段核心代码, 位于 <code>eglibc-2.19/elf/dl-lookup.c</code> 中的 <code>do_lookup_x</code> 函数中.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line">//http://www.eglibc.org/cgi-bin/viewvc.cgi/branches/eglibc-2_19/libc/elf/dl-lookup.c?view=markup</div><div class="line">//eglibc-2.19/elf/dl-lookup.c</div><div class="line"></div><div class="line">  const ElfW(Sym) *sym;</div><div class="line">  const ElfW(Addr) *bitmask = map-&gt;l_gnu_bitmask;</div><div class="line">  if (__builtin_expect (bitmask != NULL, 1))</div><div class="line">&#123;</div><div class="line">  ElfW(Addr) bitmask_word</div><div class="line">    = bitmask[(new_hash / __ELF_NATIVE_CLASS)</div><div class="line">          &amp; map-&gt;l_gnu_bitmask_idxbits];</div><div class="line"></div><div class="line">  unsigned int hashbit1 = new_hash &amp; (__ELF_NATIVE_CLASS - 1);</div><div class="line">  unsigned int hashbit2 = ((new_hash &gt;&gt; map-&gt;l_gnu_shift)</div><div class="line">               &amp; (__ELF_NATIVE_CLASS - 1));</div><div class="line"></div><div class="line">  if (__builtin_expect ((bitmask_word &gt;&gt; hashbit1)</div><div class="line">            &amp; (bitmask_word &gt;&gt; hashbit2) &amp; 1, 0))</div><div class="line">    &#123;</div><div class="line">      Elf32_Word bucket = map-&gt;l_gnu_buckets[new_hash</div><div class="line">                         % map-&gt;l_nbuckets];</div><div class="line">      if (bucket != 0)</div><div class="line">    &#123;</div><div class="line">      const Elf32_Word *hasharr = &amp;map-&gt;l_gnu_chain_zero[bucket];</div><div class="line"></div><div class="line">      do</div><div class="line">        if (((*hasharr ^ new_hash) &gt;&gt; 1) == 0)</div><div class="line">          &#123;</div><div class="line">        symidx = hasharr - map-&gt;l_gnu_chain_zero;</div><div class="line">        sym = check_match (&amp;symtab[symidx]);</div><div class="line">        if (sym != NULL)</div><div class="line">          goto found_it;</div><div class="line">          &#125;</div><div class="line">      while ((*hasharr++ &amp; 1u) == 0);</div><div class="line">    &#125;</div><div class="line">    &#125;</div><div class="line">  /* No symbol found.  */</div><div class="line">  symidx = SHN_UNDEF;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这里有点坑, 就是此时 <code>link_map</code> 结构并非 <code>#include &lt;link.h&gt;</code> 中的结构, 在 <code>eglibc-2.19/include/link.h</code> 中有这么一段代码:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">#define link_map    link_map_public</div><div class="line">#define la_objopen  la_objopen_wrongproto</div><div class="line">#include &lt;elf/link.h&gt;</div><div class="line">#undef  link_map</div><div class="line">#undef  la_objope</div></pre></td></tr></table></figure>
+<p>所以需要我们自己去构造这些结构体变量的成员, 构造的方法可以参考 <code>eglibc-2.19/elf/dl-lookup.c</code> 中 <code>_dl_setup_hash</code> 函数. 这里附上一段代码作为参考</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">void</div><div class="line">internal_function</div><div class="line">_dl_setup_hash (struct link_map *map)</div><div class="line">&#123;</div><div class="line">  Elf_Symndx *hash;</div><div class="line"></div><div class="line">  if (__builtin_expect (map-&gt;l_info[DT_ADDRTAGIDX (DT_GNU_HASH) + DT_NUM</div><div class="line">                    + DT_THISPROCNUM + DT_VERSIONTAGNUM</div><div class="line">                    + DT_EXTRANUM + DT_VALNUM] != NULL, 1))</div><div class="line">    &#123;</div><div class="line">      Elf32_Word *hash32</div><div class="line">    = (void *) D_PTR (map, l_info[DT_ADDRTAGIDX (DT_GNU_HASH) + DT_NUM</div><div class="line">                      + DT_THISPROCNUM + DT_VERSIONTAGNUM</div><div class="line">                      + DT_EXTRANUM + DT_VALNUM]);</div><div class="line">      map-&gt;l_nbuckets = *hash32++;</div><div class="line">      Elf32_Word symbias = *hash32++;</div><div class="line">      Elf32_Word bitmask_nwords = *hash32++;</div><div class="line">      /* Must be a power of two.  */</div><div class="line">      /* Important!!! */</div><div class="line">      assert ((bitmask_nwords &amp; (bitmask_nwords - 1)) == 0);</div><div class="line">      map-&gt;l_gnu_bitmask_idxbits = bitmask_nwords - 1;</div><div class="line">      map-&gt;l_gnu_shift = *hash32++;</div><div class="line"></div><div class="line">      map-&gt;l_gnu_bitmask = (ElfW(Addr) *) hash32;</div><div class="line">      hash32 += __ELF_NATIVE_CLASS / 32 * bitmask_nwords;</div><div class="line"></div><div class="line">      map-&gt;l_gnu_buckets = hash32;</div><div class="line">      hash32 += map-&gt;l_nbuckets;</div><div class="line">      map-&gt;l_gnu_chain_zero = hash32 - symbias;</div><div class="line">      return;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">  if (!map-&gt;l_info[DT_HASH])</div><div class="line">    return;</div><div class="line">  hash = (void *) D_PTR (map, l_info[DT_HASH]);</div><div class="line"></div><div class="line">  map-&gt;l_nbuckets = *hash++;</div><div class="line">  /* Skip nchain.  */</div><div class="line">  hash++;</div><div class="line">  map-&gt;l_buckets = hash;</div><div class="line">  hash += map-&gt;l_nbuckets;</div><div class="line">  map-&gt;l_chain = hash;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这里算法不进行具体的解释, 可以参考下文的对应的实现, 这题提一下本来是参照 <code>https://blogs.oracle.com/ali/entry/gnu_hash_elf_sections</code> 实现的符号查找算法, 但总感觉不太标准, 就又按照 <code>glibc</code> 实现了一遍, 本质大同小异, 会在代码中做一些对比说明.</p>
+<p>这里另外提两点关于 <code>glibc</code> 中代码实现风格的, 1. 在 <code>glibc</code> 实现关于符号的符号查找的 <code>hash</code> 算法的过程中大量利用了 <code>移位代替取模</code>, 比如上面的 <code>bitmask_nwords Must be a power of two</code>. 这点在下文的具体算法的实现中会有体现. 2. 在 <code>glibc</code> 中大量使用宏来处理不同处理器的兼容性问题, 比如 <code>ElfW(Addr)</code>, <code>ElfW</code> 的定义是:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">// #include &lt;bits/elfclass.h&gt;</div><div class="line">#define __ELF_NATIVE_CLASS 32</div><div class="line"></div><div class="line">// #include &lt;link.h&gt;</div><div class="line">#include &lt;bits/elfclass.h&gt;</div><div class="line">#define ElfW(type)  _ElfW (Elf, __ELF_NATIVE_CLASS, type)</div><div class="line">#define _ElfW(e,w,t)    _ElfW_1 (e, w, _##t)</div><div class="line">#define _ElfW_1(e,w,t)  e##w##t</div></pre></td></tr></table></figure>
+<p><code>__ELF_NATIVE_CLASS</code> 定义当前机子的字长, 这样 <code>ElfW(Addr)</code> 就被解析为 <code>Elf32_Addr</code> 或者 <code>Elf64_Addr</code>, 最后根据 <code>#include &lt;elf.h&gt;</code> 定义的类型来做处理.</p>
+<p>ok, 先放出来关于 <code>setup_hash</code> 的实现, 作用就是在解析 <code>Dynamic Segment</code> 的过程中顺便完善 <code>link_map</code> 结构, 方便下文的 <code>hash</code> 算法的使用.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">void</div><div class="line">setup_hash(int pid, struct link_map *map, struct link_map_more *map_more) &#123;</div><div class="line">    Elf32_Word *gnu_hash_header = (Elf32_Word *)malloc(sizeof(Elf32_Word) * 4);</div><div class="line">    ptrace_read(pid, map_more-&gt;gnuhash_addr, gnu_hash_header, sizeof(Elf32_Word) * 4);</div><div class="line"></div><div class="line">    // .gnu.hash</div><div class="line">    map_more-&gt;nbuckets =gnu_hash_header[0];</div><div class="line">    map_more-&gt;symndx = gnu_hash_header[1];</div><div class="line">    map_more-&gt;nmaskwords = gnu_hash_header[2];</div><div class="line">    map_more-&gt;shift2 = gnu_hash_header[3];</div><div class="line">    map_more-&gt;bitmask_addr = map_more-&gt;gnuhash_addr + 4 * sizeof(Elf32_Word);</div><div class="line">    map_more-&gt;hash_buckets_addr =  map_more-&gt;bitmask_addr + map_more-&gt;nmaskwords * sizeof(ElfW(Addr));</div><div class="line">    map_more-&gt;hash_values_addr = map_more-&gt;hash_buckets_addr + map_more-&gt;nbuckets * sizeof(Elf32_Word);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这里根据 <code>.gnu.hash</code> 的结构进行解析, 应该没有什么问题.</p>
+<p>ok, 再放出关于符号查找 <code>hash</code> 算法的具体, 这里整个的核心.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">//eglibc-2.19/elf/dl-lookup.c</div><div class="line">unsigned long</div><div class="line">dl_new_hash (const char *s)</div><div class="line">&#123;</div><div class="line">  unsigned long h = 5381;</div><div class="line">  unsigned char c;</div><div class="line">  for (c = *s; c != &apos;\0&apos;; c = *++s)</div><div class="line">    h = h * 33 + c;</div><div class="line">  return h &amp; 0xffffffff;</div><div class="line">&#125;</div><div class="line"></div><div class="line">/* seach symbol name in elf(so) */</div><div class="line">ElfW(Sym) *</div><div class="line">symhash(int pid, struct link_map_more *map_more, const char *symname)</div><div class="line">&#123;</div><div class="line">	unsigned long c;</div><div class="line">	Elf32_Word new_hash, h2;</div><div class="line">	unsigned int  hb1, hb2;</div><div class="line">	unsigned long n;</div><div class="line">    Elf_Symndx symndx;</div><div class="line">	ElfW(Addr) bitmask_word;</div><div class="line">    ElfW(Addr) addr;</div><div class="line">    ElfW(Addr) sym_addr;</div><div class="line">    ElfW(Addr) hash_addr;</div><div class="line">	char symstr[256];</div><div class="line">	ElfW(Sym) * sym = malloc(sizeof(ElfW(Sym)));</div><div class="line"></div><div class="line">	new_hash = dl_new_hash(symname);</div><div class="line"></div><div class="line">	/* new-hash % __ELF_NATIVE_CLASS */</div><div class="line">	hb1 = new_hash &amp; (__ELF_NATIVE_CLASS - 1);</div><div class="line">	hb2 = (new_hash &gt;&gt; map_more-&gt;shift2) &amp; (__ELF_NATIVE_CLASS - 1);</div><div class="line"></div><div class="line">	printf(&quot;[*] start gnu hash search:\n\tnew_hash: 0x%x(%u)\n&quot;, symname, new_hash, new_hash);</div><div class="line"></div><div class="line">	/* ELFCLASS size */</div><div class="line">    //__ELF_NATIVE_CLASS</div><div class="line"></div><div class="line">	/*  nmaskwords must be power of 2, so that allows the modulo operation */</div><div class="line">	/* ((new_hash / __ELF_NATIVE_CLASS) % maskwords) */</div><div class="line">	n = (new_hash / __ELF_NATIVE_CLASS) &amp; (map_more-&gt;nmaskwords - 1);</div><div class="line">	printf(&quot;\tn: %lu\n&quot;, n);</div><div class="line"></div><div class="line">    /* Use hash to quickly determine whether there is the symbol we need */</div><div class="line">	addr = map_more-&gt;bitmask_addr + n * sizeof(ElfW(Addr));</div><div class="line">	ptrace_read(pid, addr, &amp;bitmask_word, sizeof(ElfW(Addr)));</div><div class="line">    /* eglibc-2.19/elf/dl-loopup.c:236 */</div><div class="line">    /* https://blogs.oracle.com/ali/entry/gnu_hash_elf_sections */</div><div class="line">    /* different method same result */</div><div class="line">    if(((bitmask_word &gt;&gt; hb1) &amp; (bitmask_word &gt;&gt; hb2) &amp; 1) == 0)</div><div class="line">		return NULL;</div><div class="line"></div><div class="line">	/* The first index of `.dynsym` to the bucket .dynsym */</div><div class="line">	addr = map_more-&gt;hash_buckets_addr + (new_hash % map_more-&gt;nbuckets) * sizeof(Elf_Symndx);</div><div class="line">	ptrace_read(pid, addr, &amp;symndx, sizeof(Elf_Symndx));</div><div class="line">	printf(&quot;\thash buckets index: 0x%x(%u), first dynsym index: 0x%x(%u)\n&quot;, (new_hash % map_more-&gt;nbuckets), (new_hash % map_more-&gt;nbuckets), symndx, symndx);</div><div class="line"></div><div class="line">	if(symndx == 0)</div><div class="line">		return NULL;</div><div class="line"></div><div class="line">	sym_addr = map_more-&gt;dynsym_addr + symndx * sizeof(ElfW(Sym));</div><div class="line">	hash_addr = map_more-&gt;hash_values_addr + (symndx - map_more-&gt;symndx) * sizeof(Elf32_Word);</div><div class="line"></div><div class="line">	printf(&quot;[*] start bucket search:\n&quot;);</div><div class="line">    do</div><div class="line">    &#123;</div><div class="line">		ptrace_read(pid, hash_addr, &amp;h2, sizeof(Elf32_Word));</div><div class="line">		printf(&quot;\th2: 0x%x(%u)\n&quot;, h2, h2);</div><div class="line">        /* 1. hash value same */</div><div class="line">        if(((h2 ^ new_hash) &gt;&gt; 1) == 0) &#123;</div><div class="line"></div><div class="line">			sym_addr = map_more-&gt;dynsym_addr + ((map_more-&gt;symndx + (hash_addr - map_more-&gt;hash_values_addr) / sizeof(Elf32_Word)) * sizeof(ElfW(Sym)));</div><div class="line">            /* read ElfW(Sym) */</div><div class="line">			ptrace_read(pid, sym_addr, sym, sizeof(ElfW(Sym)));</div><div class="line">            addr = map_more-&gt;dynstr_addr + sym-&gt;st_name;</div><div class="line">            /* read string */</div><div class="line">            ptrace_read(pid, addr, symstr, sizeof(symstr));</div><div class="line"></div><div class="line">            /* 2. name same */</div><div class="line">            if(!strcmp(symname, symstr))</div><div class="line">                return sym;</div><div class="line">        &#125;</div><div class="line">		hash_addr += sizeof(sizeof(Elf32_Word));</div><div class="line">	&#125; while((h2 &amp; 1u) == 0); // search in same bucket</div><div class="line">    return NULL;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这里介绍下上面算法的流程</p>
+<p>首先需要利用 <code>bitmask</code> 根据 <code>Bloom Filter(布隆过滤器)</code> 判断是否存在于符号表, 这里先放出 wiki 的参考链接 <a href="https://zh.wikipedia.org/wiki/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8" target="_blank" rel="external">Bloom Filter</a>, 这里简单介绍下 <code>Bloom Filter</code>, 它可以在常量时间内判断 <code>hash_value</code> 是否存在于 <code>hash_values_buckets</code>, 但是它是有误差的, 也就是说如果 <code>Bloom Filter</code> 判断出不存在就是一定不在, 但是如果判断存在则可能存在, 仅仅是可能存在, 原因就是因为 <code>hash</code> 冲突的存在, 具体参考下 <code>Bloom Filter</code> 的原理.</p>
+<p>接下来就是根据该符号的 <code>hash value</code>, 确定该符号在哪一个 <code>bucket</code>, 找到该 <code>bucket(桶)</code> 内第一个符号结构, 之后便开始在桶内进行符号查找.</p>
+<p>接下来就是桶内查找, 需要满足两个条件, 1. <code>hash value</code> 相同 2. 字符串相同.</p>
+<p>剩下的大家可以通过阅读来具体理解下, 大部分我都加了注释.</p>
+<p>ok, 到这一步, 就可以拿到 <code>__libc_dlopen_mode</code> 的地址了, 然后下一步的问题就是:</p>
+<h4 id="问题5-如何调用-libc-dlopen-mode"><a href="#问题5-如何调用-libc-dlopen-mode" class="headerlink" title="问题5: 如何调用 __libc_dlopen_mode?"></a>问题5: 如何调用 <code>__libc_dlopen_mode</code>?</h4><p>大概有两种思路, 单纯依靠寄存器 <code>eip</code> 修改执行位置, 其他寄存器传参数, 这个方法在之前 <code>_dl_open</code> 是被定义为 <code>internal_function</code>, 也就是通过寄存器传参, 但是对于 <code>__libc_dlopen_mode</code> 已经不是寄存器传递参数. 另一个就是注入一段代码, 执行这段代码, 通过正常的函数调用方法调用 <code>__libc_dlopen_mode</code>, 执行完毕后恢复这段内存原始代码, 这里主要分析下第二种方法.</p>
+<p>既然采用注入代码方法, 那么问题就来了, 代码应该注入到哪里? 可能首先想到的就是注入到当前 <code>%eip</code> 的位置, 因为毕竟运行后会恢复为原始内存, 但是有一个问题就是, 假如被覆盖的这块内存在执行的过程中需要被二次使用怎么办, 此时内存代码已经不是原来的代码, 并且还有没有被恢复? 这就是上面说的这种注入方法存在局限性.</p>
+<p>这里先给大家放一段目前普遍采用的注入方式, 也就是注入到当前 <code>%eip</code> 的位置, 并为大家复现这个情况.</p>
+<p>这里采用手动注入一段代码的方式, 用 <code>gdb attach</code> 该进程.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">#include &lt;stdio.h&gt;</div><div class="line">int main()</div><div class="line">&#123;</div><div class="line">     char *evilso = &quot;/vagrant/inject/evil.so&quot;;</div><div class="line">     while(1)</div><div class="line">     &#123;</div><div class="line">         printf(&quot;Going to sleep...\n&quot;);</div><div class="line">         sleep(3);</div><div class="line">         printf(&quot;Wake up\n&quot;);</div><div class="line">     &#125;</div><div class="line">     return 0;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>下面就是相关的分析过程,</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div></pre></td><td class="code"><pre><div class="line"># 当前gdb挂载点</div><div class="line">gdb-peda$ disassemble</div><div class="line">Dump of assembler code for function __kernel_vsyscall:</div><div class="line">   0xb7700418 &lt;+0&gt;:     push   ecx</div><div class="line">   0xb7700419 &lt;+1&gt;:     push   edx</div><div class="line">   0xb770041a &lt;+2&gt;:     push   ebp</div><div class="line">   0xb770041b &lt;+3&gt;:     mov    ebp,esp</div><div class="line">   0xb770041d &lt;+5&gt;:     sysenter</div><div class="line">   0xb770041f &lt;+7&gt;:     nop</div><div class="line">   0xb7700420 &lt;+8&gt;:     nop</div><div class="line">   0xb7700421 &lt;+9&gt;:     nop</div><div class="line">   0xb7700422 &lt;+10&gt;:    nop</div><div class="line">   0xb7700423 &lt;+11&gt;:    nop</div><div class="line">   0xb7700424 &lt;+12&gt;:    nop</div><div class="line">   0xb7700425 &lt;+13&gt;:    nop</div><div class="line">   0xb7700426 &lt;+14&gt;:    int    0x80</div><div class="line">=&gt; 0xb7700428 &lt;+16&gt;:    pop    ebp</div><div class="line">   0xb7700429 &lt;+17&gt;:    pop    edx</div><div class="line">   0xb770042a &lt;+18&gt;:    pop    ecx</div><div class="line">   0xb770042b &lt;+19&gt;:    ret</div><div class="line">End of assembler dump.</div><div class="line"></div><div class="line">gdb-peda$ disassemble main</div><div class="line">Dump of assembler code for function main:</div><div class="line">   0x0804844d &lt;+0&gt;:     push   ebp</div><div class="line">   0x0804844e &lt;+1&gt;:     mov    ebp,esp</div><div class="line">   0x08048450 &lt;+3&gt;:     and    esp,0xfffffff0</div><div class="line">   0x08048453 &lt;+6&gt;:     sub    esp,0x20</div><div class="line">   0x08048456 &lt;+9&gt;:     mov    DWORD PTR [esp+0x1c],0x8048520</div><div class="line">   0x0804845e &lt;+17&gt;:    mov    DWORD PTR [esp],0x8048538</div><div class="line">   0x08048465 &lt;+24&gt;:    call   0x8048320 &lt;puts@plt&gt;</div><div class="line">   0x0804846a &lt;+29&gt;:    mov    DWORD PTR [esp],0x3</div><div class="line">   0x08048471 &lt;+36&gt;:    call   0x8048310 &lt;sleep@plt&gt;</div><div class="line">   0x08048476 &lt;+41&gt;:    mov    DWORD PTR [esp],0x804854a</div><div class="line">   0x0804847d &lt;+48&gt;:    call   0x8048320 &lt;puts@plt&gt;</div><div class="line">   0x08048482 &lt;+53&gt;:    jmp    0x804845e &lt;main+17&gt;</div><div class="line">End of assembler dump.</div><div class="line"></div><div class="line">#找到需要加载的so的路径参数</div><div class="line">gdb-peda$ x/s 0x8048520</div><div class="line">0x8048520:      &quot;/vagrant/inject/evil.so&quot;</div><div class="line"></div><div class="line">#找到__libc_dlopen_mode函数符号的地址</div><div class="line">gdb-peda$ x/i __libc_dlopen_mode</div><div class="line">0xb7675ae0 &lt;__libc_dlopen_mode&gt;:     push   esi</div><div class="line"></div><div class="line">#手动代码注入后是下面的peda显示, 注意 `ebx`, 当前 `eip` 的内容, 栈的内容的变化.</div><div class="line"> [----------------------------------registers-----------------------------------]</div><div class="line">EAX: 0xfffffdfc</div><div class="line">EBX: 0xb7675ae0 (&lt;__libc_dlopen_mode&gt;:  push   esi)</div><div class="line">ECX: 0xbf81f9bc --&gt; 0x2</div><div class="line">EDX: 0xb76fd000 --&gt; 0x1aada8</div><div class="line">ESI: 0x0</div><div class="line">EDI: 0xbf81fa44 --&gt; 0x0</div><div class="line">EBP: 0xbf81f9c4 --&gt; 0x10000</div><div class="line">ESP: 0xbf81f97c --&gt; 0x8048520 (&quot;/vagrant/inject/evil.so&quot;)</div><div class="line">EIP: 0xb770b428 (&lt;__kernel_vsyscall+16&gt;:        call   ebx)</div><div class="line">EFLAGS: 0x246 (carry PARITY adjust ZERO sign trap INTERRUPT direction overflow)</div><div class="line">[-------------------------------------code-------------------------------------]</div><div class="line">   0xb770b424 &lt;__kernel_vsyscall+12&gt;:   nop</div><div class="line">   0xb770b425 &lt;__kernel_vsyscall+13&gt;:   nop</div><div class="line">   0xb770b426 &lt;__kernel_vsyscall+14&gt;:   int    0x80</div><div class="line">=&gt; 0xb770b428 &lt;__kernel_vsyscall+16&gt;:   call   ebx</div><div class="line">   0xb770b42a &lt;__kernel_vsyscall+18&gt;:   add    BYTE PTR [eax],al</div><div class="line">   0xb770b42c:  add    BYTE PTR [esi],ch</div><div class="line">   0xb770b42e:  jae    0xb770b498</div><div class="line">   0xb770b430:  jae    0xb770b4a6</div><div class="line">Guessed arguments:</div><div class="line">arg[0]: 0x8048520 (&quot;/vagrant/inject/evil.so&quot;)</div><div class="line">arg[1]: 0x1</div><div class="line">[------------------------------------stack-------------------------------------]</div><div class="line">0000| 0xbf81f97c --&gt; 0x8048520 (&quot;/vagrant/inject/evil.so&quot;)</div><div class="line">0004| 0xbf81f980 --&gt; 0x1</div><div class="line">0008| 0xbf81f984 --&gt; 0xbf81f9bc --&gt; 0x2</div><div class="line">0012| 0xbf81f988 --&gt; 0xb7607b70 (&lt;nanosleep+32&gt;:        mov    ebx,edx)</div><div class="line">0016| 0xbf81f98c --&gt; 0xb760793d (&lt;sleep+205&gt;:   test   eax,eax)</div><div class="line">0020| 0xbf81f990 --&gt; 0xbf81f9bc --&gt; 0x2</div><div class="line">0024| 0xbf81f994 --&gt; 0xbf81f9bc --&gt; 0x2</div><div class="line">0028| 0xbf81f998 --&gt; 0x0</div><div class="line">[------------------------------------------------------------------------------]</div><div class="line"></div><div class="line">#这里我们再加一个watchpoint, 需要监视哪个函数再一次调用了 __kernel_vsyscall, 这段技巧在上面也提到过.</div><div class="line">watch ($eip &gt; 0xb7700418) &amp;&amp; ($eip &lt; 0xb770042b)</div><div class="line"></div><div class="line">#继续执行 等待触发watchpoint, 查看调用栈, 发现</div><div class="line">gdb-peda$ bt</div><div class="line">#0  0xb7735418 in __kernel_vsyscall ()</div><div class="line">#1  0xb765efde in brk () from /lib/i386-linux-gnu/libc.so.6</div><div class="line">#2  0xb765f084 in sbrk () from /lib/i386-linux-gnu/libc.so.6</div><div class="line">#3  0xb75f4ccf in __default_morecore () from /lib/i386-linux-gnu/libc.so.6</div><div class="line">#4  0xb75f1352 in ?? () from /lib/i386-linux-gnu/libc.so.6</div><div class="line">#5  0xb75f2888 in malloc () from /lib/i386-linux-gnu/libc.so.6</div><div class="line">#6  0xb75f295f in malloc () from /lib/i386-linux-gnu/libc.so.6</div><div class="line">#7  0xb773b026 in local_strdup (s=s@entry=0x8048520 &quot;/vagrant/inject/evil.so&quot;)</div><div class="line">    at dl-load.c:162</div><div class="line">#8  0xb773d4d0 in expand_dynamic_string_token (l=l@entry=0xb7757c28,</div><div class="line">    s=s@entry=0x8048520 &quot;/vagrant/inject/evil.so&quot;, is_path=is_path@entry=0x0)</div><div class="line">    at dl-load.c:429</div><div class="line">#9  0xb773e0dc in _dl_map_object (loader=loader@entry=0xb7757c28,</div><div class="line">    name=name@entry=0x8048520 &quot;/vagrant/inject/evil.so&quot;, type=type@entry=0x2,</div><div class="line">    trace_mode=trace_mode@entry=0x0, mode=mode@entry=0x10000001, nsid=0x0)</div><div class="line">    at dl-load.c:2538</div><div class="line">#10 0xb7748c14 in dl_open_worker (a=0xbfc39228) at dl-open.c:235</div><div class="line">#11 0xb7744c06 in _dl_catch_error (objname=objname@entry=0xbfc39220,</div><div class="line">    errstring=errstring@entry=0xbfc39224, mallocedp=mallocedp@entry=0xbfc3921f,</div><div class="line">    operate=operate@entry=0xb7748b50 &lt;dl_open_worker&gt;, args=args@entry=0xbfc39228)</div><div class="line">    at dl-error.c:187</div><div class="line">#12 0xb7748644 in _dl_open (file=0x8048520 &quot;/vagrant/inject/evil.so&quot;, mode=0x1,</div><div class="line">    caller_dlopen=0xb773542a &lt;__kernel_vsyscall+18&gt;, nsid=&lt;optimized out&gt;,</div><div class="line">    argc=0x1, argv=0xbfc396a4, env=0xbfc396ac) at dl-open.c:661</div><div class="line">#13 0xb769f9ab in ?? () from /lib/i386-linux-gnu/libc.so.6</div><div class="line">#14 0xb7744c06 in _dl_catch_error (objname=0xbfc39394, errstring=0xbfc39398,</div><div class="line">    mallocedp=0xbfc39393, operate=0xb769f950, args=0xbfc393cc) at dl-error.c:187</div><div class="line">#15 0xb769fa9b in ?? () from /lib/i386-linux-gnu/libc.so.6</div><div class="line">#16 0xb769fb21 in __libc_dlopen_mode () from /lib/i386-linux-gnu/libc.so.6</div><div class="line">#17 0xb773542a in __kernel_vsyscall ()</div><div class="line">#18 0xbfc3942c in ?? ()</div><div class="line">#19 0x00000000 in ?? ()</div><div class="line"></div><div class="line"># 继续执行失败</div></pre></td></tr></table></figure>
+<p>ok, 这也就不难发现, 为什么说现在的绝大部分注入都是有限制的, 当我们在系统中断函数进行代码注入, 导致在 <code>__libc_dlopen_mode</code> 执行过程中需要调用 <code>malloc</code> (<code>eglibc-2.19/elf/dl-lookup.c</code> 中 <code>local_strdup</code>)进行堆空间分配, 但由于此时没有cache, 因而需要触发系统调用使用 <code>brk</code> 分配一块堆内存, 这一块具体查看linux内存分配相关的文章, <code>&lt;程序员的自我修养&gt;</code> 简单提到过一些关于 <code>malloc</code> 堆内存分配.</p>
+<p>ok, 现在问题复现了, 需要采用其他方法进行注入, 这里采用的是将代码注入到程序入口点位置, 然后修改 <code>%eip</code> 为程序入口点位置, 这样就不会存在影响, 或者查找一块连续的 <code>nop</code> 内存块进行注入. 这里直接注入到程序入口点位置.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">void</div><div class="line">inject_code(int pid, char *evilso, ElfW(Addr) dlopen_addr) &#123;</div><div class="line">	struct	user_regs_struct regz, regzbak;</div><div class="line">	unsigned long len;</div><div class="line">	unsigned char *backup = NULL;</div><div class="line">	unsigned char *loader = NULL;</div><div class="line">	ElfW(Addr) entry_addr;</div><div class="line"></div><div class="line">	setaddr(soloader + 12, dlopen_addr);</div><div class="line"></div><div class="line">	entry_addr = locate_start(pid);</div><div class="line">	printf(&quot;[+] entry point: 0x%x\n&quot;, entry_addr);</div><div class="line"></div><div class="line">	len = sizeof(soloader) + strlen(evilso);</div><div class="line">	loader = malloc(sizeof(char) * len);</div><div class="line">	memcpy(loader, soloader, sizeof(soloader));</div><div class="line">	memcpy(loader+sizeof(soloader) - 1 , evilso, strlen(evilso));</div><div class="line"></div><div class="line">	backup = malloc(len + sizeof(ElfW(Word)));</div><div class="line">	ptrace_read(pid, entry_addr, backup, len);</div><div class="line"></div><div class="line">	if(ptrace(PTRACE_GETREGS , pid , NULL , &amp;regz) &lt; 0) exit(-1);</div><div class="line">	if(ptrace(PTRACE_GETREGS , pid , NULL , &amp;regzbak) &lt; 0) exit(-1);</div><div class="line">	printf(&quot;[+] stopped %d at eip:%p, esp:%p\n&quot;, pid, regz.eip, regz.esp);</div><div class="line"></div><div class="line">	/* `eip` points to the next instruction, so current instruction is `entry_addr`  */</div><div class="line">	regz.eip = entry_addr + 2;</div><div class="line"></div><div class="line">	/* code inject */</div><div class="line">	ptrace_write(pid, entry_addr, loader, len);</div><div class="line"></div><div class="line">	/* set eip as entry_point */</div><div class="line">	ptrace(PTRACE_SETREGS , pid , NULL , &amp;regz);</div><div class="line">	ptrace_cont(pid);</div><div class="line"></div><div class="line">	if(ptrace(PTRACE_GETREGS , pid , NULL , &amp;regz) &lt; 0) exit(-1);</div><div class="line">	printf(&quot;[+] inject code done %d at eip:%p\n&quot;, pid, regz.eip);</div><div class="line"></div><div class="line">	/* restore backup data */</div><div class="line">	// ptrace_write(pid,entry_addr, backup, len);</div><div class="line">	ptrace(PTRACE_SETREGS , pid , NULL , &amp;regzbak);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>至此所有问题得到解答, <code>so</code> 注入完成, 程序已经上传到 <code>github</code>.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div></pre></td><td class="code"><pre><div class="line">➜  inject gcc -w -o inject /vagrant/inject/inject.c /vagrant/inject/utils.c &amp;&amp; sudo ./inject 24506 /vagrant/inject/evil.so</div><div class="line">attached to pid 24506</div><div class="line">[*] start search &apos;__libc_dlopen_mode&apos;:</div><div class="line">----------------------------------------------------------------</div><div class="line">[+] libaray path: /lib/i386-linux-gnu/libc.so.6</div><div class="line">[+] gnu.hash:</div><div class="line">        nbuckets: 0x3f3</div><div class="line">        symndx: 0xa</div><div class="line">        nmaskwords: 0x200</div><div class="line">        shift2: 0xe</div><div class="line">        bitmask_addr: 0xb75281c8</div><div class="line">        hash_buckets_addr: 0xb75289c8</div><div class="line">        bitmask_addr: 0xb75281c8                                                                                                                                     [0/1762]</div><div class="line">        hash_buckets_addr: 0xb75289c8</div><div class="line">        hash_values_addr: 0xb7529994</div><div class="line">[+] dynstr: 0xb7535474</div><div class="line">[+] dynysm: 0xb752bed4</div><div class="line">[+] soname: libc.so.6</div><div class="line">[*] start gnu hash search:</div><div class="line">        new_hash: 0x8049891(4073429154)</div><div class="line">        n: 197</div><div class="line">        hash buckets index: 0x3c6(966), first dynsym index: 0x8f5(2293)</div><div class="line">[*] start bucket search:</div><div class="line">        h2: 0xd5e07632(3588257330)</div><div class="line">        h2: 0xf2cb98a2(4073429154)</div><div class="line">----------------------------------------------------------------</div><div class="line">[+] Found &apos;__libc_dlopen_mode&apos; at 0xb764bae0</div><div class="line">[+] entry point: 0x8048350</div><div class="line">[+] stopped 24506 at eip:0xb76e1428, esp:0xbfec2fec</div><div class="line">[+] inject code done 24506 at eip:0x8048366</div><div class="line">[*] start search &apos;evilfunc&apos;:</div><div class="line">----------------------------------------------------------------</div><div class="line">[+] libaray path: /vagrant/inject/evil.so</div><div class="line">[+] gnu.hash:</div><div class="line">        nbuckets: 0x3</div><div class="line">        symndx: 0x7</div><div class="line">        nmaskwords: 0x2</div><div class="line">        shift2: 0x6</div><div class="line">        bitmask_addr: 0xb76db148</div><div class="line">        hash_buckets_addr: 0xb76db150</div><div class="line">        hash_values_addr: 0xb76db15c</div><div class="line">[+] dynstr: 0xb76db244</div><div class="line">[+] dynysm: 0xb76db174</div><div class="line">[*] start gnu hash search:</div><div class="line">        new_hash: 0x80498ec(701380385)</div><div class="line">        n: 1</div><div class="line">        hash buckets index: 0x2(2), first dynsym index: 0xb(11)</div><div class="line">[*] start bucket search:</div><div class="line">        h2: 0x29ce3720(701380384)</div><div class="line">----------------------------------------------------------------</div><div class="line">[+] Found &apos;evilfunc&apos; at 0xb76db53b</div><div class="line">[*] lib injection done!</div><div class="line"></div><div class="line">#查看pid对应maps可以查看到已经加载了恶意的so</div><div class="line">➜  inject cat /proc/24506/maps</div><div class="line">08048000-08049000 r-xp 00000000 08:01 266876     /home/vagrant/pwn/elf/hello</div><div class="line">08049000-0804a000 r--p 00000000 08:01 266876     /home/vagrant/pwn/elf/hello</div><div class="line">0804a000-0804b000 rw-p 00001000 08:01 266876     /home/vagrant/pwn/elf/hello</div><div class="line">084a2000-084c3000 rw-p 00000000 00:00 0          [heap]</div><div class="line">b7527000-b7528000 rw-p 00000000 00:00 0</div><div class="line">b7528000-b76d0000 r-xp 00000000 08:01 2134       /lib/i386-linux-gnu/libc-2.19.so</div><div class="line">b76d0000-b76d1000 ---p 001a8000 08:01 2134       /lib/i386-linux-gnu/libc-2.19.so</div><div class="line">b76d1000-b76d3000 r--p 001a8000 08:01 2134       /lib/i386-linux-gnu/libc-2.19.so</div><div class="line">b76d3000-b76d4000 rw-p 001aa000 08:01 2134       /lib/i386-linux-gnu/libc-2.19.so</div><div class="line">b76d4000-b76d7000 rw-p 00000000 00:00 0</div><div class="line">b76db000-b76dc000 r-xp 00000000 00:1a 1974       /vagrant/inject/evil.so</div><div class="line">b76dc000-b76dd000 r--p 00000000 00:1a 1974       /vagrant/inject/evil.so</div><div class="line">b76dd000-b76de000 rw-p 00001000 00:1a 1974       /vagrant/inject/evil.so</div><div class="line">b76de000-b76e1000 rw-p 00000000 00:00 0</div><div class="line">b76e1000-b76e2000 r-xp 00000000 00:00 0          [vdso]</div><div class="line">b76e2000-b7702000 r-xp 00000000 08:01 2153       /lib/i386-linux-gnu/ld-2.19.so</div><div class="line">b7702000-b7703000 r--p 0001f000 08:01 2153       /lib/i386-linux-gnu/ld-2.19.so</div><div class="line">b7703000-b7704000 rw-p 00020000 08:01 2153       /lib/i386-linux-gnu/ld-2.19.so</div><div class="line">bfea3000-bfec4000 rw-p 00000000 00:00 0          [stack]</div><div class="line">➜  inject</div></pre></td></tr></table></figure>
+<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><h4 id="如何生成汇编对应16进制"><a href="#如何生成汇编对应16进制" class="headerlink" title="如何生成汇编对应16进制?"></a>如何生成汇编对应16进制?</h4><p>这里使用 <code>nasm</code> 工具.</p>
+<p>先写好汇编代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">➜ cat __libc_dlopen_mode.asm</div><div class="line">_start: jmp string</div><div class="line">begin: pop eax ; char *file</div><div class="line">mov edx, 0x1 ; int mode</div><div class="line">push edx ;</div><div class="line">push eax ;</div><div class="line">mov ebx, 0x12345678 ; addr of __libc_dlopen_mode()</div><div class="line">call ebx ; call __libc_dlopen_mode()</div><div class="line">add esp, 0x8 ; resotre stack</div><div class="line">int3 ; breakpoint</div><div class="line"></div><div class="line">string: call begin</div><div class="line">db &quot;/tmp/ourlibby.so&quot;,0x00</div></pre></td></tr></table></figure>
+<p>之后使用 <code>nasm -f elf32 -o __libc_dlopen_mode.o __libc_dlopen_mode.asm</code> 即可生成目标文件, 之后使用 <code>objdump -d __libc_dlopen_mode.o</code> 即可查看汇编对应的16进制</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">➜ objdump -d __libc_dlopen_mode.o</div><div class="line"></div><div class="line">__libc_dlopen_mode.o:     file format elf32-i386</div><div class="line"></div><div class="line"></div><div class="line">Disassembly of section .text:</div><div class="line"></div><div class="line">00000000 &lt;_start&gt;:</div><div class="line">   0:   eb 13                   jmp    15 &lt;string&gt;</div><div class="line"></div><div class="line">00000002 &lt;begin&gt;:</div><div class="line">   2:   58                      pop    %eax</div><div class="line">   3:   ba 01 00 00 00          mov    $0x1,%edx</div><div class="line">   8:   52                      push   %edx</div><div class="line">   9:   50                      push   %eax</div><div class="line">   a:   bb 78 56 34 12          mov    $0x12345678,%ebx</div><div class="line">   f:   ff d3                   call   *%ebx</div><div class="line">  11:   83 c4 08                add    $0x8,%esp</div><div class="line">  14:   cc                      int3</div><div class="line"></div><div class="line">00000015 &lt;string&gt;:</div><div class="line">  15:   e8 e8 ff ff ff          call   2 &lt;begin&gt;</div><div class="line">  1a:   2f                      das</div><div class="line">  1b:   74 6d                   je     8a &lt;string+0x75&gt;</div><div class="line">  1d:   70 2f                   jo     4e &lt;string+0x39&gt;</div><div class="line">  1f:   6f                      outsl  %ds:(%esi),(%dx)</div><div class="line">  20:   75 72                   jne    94 &lt;string+0x7f&gt;</div><div class="line">  22:   6c                      insb   (%dx),%es:(%edi)</div><div class="line">  23:   69 62 62 79 2e 73 6f    imul   $0x6f732e79,0x62(%edx),%esp</div></pre></td></tr></table></figure>
+
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+
+
+
+
+
+
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2016/12/21/pwn/PWN之技巧与笔记/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            Newer
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2017/01/04/pwn/PWN之绕过保护机制/" id="post_nav-older" class="next-content">
+            Older
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.jpeg" alt="jmpews's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        jmpews@email.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mailto: jmpews@gmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/" target="_self">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                Home
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    Archives
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2017/04/">April 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/03/">March 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/02/">February 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/01/">January 2017<span class="sidebar_archives-count">8</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/12/">December 2016<span class="sidebar_archives-count">3</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">chrome_reader_mode</i>
+                
+                Categories
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                <a class="sidebar_archives-link" href="/categories/darwin/">darwin<span class="sidebar_archives-count">6</span></a></li><li><a class="sidebar_archives-link" href="/categories/pwn/">pwn<span class="sidebar_archives-count">15</span></a></li><li><a class="sidebar_archives-link" href="/categories/test/">test<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="About">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                About
+            </a>
+        </li>
+        
+    
+        <li>
+            <a href="/tags" title="Tags">
+                
+                Tags
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+        <li>
+            <a href="/archives">
+                Number of articles
+                <span class="sidebar-badge">22</span>
+            </a>
+        </li>
+        
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+
+<!-- Theme Material -->
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+        <a href="https://twitter.com/jmpews" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-twitter.svg);">
+                <span class="visuallyhidden">Twitter</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+
+    <!-- Weibo -->
+    
+        <a href="https://weibo.com/winter1ife" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-weibo.svg);">
+                <span class="visuallyhidden">Weibo</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/jmpews" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-github.svg);">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;
+            <script type="text/javascript">
+                var fd = new Date();
+                document.write(fd.getFullYear());
+            </script>
+            &nbsp;Zz
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import File -->
+
+    <script src="/js/lazyload.min.js"></script>
+    <script src="/js/js.min.js"></script>
+
+
+
+    <script src="/js/nprogress.js"></script>
+
+
+<script type="text/javascript">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Window Load-->
+<script>
+    $(window).load(function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+</script>
+
+<!-- MathJax Load-->
+
+<script>
+    <!-- Offer LazyLoad -->
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    <!-- Start Queue -->
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+                </main>
+            </div>
+        </body>
+    
+</html>
