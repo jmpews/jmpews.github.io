@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.3.4 -->
+
+    <!-- Title -->
+    
+    <title>
+        
+            如何使多Container协同发挥Docker的优势 | 
+        
+        Zz
+    </title>
+
+    <!-- Meta & Info -->
+    <meta charset="utf-8">
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+    
+    
+    
+    
+    
+    
+
+    <meta http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0097A7">
+    <meta name="author" content="jmpews">
+    <meta name="description" content="pwn &amp; dev &amp; reverse">
+    <meta name="keywords" content="null,docker">
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" sizes="192x192" href="/img/favicon.png">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!--iOS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-title" content="Title">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="480">
+
+    <!-- Add to homescreen for Chrome on Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- Add to homescreen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Zz">
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="http://jmpews.github.com">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="如何使多Container协同发挥Docker的优势 | Zz">
+    <meta property="og:description" content="pwn &amp; dev &amp; reverse">
+    <meta property="og:article:tag" content="docker"> 
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.en.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import CSS & jQuery -->
+    
+        <link rel="stylesheet" href="/css/material.min.css">
+        <link rel="stylesheet" href="/css/style.min.css">
+        <!-- Config CSS -->
+
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #607D8B !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #607D8B !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #607D8B !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-color: #F5F5F5;
+      }
+
+      /* blog_info bottom background */
+      #scheme-Paradox .material-layout .something-else .mdl-card__supporting-text{
+        background-color: #fff;
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/queue.js"></script>
+    
+
+    <!-- UC Browser Compatible -->
+    <script>
+        var agent = navigator.userAgent.toLowerCase();
+        if(agent.indexOf('ucbrowser')>0) {
+            document.write("<link rel=\"stylesheet\" href=\"/css/uc.css\">");
+            alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+        }
+    </script>
+
+    
+
+    
+
+
+    <!-- Bing Background -->
+    
+
+    <!-- Custom Head -->
+    
+</head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+    <!-- Left aligned menu below button -->
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#前言"><span class="post-toc-number">1.</span> <span class="post-toc-text">前言</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Web层部容器构建"><span class="post-toc-number">2.</span> <span class="post-toc-text">Web层部容器构建</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#MySQL容器构建"><span class="post-toc-number">3.</span> <span class="post-toc-text">MySQL容器构建</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#连接Web-MySQL两个容器"><span class="post-toc-number">4.</span> <span class="post-toc-text">连接Web, MySQL两个容器</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#0x03-通过Docker-Compose更简洁快速部署"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">0x03 通过Docker-Compose更简洁快速部署</span></a></li></ol></li></ol>
+
+        <!--
+        <li class="mdl-menu__item">
+            Some Action
+        </li>
+        -->
+    </ul>
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        
+            <!-- Random Thumbnail -->
+            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+            <script>
+    var randomNum = Math.floor(Math.random() * 19 + 1);
+
+    $('.post_thumbnail-random').attr('data-original', '/img/random/material-' + randomNum + '.png');
+    $('.post_thumbnail-random').addClass('lazy');
+</script>
+
+        
+    
+            <p class="article-headline-p">
+                如何使多Container协同发挥Docker的优势
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.jpeg" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>jmpews</strong>
+        <span>Dec 10, 2016</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/docker/">docker</a>
+    </ul>
+    
+
+    <!-- Share -->
+    <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=如何使多Container协同发挥Docker的优势&url=http://jmpews.github.com//2016/12/10/python/如何使多Container协同发挥Docker的优势/index.html&pic=&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Weibo
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+        <a class="post_share-link" href="https://twitter.com/intent/tweet?text=如何使多Container协同发挥Docker的优势&url=http://jmpews.github.com//2016/12/10/python/如何使多Container协同发挥Docker的优势/index.html&via=jmpews" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Twitter
+            </li>
+        </a>
+    
+
+    <!-- Share Facebook -->
+    
+        <a class="post_share-link" href="https://www.facebook.com/sharer/sharer.php?u=http://jmpews.github.com//2016/12/10/python/如何使多Container协同发挥Docker的优势/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Facebook
+            </li>
+        </a>
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://jmpews.github.com//2016/12/10/python/如何使多Container协同发挥Docker的优势/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>这里用Docker部署一个torweb(Tornado, MySQL)服务作为例子. 将整个服务拆分为Web(Python)和MySQL放在不同的容器运行.</p>
+<p>这里的torweb是我自己写的服务, <a href="https://github.com/jmpews/torweb" target="_blank" rel="external">https://github.com/jmpews/torweb</a> , Dockerfile配置文件,  <a href="https://github.com/jmpews/dockerfiles" target="_blank" rel="external">https://github.com/jmpews/dockerfiles</a></p>
+<h2 id="Web层部容器构建"><a href="#Web层部容器构建" class="headerlink" title="Web层部容器构建"></a>Web层部容器构建</h2><p>几个注意点</p>
+<ol>
+<li>最好把需要完成一个任务的所有命令放在一行(<code>&amp;&amp;</code>), 因为docker使用行作为每一步的分割, 每执行一步就会做cache, 当出现错误, 下次执行会使用之前cache.</li>
+<li>注意基础依赖包的安装, 比如:<code>ssl</code>, <code>sqlite3</code>等</li>
+<li>需要将Dockerfile需要COPY的文件放到和Dockerfile同目录下.</li>
+</ol>
+<p>Dockerfile文件如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div></pre></td><td class="code"><pre><div class="line">FROM daocloud.io/library/ubuntu:14.04</div><div class="line"></div><div class="line">MAINTAINER jmpews &quot;jmpews@gmail.com&quot;</div><div class="line"></div><div class="line"># 将修改源所有命令放在一行用&amp;&amp;连接</div><div class="line">RUN cp /etc/apt/sources.list /etc/apt/sources.list.bak \</div><div class="line">&amp;&amp; sed -i &apos;s/archive.ubuntu.com/mirrors.aliyun.com/g&apos; /etc/apt/sources.list \</div><div class="line">&amp;&amp; apt-get update</div><div class="line"></div><div class="line"># DEBIAN_FRONTEND=noninteractive 不进行交互</div><div class="line"># 先检查有没有安装 sqlite3 ssl</div><div class="line">RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \</div><div class="line">                                    build-essential \</div><div class="line">                                    g++ \</div><div class="line">                                    gcc \</div><div class="line">                                    libc6-dev \</div><div class="line">                                    make \</div><div class="line">                                    python-pip \</div><div class="line">                                    libssl-dev \</div><div class="line">                                    openssl \</div><div class="line">                                    sqlite3 \</div><div class="line">                                    libsqlite3-dev \</div><div class="line">    &amp;&amp; apt-get install -y wget curl git</div><div class="line"># 删除apt-get的缓存</div><div class="line"># RUN rm -rf /var/lib/apt/lists/*</div><div class="line"></div><div class="line"># 修改时区</div><div class="line">RUN echo &quot;Asia/Shanghai&quot; &gt; /etc/timezone &amp;&amp; dpkg-reconfigure -f noninteractive tzdata</div><div class="line"></div><div class="line"># COPY 目录下所有文件到指定目录下, 注意最后/保留</div><div class="line"># 配置应用目录</div><div class="line">RUN mkdir -p /app/torweb</div><div class="line">COPY torweb /app/torweb/ #目标文件是目录拷贝目录下所有文件到指定目录下</div><div class="line">COPY Python-3.5.2.tgz /root/ #拷贝指定文件到目录下</div><div class="line"></div><div class="line"># Python环境配置, 修改为阿里源</div><div class="line">RUN mkdir ~/.pip &amp;&amp; echo &apos;[global]\n\</div><div class="line">index-url = http://mirrors.aliyun.com/pypi/simple/\n\</div><div class="line">[install]\n\</div><div class="line">trusted-host = mirrors.aliyun.com&apos; &gt; ~/.pip/pip.conf</div><div class="line"></div><div class="line"># 配置Python3的环境</div><div class="line"># RUN wget https://www.python.org/ftp/python/3.5.2/Python-3.5.2.tgz</div><div class="line">RUN cd /root/ \</div><div class="line">    &amp;&amp; tar zxvf Python-3.5.2.tgz \</div><div class="line">    &amp;&amp; cd /root/Python-3.5.2 \</div><div class="line">    &amp;&amp; ./configure --prefix=/usr/local/python3.5.2 \</div><div class="line">    &amp;&amp; make &amp;&amp; make install</div><div class="line"></div><div class="line"># 使用virtualenv来做部署环境, 发现好像没啥用</div><div class="line"># RUN pip install virtualenv \</div><div class="line">#     &amp;&amp; mkdir /virtualenv \</div><div class="line">#     &amp;&amp; cd /virtualenv \</div><div class="line">#     &amp;&amp; virtualenv -p /usr/local/python3.5.2/bin/python3 python3.5.2</div><div class="line"># RUN . /virtualenv/python3.5.2/bin/activate \</div><div class="line">#     &amp;&amp; pip install -r requirements.txt</div><div class="line"></div><div class="line"># 安装依赖torweb项目依赖</div><div class="line">RUN cd /app/torweb \</div><div class="line">    &amp;&amp;/usr/local/python3.5.2/bin/pip3 install -r requirements.txt</div><div class="line"></div><div class="line"># 设置工作目录(默认目录)</div><div class="line">WORKDIR /app/torweb</div><div class="line"></div><div class="line"># EXPOSE默认不暴露端口, 只有加-P参数才会将该端口随机绑定一个宿主机可用端口</div><div class="line"># EXPOSE 8888</div><div class="line"></div><div class="line"># CMD相当于启动命令</div><div class="line">CMD [&quot;/usr/local/python3.5.2/bin/python3&quot;, &quot;app.py&quot;]</div><div class="line"></div><div class="line"># EXPOSE 方式, 使用docker ps会发现绑定到宿主机随机可用端口</div><div class="line"># docker run -d -P --link db:db jmpews/base:test1</div><div class="line"># -p特定端口映射</div><div class="line"># docker run -d -p 8888:8888 --link db:db jmpews/base:test1</div></pre></td></tr></table></figure>
+<h2 id="MySQL容器构建"><a href="#MySQL容器构建" class="headerlink" title="MySQL容器构建"></a>MySQL容器构建</h2><p>直接使用<code>daocloud.io/library/mysql:5.7.14</code>镜像.</p>
+<p>启动MySQL作为一个容器.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"># -e MYSQL_ROOT_PASSWORD 环境变量,启动Container必须设置的数据库密码</div><div class="line"># --name 容器的名字</div><div class="line">docker run --name torweb-mysql -e MYSQL_ROOT_PASSWORD=root -d daocloud.io/library/mysql:5.7.14</div></pre></td></tr></table></figure>
+<h2 id="连接Web-MySQL两个容器"><a href="#连接Web-MySQL两个容器" class="headerlink" title="连接Web, MySQL两个容器"></a>连接Web, MySQL两个容器</h2><p><strong> 通过<code>--link</code>连接容器, 现在属于从属关系, 现在web层服务父容器可以通过隧道调用MySQL服务, MYSQL子容器通过注入环境变量来传递配置参数给torweb层父容器. </strong></p>
+<p>通过<code>docker run -ti --link torweb-mysql:db jmpews/base:test1 /bin/bash -c env</code>, 可以发现注入了很多<code>DB_</code>的环境变量(<code>DB_</code>即为db别名的大写), 所以在程序中需要通过这些环境变量连接数据库.<br><img src="http://oaxgrbqi8.bkt.clouddn.com/14703344757862.jpg" alt=""></p>
+<p>刚才已经启动MySQL服务, 现在启动torweb服务</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"># torweb-mysql为容器name, db为容器别名</div><div class="line"># 启动会执行Dockerfile里CMD对应的命令</div><div class="line">docker run -d -p 8888:8888 --link torweb-mysql:db jmpews/base:test1</div></pre></td></tr></table></figure>
+<h3 id="0x03-通过Docker-Compose更简洁快速部署"><a href="#0x03-通过Docker-Compose更简洁快速部署" class="headerlink" title="0x03 通过Docker-Compose更简洁快速部署"></a>0x03 通过<code>Docker-Compose</code>更简洁快速部署</h3><p>这样我们需要先启动MySQL服务, 再启动Web服务, 过程繁琐, Docker官方推荐使用<code>docker-compose</code>, 进行统一部署.</p>
+<p>在目录下建立 <code>docker-compose.yml</code>, 然后使用 <code>docker-compose up</code> 配置.</p>
+<p>具体配置目录如下.<br><img src="http://oaxgrbqi8.bkt.clouddn.com/14703354062153.jpg" alt=""></p>
+<p>具体配置文件内容如下.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"># docker-compose.yml</div><div class="line">torweb:</div><div class="line">	# docker build目录</div><div class="line">  build: ./web</div><div class="line">  links:</div><div class="line">    - db:db</div><div class="line">  ports:</div><div class="line">    - 8888:8888</div><div class="line">  # 每次启动执行命令</div><div class="line">  command: /usr/local/python3.5.2/bin/python3 app.py</div><div class="line"></div><div class="line">db:</div><div class="line">	# docker的基础镜像</div><div class="line">  image: daocloud.io/library/mysql:5.7.14</div><div class="line">  expose:</div><div class="line">    - &quot;3306&quot;</div><div class="line">  environment:</div><div class="line">    MYSQL_ROOT_PASSWORD: root</div></pre></td></tr></table></figure>
+
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+
+
+
+
+
+
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2016/12/10/python/异步在Tornado中的实现/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            Newer
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2016/12/10/python/为python添加DES_CFB_64解密加密模块/" id="post_nav-older" class="next-content">
+            Older
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.jpeg" alt="jmpews's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        jmpews@email.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mailto: jmpews@gmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/" target="_self">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                Home
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    Archives
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2017/04/">April 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/03/">March 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/02/">February 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/01/">January 2017<span class="sidebar_archives-count">8</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/12/">December 2016<span class="sidebar_archives-count">42</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">chrome_reader_mode</i>
+                
+                Categories
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                <a class="sidebar_archives-link" href="/categories/backend/">backend<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/categories/darwin/">darwin<span class="sidebar_archives-count">6</span></a></li><li><a class="sidebar_archives-link" href="/categories/notes/">notes<span class="sidebar_archives-count">16</span></a></li><li><a class="sidebar_archives-link" href="/categories/pwn/">pwn<span class="sidebar_archives-count">15</span></a></li><li><a class="sidebar_archives-link" href="/categories/python/">python<span class="sidebar_archives-count">18</span></a></li><li><a class="sidebar_archives-link" href="/categories/test/">test<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="About">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                About
+            </a>
+        </li>
+        
+    
+        <li>
+            <a href="/tags" title="Tags">
+                
+                Tags
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+        <li>
+            <a href="/archives">
+                Number of articles
+                <span class="sidebar-badge">61</span>
+            </a>
+        </li>
+        
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+
+<!-- Theme Material -->
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+        <a href="https://twitter.com/jmpews" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-twitter.svg);">
+                <span class="visuallyhidden">Twitter</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+
+    <!-- Weibo -->
+    
+        <a href="https://weibo.com/winter1ife" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-weibo.svg);">
+                <span class="visuallyhidden">Weibo</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/jmpews" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-github.svg);">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;
+            <script type="text/javascript">
+                var fd = new Date();
+                document.write(fd.getFullYear());
+            </script>
+            &nbsp;Zz
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import File -->
+
+    <script src="/js/lazyload.min.js"></script>
+    <script src="/js/js.min.js"></script>
+
+
+
+    <script src="/js/nprogress.js"></script>
+
+
+<script type="text/javascript">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Window Load-->
+<script>
+    $(window).load(function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+</script>
+
+<!-- MathJax Load-->
+
+<script>
+    <!-- Offer LazyLoad -->
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    <!-- Start Queue -->
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+                </main>
+            </div>
+        </body>
+    
+</html>

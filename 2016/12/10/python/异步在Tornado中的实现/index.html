@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.3.4 -->
+
+    <!-- Title -->
+    
+    <title>
+        
+            异步在tornado中的实现 | 
+        
+        Zz
+    </title>
+
+    <!-- Meta & Info -->
+    <meta charset="utf-8">
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+    
+    
+    
+    
+    
+    
+
+    <meta http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0097A7">
+    <meta name="author" content="jmpews">
+    <meta name="description" content="pwn &amp; dev &amp; reverse">
+    <meta name="keywords" content="null,python,tornado">
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" sizes="192x192" href="/img/favicon.png">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!--iOS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-title" content="Title">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="480">
+
+    <!-- Add to homescreen for Chrome on Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- Add to homescreen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Zz">
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="http://jmpews.github.com">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="异步在tornado中的实现 | Zz">
+    <meta property="og:description" content="pwn &amp; dev &amp; reverse">
+    <meta property="og:article:tag" content="python"> <meta property="og:article:tag" content="tornado"> 
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.en.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import CSS & jQuery -->
+    
+        <link rel="stylesheet" href="/css/material.min.css">
+        <link rel="stylesheet" href="/css/style.min.css">
+        <!-- Config CSS -->
+
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #607D8B !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #607D8B !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #607D8B !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-color: #F5F5F5;
+      }
+
+      /* blog_info bottom background */
+      #scheme-Paradox .material-layout .something-else .mdl-card__supporting-text{
+        background-color: #fff;
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/queue.js"></script>
+    
+
+    <!-- UC Browser Compatible -->
+    <script>
+        var agent = navigator.userAgent.toLowerCase();
+        if(agent.indexOf('ucbrowser')>0) {
+            document.write("<link rel=\"stylesheet\" href=\"/css/uc.css\">");
+            alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+        }
+    </script>
+
+    
+
+    
+
+
+    <!-- Bing Background -->
+    
+
+    <!-- Custom Head -->
+    
+</head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+    <!-- Left aligned menu below button -->
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#前言"><span class="post-toc-number">1.</span> <span class="post-toc-text">前言</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#几个注意的点"><span class="post-toc-number">2.</span> <span class="post-toc-text">几个注意的点</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#基于回调函数实现"><span class="post-toc-number">3.</span> <span class="post-toc-text">基于回调函数实现</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#tornado-gen-coroutine配合yield实现异步"><span class="post-toc-number">4.</span> <span class="post-toc-text">@tornado.gen.coroutine配合yield实现异步</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#下面是具体的代码分析"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">下面是具体的代码分析</span></a></li></ol></li></ol>
+
+        <!--
+        <li class="mdl-menu__item">
+            Some Action
+        </li>
+        -->
+    </ul>
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        
+            <!-- Random Thumbnail -->
+            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+            <script>
+    var randomNum = Math.floor(Math.random() * 19 + 1);
+
+    $('.post_thumbnail-random').attr('data-original', '/img/random/material-' + randomNum + '.png');
+    $('.post_thumbnail-random').addClass('lazy');
+</script>
+
+        
+    
+            <p class="article-headline-p">
+                异步在tornado中的实现
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.jpeg" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>jmpews</strong>
+        <span>Dec 10, 2016</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/python/">python</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/tornado/">tornado</a>
+    </ul>
+    
+
+    <!-- Share -->
+    <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=异步在tornado中的实现&url=http://jmpews.github.com//2016/12/10/python/异步在Tornado中的实现/index.html&pic=&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Weibo
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+        <a class="post_share-link" href="https://twitter.com/intent/tweet?text=异步在tornado中的实现&url=http://jmpews.github.com//2016/12/10/python/异步在Tornado中的实现/index.html&via=jmpews" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Twitter
+            </li>
+        </a>
+    
+
+    <!-- Share Facebook -->
+    
+        <a class="post_share-link" href="https://www.facebook.com/sharer/sharer.php?u=http://jmpews.github.com//2016/12/10/python/异步在Tornado中的实现/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Facebook
+            </li>
+        </a>
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://jmpews.github.com//2016/12/10/python/异步在Tornado中的实现/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>对异步I/O而言, 当遇到I/O需要等待时, 就注册一个事件告诉系统, 当数据准备好了, 就调用这个函数就行, 然后就立刻返回, 继续执行其他, 然后当事件循环机制发现数据可读啦, 就调用回调函数。所以一般来说实现异步函数需要<strong>事件循环机制</strong>、<strong>回调函数</strong>。</p>
+<h2 id="几个注意的点"><a href="#几个注意的点" class="headerlink" title="几个注意的点"></a>几个注意的点</h2><ul>
+<li>无论是回调还是协程, 都必须在过程中使用异步函数。</li>
+<li>通过future来代表处理结果, 简单来说用来代表执行结果, 包含判断是否执行完毕、是否还在运行、是否有结果等方法。异步函数通过 <code>set_result()</code> 与 <code>future</code> 联系起来</li>
+</ul>
+<h2 id="基于回调函数实现"><a href="#基于回调函数实现" class="headerlink" title="基于回调函数实现"></a>基于回调函数实现</h2><ol>
+<li><code>fetch</code>返回<code>future</code></li>
+<li><code>fetch_impl</code>, 非阻塞socket连接(注册<code>ioloop</code>, 等待数据可读)</li>
+<li>有数据可以读取(response或error), 如果有response则调用回调函数即<code>handle_response()</code>, 设置<code>future</code>的结果：<code>future.set_result(response)</code>,</li>
+<li><code>future.set_result(response)</code>调用所有_callbacks这里即<code>handle_future()</code></li>
+<li><code>handle_future()</code>注册真正的回调函数处理结果, 下次调用</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">import ioloop</div><div class="line">def handle_request(response):</div><div class="line">    if response.error:</div><div class="line">        print &quot;Error:&quot;, response.error</div><div class="line">    else:</div><div class="line">        print response.body</div><div class="line">    ioloop.IOLoop.instance().stop()</div><div class="line"></div><div class="line">http_client = httpclient.AsyncHTTPClient()</div><div class="line">http_client.fetch(&quot;http://www.google.com/&quot;, handle_request)</div><div class="line">ioloop.IOLoop.instance().start()</div></pre></td></tr></table></figure>
+<h2 id="tornado-gen-coroutine配合yield实现异步"><a href="#tornado-gen-coroutine配合yield实现异步" class="headerlink" title="@tornado.gen.coroutine配合yield实现异步"></a><code>@tornado.gen.coroutine</code>配合yield实现异步</h2><p>和回调某些方面类似的, 但使用协程可以通过<code>send(result)</code>, 将数据回传给<code>response</code>。</p>
+<ol>
+<li><code>def get(self)</code>因为yield的存在变为生成器函数。等待<code>next(get)</code>启动生成器,</li>
+<li>由<code>@tornado.gen.coroutine</code>装饰函数<code>def get(self)</code>, 首先会调用<code>next()</code>启动生成器, 接受yield右边表达式结果作为返回值, 即<code>fetch</code>返回的<code>future</code>。调用<code>Runner(result, future, yielded)</code>给<code>future</code>增加done_callback函数, 即<code>send(value)</code>, 返回生成器函数。</li>
+</ol>
+<p>采用同步的编码方式, 实现异步。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">class GenAsyncHandler(RequestHandler):</div><div class="line">    @gen.coroutine</div><div class="line">    def get(self):</div><div class="line">        http_client = AsyncHTTPClient()</div><div class="line">        # 挂起等待send(result)被调用</div><div class="line">        response = yield http_client.fetch(&apos;http://example.com&apos;)</div><div class="line">        do_something_with_response(response)</div><div class="line">        self.render(&apos;template.html&apos;)</div></pre></td></tr></table></figure>
+<h3 id="下面是具体的代码分析"><a href="#下面是具体的代码分析" class="headerlink" title="下面是具体的代码分析"></a>下面是具体的代码分析</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div></pre></td><td class="code"><pre><div class="line"># gen.py</div><div class="line"># @gen.coroutine</div><div class="line">def _make_coroutine_wrapper(func, replace_callback):</div><div class="line">    @functools.wraps(func)</div><div class="line">    def wrapper(*args, **kwargs):</div><div class="line">        future = TracebackFuture()</div><div class="line"></div><div class="line">        if replace_callback and &apos;callback&apos; in kwargs:</div><div class="line">            callback = kwargs.pop(&apos;callback&apos;)</div><div class="line">            IOLoop.current().add_future(</div><div class="line">                future, lambda future: callback(future.result()))</div><div class="line"></div><div class="line">        try:</div><div class="line">            # result是包含yield的那个函数生成器</div><div class="line">            result = func(*args, **kwargs)</div><div class="line">        except (Return, StopIteration) as e:</div><div class="line">            result = getattr(e, &apos;value&apos;, None)</div><div class="line">        except Exception:</div><div class="line">            future.set_exc_info(sys.exc_info())</div><div class="line">            return future</div><div class="line">        else:</div><div class="line">            if isinstance(result, types.GeneratorType):</div><div class="line">                try:</div><div class="line">                    orig_stack_contexts = stack_context._state.contexts</div><div class="line">                    #返回异步函数的(这里为fetch)的future, 通过该future将异步函数和yiled联系起来。重要！</div><div class="line"></div><div class="line">                    yielded = next(result)</div><div class="line">                    if stack_context._state.contexts is not orig_stack_contexts:</div><div class="line">                        yielded = TracebackFuture()</div><div class="line">                        yielded.set_exception(</div><div class="line">                            stack_context.StackContextInconsistentError(</div><div class="line">                                &apos;stack_context inconsistency (probably caused &apos;</div><div class="line">                                &apos;by yield within a &quot;with StackContext&quot; block)&apos;))</div><div class="line">                except (StopIteration, Return) as e:</div><div class="line">                # 生成器函数执行完毕</div><div class="line">                    future.set_result(getattr(e, &apos;value&apos;, None))</div><div class="line">                except Exception:</div><div class="line">                    future.set_exc_info(sys.exc_info())</div><div class="line">                else:</div><div class="line">                    # result:函数生成器</div><div class="line">                    # future:get函数的future</div><div class="line">                    # yielded:fetch函数的future</div><div class="line">                    Runner(result, future, yielded)</div><div class="line">                try:</div><div class="line">                    return future</div><div class="line">                finally:</div><div class="line">                    future = None</div><div class="line">        future.set_result(result)</div><div class="line">        #　返回future</div><div class="line">        return future</div><div class="line">    ＃　返回修饰后的函数</div><div class="line">    return wrapper</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div></pre></td><td class="code"><pre><div class="line"># gen.py</div><div class="line">class Runner(object):</div><div class="line">    def handle_yield(self, yielded):</div><div class="line">        ...</div><div class="line">        ＃　跳过其他处理code</div><div class="line">        try:</div><div class="line">            self.future = convert_yielded(yielded)</div><div class="line">        except BadYieldError:</div><div class="line">            self.future = TracebackFuture()</div><div class="line">            self.future.set_exc_info(sys.exc_info())</div><div class="line"></div><div class="line">        if not self.future.done() or self.future is moment:</div><div class="line">            # 注册回调函数, 当fetch调用set_result(), 调用run()</div><div class="line">            self.io_loop.add_future(</div><div class="line">                self.future, lambda f: self.run())</div><div class="line">            return False</div><div class="line">        return True</div><div class="line"></div><div class="line">    def run(self):</div><div class="line">            if self.running or self.finished:</div><div class="line">                return</div><div class="line">            try:</div><div class="line">                self.running = True</div><div class="line">                while True:</div><div class="line">                    future = self.future</div><div class="line">                    if not future.done():</div><div class="line">                    #执行run时generator返回的那个future必须已经有结果, 否则就没必要传回到generator中了</div><div class="line">                        return</div><div class="line">                    self.future = None</div><div class="line">                    try:</div><div class="line">                        orig_stack_contexts = stack_context._state.contexts</div><div class="line">                        exc_info = None</div><div class="line"></div><div class="line">                        try:</div><div class="line">                            value = future.result()</div><div class="line">                        except Exception:</div><div class="line">                            self.had_exception = True</div><div class="line">                            exc_info = sys.exc_info()</div><div class="line"></div><div class="line">                        if exc_info is not None:</div><div class="line">                            yielded = self.gen.throw(*exc_info)</div><div class="line">                            exc_info = None</div><div class="line">                        else:</div><div class="line">                            # send(value)将结果回传给response</div><div class="line">                            yielded = self.gen.send(value)</div><div class="line"></div><div class="line">                        if stack_context._state.contexts is not orig_stack_contexts:</div><div class="line">                            self.gen.throw(</div><div class="line">                                stack_context.StackContextInconsistentError(</div><div class="line">                                    &apos;stack_context inconsistency (probably caused &apos;</div><div class="line">                                    &apos;by yield within a &quot;with StackContext&quot; block)&apos;))</div><div class="line">                    except (StopIteration, Return) as e:</div><div class="line">                        #generator执行完毕并成功的处理</div><div class="line">                    except Exception:</div><div class="line">                        #generator执行过程中异常的处理</div><div class="line">                    if not self.handle_yield(yielded):</div><div class="line">                        #这里generator还没有执行完毕, yielded是generator迭代过一次之后返回的新yielded。如果yieled还没有被解析出结果就通过handle_yield给yieled设置完成时的重启run的回调,否则yielded已经有结果, 就再次运行run, 所以run中才会有一个循环</div><div class="line">                        return</div><div class="line">            finally:</div><div class="line">                self.running = False</div></pre></td></tr></table></figure>
+<p>附：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">class MainHandler(tornado.web.RequestHandler):</div><div class="line">	@gen.coroutine</div><div class="line">	def get(self):</div><div class="line">		data=yiled self.get_data()</div><div class="line">		self.wirte(data)</div><div class="line">		self.finish()</div><div class="line"></div><div class="line">	def get_data(self):</div><div class="line">		# 异步函数需要返回future</div><div class="line">		future=Future()</div><div class="line">		s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)</div><div class="line">		s.connect((localhost,8888))</div><div class="line">		s.send(&apos;hello\n&apos;)</div><div class="line">		def handle_data(sock,event):</div><div class="line">			io_loop=ioloop.IOLoop.current()</div><div class="line">			io_loop.remove_handler(sock)</div><div class="line">			data=sock.recv(1024)</div><div class="line">			future.set_result(data)</div><div class="line"></div><div class="line">		io_loop=ioloop.IOLoop.current()</div><div class="line">		io_loop.add_handlers(s,handle_data,io_loop.READ)</div><div class="line">		return future</div><div class="line"></div><div class="line">if __name__==&quot;__main__&quot;:</div><div class="line">	app=tornado.web.application(</div><div class="line">		handlers=[</div><div class="line">			(r&apos;/&apos;,MainHandler)</div><div class="line">		]</div><div class="line">	)</div><div class="line">	app.listen(8000)</div><div class="line">	tornado.ioloop.IOLoop.instance().start()</div></pre></td></tr></table></figure>
+
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+
+
+
+
+
+
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2016/12/10/python/搭建docker-registry的开发环境/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            Newer
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2016/12/10/python/如何使多Container协同发挥Docker的优势/" id="post_nav-older" class="next-content">
+            Older
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.jpeg" alt="jmpews's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        jmpews@email.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mailto: jmpews@gmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/" target="_self">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                Home
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    Archives
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2017/04/">April 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/03/">March 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/02/">February 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/01/">January 2017<span class="sidebar_archives-count">8</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/12/">December 2016<span class="sidebar_archives-count">42</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">chrome_reader_mode</i>
+                
+                Categories
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                <a class="sidebar_archives-link" href="/categories/backend/">backend<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/categories/darwin/">darwin<span class="sidebar_archives-count">6</span></a></li><li><a class="sidebar_archives-link" href="/categories/notes/">notes<span class="sidebar_archives-count">16</span></a></li><li><a class="sidebar_archives-link" href="/categories/pwn/">pwn<span class="sidebar_archives-count">15</span></a></li><li><a class="sidebar_archives-link" href="/categories/python/">python<span class="sidebar_archives-count">18</span></a></li><li><a class="sidebar_archives-link" href="/categories/test/">test<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="About">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                About
+            </a>
+        </li>
+        
+    
+        <li>
+            <a href="/tags" title="Tags">
+                
+                Tags
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+        <li>
+            <a href="/archives">
+                Number of articles
+                <span class="sidebar-badge">61</span>
+            </a>
+        </li>
+        
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+
+<!-- Theme Material -->
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+        <a href="https://twitter.com/jmpews" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-twitter.svg);">
+                <span class="visuallyhidden">Twitter</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+
+    <!-- Weibo -->
+    
+        <a href="https://weibo.com/winter1ife" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-weibo.svg);">
+                <span class="visuallyhidden">Weibo</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/jmpews" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-github.svg);">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;
+            <script type="text/javascript">
+                var fd = new Date();
+                document.write(fd.getFullYear());
+            </script>
+            &nbsp;Zz
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import File -->
+
+    <script src="/js/lazyload.min.js"></script>
+    <script src="/js/js.min.js"></script>
+
+
+
+    <script src="/js/nprogress.js"></script>
+
+
+<script type="text/javascript">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Window Load-->
+<script>
+    $(window).load(function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+</script>
+
+<!-- MathJax Load-->
+
+<script>
+    <!-- Offer LazyLoad -->
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    <!-- Start Queue -->
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+                </main>
+            </div>
+        </body>
+    
+</html>

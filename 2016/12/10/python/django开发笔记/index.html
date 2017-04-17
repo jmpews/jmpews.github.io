@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.3.4 -->
+
+    <!-- Title -->
+    
+    <title>
+        
+            django开发笔记 | 
+        
+        Zz
+    </title>
+
+    <!-- Meta & Info -->
+    <meta charset="utf-8">
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+    
+    
+    
+    
+    
+    
+
+    <meta http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0097A7">
+    <meta name="author" content="jmpews">
+    <meta name="description" content="pwn &amp; dev &amp; reverse">
+    <meta name="keywords" content="null,python,django">
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" sizes="192x192" href="/img/favicon.png">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!--iOS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-title" content="Title">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="480">
+
+    <!-- Add to homescreen for Chrome on Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- Add to homescreen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Zz">
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="http://jmpews.github.com">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="django开发笔记 | Zz">
+    <meta property="og:description" content="pwn &amp; dev &amp; reverse">
+    <meta property="og:article:tag" content="python"> <meta property="og:article:tag" content="django"> 
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.en.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import CSS & jQuery -->
+    
+        <link rel="stylesheet" href="/css/material.min.css">
+        <link rel="stylesheet" href="/css/style.min.css">
+        <!-- Config CSS -->
+
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #607D8B !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #607D8B !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #607D8B !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-color: #F5F5F5;
+      }
+
+      /* blog_info bottom background */
+      #scheme-Paradox .material-layout .something-else .mdl-card__supporting-text{
+        background-color: #fff;
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/queue.js"></script>
+    
+
+    <!-- UC Browser Compatible -->
+    <script>
+        var agent = navigator.userAgent.toLowerCase();
+        if(agent.indexOf('ucbrowser')>0) {
+            document.write("<link rel=\"stylesheet\" href=\"/css/uc.css\">");
+            alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+        }
+    </script>
+
+    
+
+    
+
+
+    <!-- Bing Background -->
+    
+
+    <!-- Custom Head -->
+    
+</head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+    <!-- Left aligned menu below button -->
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#入门配置篇"><span class="post-toc-number">1.</span> <span class="post-toc-text">入门配置篇</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Admin基本配置"><span class="post-toc-number">2.</span> <span class="post-toc-text">Admin基本配置</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Django下URLconf配置"><span class="post-toc-number">3.</span> <span class="post-toc-text">Django下URLconf配置</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#1-使用命名组参数"><span class="post-toc-number">3.0.1.</span> <span class="post-toc-text">1.使用命名组参数</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#2-传递额外参数"><span class="post-toc-number">3.0.2.</span> <span class="post-toc-text">2.传递额外参数</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#post和get分给不同函数处理"><span class="post-toc-number">3.0.3.</span> <span class="post-toc-text">post和get分给不同函数处理</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#装饰器-访问很多页面要求已经登陆"><span class="post-toc-number">4.</span> <span class="post-toc-text">装饰器(访问很多页面要求已经登陆)</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#渲染模板"><span class="post-toc-number">5.</span> <span class="post-toc-text">渲染模板</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#关闭模板自转义"><span class="post-toc-number">5.0.1.</span> <span class="post-toc-text">关闭模板自转义</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#url规则名字，自动更改前缀"><span class="post-toc-number">5.0.2.</span> <span class="post-toc-text">url规则名字，自动更改前缀</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Model高级"><span class="post-toc-number">6.</span> <span class="post-toc-text">Model高级</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#增加数据库manager方法"><span class="post-toc-number">6.0.1.</span> <span class="post-toc-text">增加数据库manager方法</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#用户model自定义"><span class="post-toc-number">6.0.2.</span> <span class="post-toc-text">用户model自定义</span></a></li></ol></li></ol></li></ol>
+
+        <!--
+        <li class="mdl-menu__item">
+            Some Action
+        </li>
+        -->
+    </ul>
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        
+            <!-- Random Thumbnail -->
+            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+            <script>
+    var randomNum = Math.floor(Math.random() * 19 + 1);
+
+    $('.post_thumbnail-random').attr('data-original', '/img/random/material-' + randomNum + '.png');
+    $('.post_thumbnail-random').addClass('lazy');
+</script>
+
+        
+    
+            <p class="article-headline-p">
+                django开发笔记
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.jpeg" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>jmpews</strong>
+        <span>Dec 10, 2016</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/django/">django</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/python/">python</a>
+    </ul>
+    
+
+    <!-- Share -->
+    <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=django开发笔记&url=http://jmpews.github.com//2016/12/10/python/django开发笔记/index.html&pic=&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Weibo
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+        <a class="post_share-link" href="https://twitter.com/intent/tweet?text=django开发笔记&url=http://jmpews.github.com//2016/12/10/python/django开发笔记/index.html&via=jmpews" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Twitter
+            </li>
+        </a>
+    
+
+    <!-- Share Facebook -->
+    
+        <a class="post_share-link" href="https://www.facebook.com/sharer/sharer.php?u=http://jmpews.github.com//2016/12/10/python/django开发笔记/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Facebook
+            </li>
+        </a>
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://jmpews.github.com//2016/12/10/python/django开发笔记/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <h2 id="入门配置篇"><a href="#入门配置篇" class="headerlink" title="入门配置篇"></a>入门配置篇</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line"># 模板</div><div class="line">&apos;DIRS&apos;: [BASE_DIR+&quot;/templates&quot;,]</div><div class="line"></div><div class="line"># 新建数据库</div><div class="line">python manage.py migrate</div><div class="line">python manage.py makemigrations</div><div class="line"></div><div class="line"># 数据库相关操作</div><div class="line">list = Test.objects.all()</div><div class="line">Test.objects.filter(id=1)</div><div class="line">Publisher.objects.order_by(&quot;name&quot;)</div><div class="line">Publisher.objects.order_by(&quot;state_province&quot;, &quot;address&quot;)</div><div class="line">#相当于limit10</div><div class="line">Publisher.objects.order_by(&apos;name&apos;)[10]</div><div class="line"></div><div class="line"># 批量update</div><div class="line">Publisher.objects.filter(id=52).update(name=&apos;Apress Publishing&apos;)</div><div class="line"></div><div class="line"># 批量删除   </div><div class="line">Publisher.objects.filter(country=&apos;USA&apos;).delete()</div><div class="line"></div><div class="line"># 提取数据</div><div class="line">try:</div><div class="line">    p = Publisher.objects.get(name=&apos;Apress&apos;)</div><div class="line">except Publisher.DoesNotExist:</div><div class="line"></div><div class="line"># django admin管理,字符型可以仅仅使用blank，而一些以其他数据，需要加上null</div><div class="line">publication_date = models.DateField(**blank=True, null=True** )</div><div class="line"></div><div class="line"># model降序</div><div class="line">class Article(models.Model):</div><div class="line">    class Meta:  #按时间下降排序</div><div class="line">        ordering = [&apos;-date_time&apos;]</div><div class="line"></div><div class="line"></div><div class="line"># 变量描述</div><div class="line">forloop.counter 索引从 1 开始算</div><div class="line">forloop.counter0 索引从 0 开始算</div><div class="line">forloop.revcounter 索引从最大长度到 1</div><div class="line">forloop.revcounter0 索引从最大长度到 0</div><div class="line">forloop.first 当遍历的元素为第一项时为真</div><div class="line">forloop.last 当遍历的元素为最后一项时为真</div><div class="line">forloop.parentloop 用在嵌套的 for 循环中，</div></pre></td></tr></table></figure>
+<h2 id="Admin基本配置"><a href="#Admin基本配置" class="headerlink" title="Admin基本配置"></a>Admin基本配置</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"># 每一个条目显示的字段</div><div class="line">list_display = (&apos;first_name&apos;, &apos;last_name&apos;, &apos;email&apos;)</div><div class="line"># 每一个条目支持修改的字段</div><div class="line">fields = (&apos;title&apos;, &apos;authors&apos;, &apos;publisher&apos;)</div></pre></td></tr></table></figure>
+<h2 id="Django下URLconf配置"><a href="#Django下URLconf配置" class="headerlink" title="Django下URLconf配置"></a>Django下URLconf配置</h2><h4 id="1-使用命名组参数"><a href="#1-使用命名组参数" class="headerlink" title="1.使用命名组参数"></a>1.使用命名组参数</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">urlpatterns = patterns(&apos;&apos;,</div><div class="line">    # 命名组参数year,month</div><div class="line">    (r&apos;^articles/(?P&lt;year&gt;\d&#123;4&#125;)/$&apos;, views.year_archive),</div><div class="line">    (r&apos;^articles/(?P&lt;year&gt;\d&#123;4&#125;)/(?P&lt;month&gt;\d&#123;2&#125;)/$&apos;, views.month_archive),</div><div class="line">)</div></pre></td></tr></table></figure>
+<h4 id="2-传递额外参数"><a href="#2-传递额外参数" class="headerlink" title="2.传递额外参数"></a>2.传递额外参数</h4><p>增加了URL和Views的耦合度</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"># 不好！！！！ 增加了URL和Views的耦合度</div><div class="line">urlpatterns = patterns(&apos;&apos;,</div><div class="line">    (r&apos;^(foo)/$&apos;, views.foobar_view),</div><div class="line">    (r&apos;^(bar)/$&apos;, views.foobar_view),</div><div class="line">)</div><div class="line"></div><div class="line">def foobar_view(request, url):</div><div class="line">    m_list = MyModel.objects.filter(is_new=True)</div><div class="line">    if url == &apos;foo&apos;:</div><div class="line">        template_name = &apos;template1.html&apos;</div><div class="line">    elif url == &apos;bar&apos;:</div><div class="line">        template_name = &apos;template2.html&apos;</div><div class="line">    return render_to_response(template_name, &#123;&apos;m_list&apos;: m_list&#125;)</div></pre></td></tr></table></figure>
+<p>传递额外参数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">urlpatterns = patterns(&apos;&apos;,</div><div class="line">    # 传递了额外参数,template_name</div><div class="line">    (r&apos;^foo/$&apos;, views.foobar_view, &#123;&apos;template_name&apos;: &apos;template1.html&apos;&#125;),</div><div class="line">    (r&apos;^bar/$&apos;, views.foobar_view, &#123;&apos;template_name&apos;: &apos;template2.html&apos;&#125;),</div><div class="line">)</div><div class="line"></div><div class="line">def foobar_view(request, template_name):</div><div class="line">    m_list = MyModel.objects.filter(is_new=True)</div><div class="line">    return render_to_response(template_name, &#123;&apos;m_list&apos;: m_list&#125;)</div></pre></td></tr></table></figure>
+<p>伪造URLconf参数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">urlpatterns = patterns(&apos;&apos;,</div><div class="line">    # 对于特例情况下，伪造urlconf</div><div class="line">    (r&apos;^mydata/birthday/$&apos;, views.my_view, &#123;&apos;month&apos;: &apos;jan&apos;, &apos;day&apos;: &apos;06&apos;&#125;),</div><div class="line">    (r&apos;^mydata/(?P&lt;month&gt;\w&#123;3&#125;)/(?P&lt;day&gt;\d\d)/$&apos;, views.my_view),</div><div class="line">)</div></pre></td></tr></table></figure>
+<ul>
+<li>额外参数优先级要高对于捕获参数的优先级</li>
+<li>url匹配存在短路逻辑</li>
+<li>从url提取的所有参数均为文本</li>
+</ul>
+<h4 id="post和get分给不同函数处理"><a href="#post和get分给不同函数处理" class="headerlink" title="post和get分给不同函数处理"></a>post和get分给不同函数处理</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"># 这里的参数，*args列表类型,**kwargs字典类型</div><div class="line">def method_splitter(request, *args, **kwargs):</div><div class="line">    get_view = kwargs.pop(&apos;GET&apos;, None)</div><div class="line">    post_view = kwargs.pop(&apos;POST&apos;, None)</div><div class="line">    if request.method == &apos;GET&apos; and get_view is not None:</div><div class="line">        return get_view(request, *args, **kwargs)</div><div class="line">    elif request.method == &apos;POST&apos; and post_view is not None:</div><div class="line">        return post_view(request, *args, **kwargs)</div><div class="line">    raise Http404</div></pre></td></tr></table></figure>
+<h2 id="装饰器-访问很多页面要求已经登陆"><a href="#装饰器-访问很多页面要求已经登陆" class="headerlink" title="装饰器(访问很多页面要求已经登陆)"></a>装饰器(访问很多页面要求已经登陆)</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"># 可以做成装饰器</div><div class="line">def requires_login(view):</div><div class="line">    def new_view(request, *args, **kwargs):</div><div class="line">        if not request.user.is_authenticated():</div><div class="line">            return HttpResponseRedirect(&apos;/accounts/login/&apos;)</div><div class="line">        return view(request, *args, **kwargs)</div><div class="line">    return new_view</div></pre></td></tr></table></figure>
+<h2 id="渲染模板"><a href="#渲染模板" class="headerlink" title="渲染模板"></a>渲染模板</h2><p>RequestContext可以包含req参数，同时可以将这个请求过程中一直存在的参数放到其中，相比Context而言。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">def custom_proc(request):</div><div class="line">    &quot;A context processor that provides &apos;app&apos;, &apos;user&apos; and &apos;ip_address&apos;.&quot;</div><div class="line">    return &#123;</div><div class="line">        &apos;app&apos;: &apos;My app&apos;,</div><div class="line">        &apos;user&apos;: request.user,</div><div class="line">        &apos;ip_address&apos;: request.META[&apos;REMOTE_ADDR&apos;]</div><div class="line">    &#125;</div><div class="line"></div><div class="line">def view_1(request):</div><div class="line">    return render_to_response(&apos;template1.html&apos;,</div><div class="line">        &#123;&apos;message&apos;: &apos;I am view 1.&apos;&#125;,</div><div class="line">        # 多个视图通用的参数</div><div class="line">        context_instance=RequestContext(request, processors=[custom_proc]))</div></pre></td></tr></table></figure>
+<h4 id="关闭模板自转义"><a href="#关闭模板自转义" class="headerlink" title="关闭模板自转义"></a>关闭模板自转义</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&#123;% autoescape off %&#125;</div><div class="line">    Hello &#123;&#123; name &#125;&#125;</div><div class="line">&#123;% endautoescape %&#125;</div></pre></td></tr></table></figure>
+<h4 id="url规则名字，自动更改前缀"><a href="#url规则名字，自动更改前缀" class="headerlink" title="url规则名字，自动更改前缀"></a>url规则名字，自动更改前缀</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">url(r&apos;^add/(\d+)/(\d+)/$&apos;, &apos;app.views.add&apos;, name=&apos;add&apos;),</div><div class="line">&#123;% url &apos;some-url-name&apos; arg arg2 as the_url %&#125;</div></pre></td></tr></table></figure>
+<h2 id="Model高级"><a href="#Model高级" class="headerlink" title="Model高级"></a>Model高级</h2><h4 id="增加数据库manager方法"><a href="#增加数据库manager方法" class="headerlink" title="增加数据库manager方法"></a>增加数据库manager方法</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">class BookManager(models.Manager):</div><div class="line">    def title_count(self, keyword):</div><div class="line">        return self.filter(title__icontains=keyword).count()</div><div class="line">    #修改初始Manager QuerySets</div><div class="line">    def get_query_set(self):</div><div class="line">        return super(DahlBookManager, self).get_query_set().filter(author=&apos;Roald Dahl&apos;)</div><div class="line"></div><div class="line">class Book(models.Model):</div><div class="line">    ...</div><div class="line">    objects = BookManager()</div><div class="line">    roald_objects=BookManager()</div></pre></td></tr></table></figure>
+<h4 id="用户model自定义"><a href="#用户model自定义" class="headerlink" title="用户model自定义"></a>用户model自定义</h4><p><a href="https://docs.djangoproject.com/en/dev/topics/auth/customizing/#substituting-a-custom-user-model" target="_blank" rel="external">https://docs.djangoproject.com/en/dev/topics/auth/customizing/#substituting-a-custom-user-model</a></p>
+<p><code>AbstractBaseUser</code> 是全部定制，需要重写覆盖<code>BaseUserManager</code>,<code>BaseUserAdmin</code></p>
+<p><code>AbstractUser</code> 如果只是扩展字段可以用这个</p>
+
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+
+
+
+
+
+
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2016/12/10/python/Tornado源码总结/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            Newer
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2016/12/10/python/docker备忘笔记/" id="post_nav-older" class="next-content">
+            Older
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.jpeg" alt="jmpews's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        jmpews@email.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mailto: jmpews@gmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/" target="_self">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                Home
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    Archives
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2017/04/">April 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/03/">March 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/02/">February 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/01/">January 2017<span class="sidebar_archives-count">8</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/12/">December 2016<span class="sidebar_archives-count">42</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">chrome_reader_mode</i>
+                
+                Categories
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                <a class="sidebar_archives-link" href="/categories/backend/">backend<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/categories/darwin/">darwin<span class="sidebar_archives-count">6</span></a></li><li><a class="sidebar_archives-link" href="/categories/notes/">notes<span class="sidebar_archives-count">16</span></a></li><li><a class="sidebar_archives-link" href="/categories/pwn/">pwn<span class="sidebar_archives-count">15</span></a></li><li><a class="sidebar_archives-link" href="/categories/python/">python<span class="sidebar_archives-count">18</span></a></li><li><a class="sidebar_archives-link" href="/categories/test/">test<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="About">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                About
+            </a>
+        </li>
+        
+    
+        <li>
+            <a href="/tags" title="Tags">
+                
+                Tags
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+        <li>
+            <a href="/archives">
+                Number of articles
+                <span class="sidebar-badge">61</span>
+            </a>
+        </li>
+        
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+
+<!-- Theme Material -->
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+        <a href="https://twitter.com/jmpews" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-twitter.svg);">
+                <span class="visuallyhidden">Twitter</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+
+    <!-- Weibo -->
+    
+        <a href="https://weibo.com/winter1ife" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-weibo.svg);">
+                <span class="visuallyhidden">Weibo</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/jmpews" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-github.svg);">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;
+            <script type="text/javascript">
+                var fd = new Date();
+                document.write(fd.getFullYear());
+            </script>
+            &nbsp;Zz
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import File -->
+
+    <script src="/js/lazyload.min.js"></script>
+    <script src="/js/js.min.js"></script>
+
+
+
+    <script src="/js/nprogress.js"></script>
+
+
+<script type="text/javascript">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Window Load-->
+<script>
+    $(window).load(function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+</script>
+
+<!-- MathJax Load-->
+
+<script>
+    <!-- Offer LazyLoad -->
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    <!-- Start Queue -->
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+                </main>
+            </div>
+        </body>
+    
+</html>

@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.3.4 -->
+
+    <!-- Title -->
+    
+    <title>
+        
+            python引用计数深度解析 | 
+        
+        Zz
+    </title>
+
+    <!-- Meta & Info -->
+    <meta charset="utf-8">
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+    
+    
+    
+    
+    
+    
+
+    <meta http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0097A7">
+    <meta name="author" content="jmpews">
+    <meta name="description" content="pwn &amp; dev &amp; reverse">
+    <meta name="keywords" content="null,python">
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" sizes="192x192" href="/img/favicon.png">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!--iOS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-title" content="Title">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="480">
+
+    <!-- Add to homescreen for Chrome on Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- Add to homescreen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Zz">
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="http://jmpews.github.com">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="python引用计数深度解析 | Zz">
+    <meta property="og:description" content="pwn &amp; dev &amp; reverse">
+    <meta property="og:article:tag" content="python"> 
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.en.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import CSS & jQuery -->
+    
+        <link rel="stylesheet" href="/css/material.min.css">
+        <link rel="stylesheet" href="/css/style.min.css">
+        <!-- Config CSS -->
+
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #607D8B !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #607D8B !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #607D8B !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-color: #F5F5F5;
+      }
+
+      /* blog_info bottom background */
+      #scheme-Paradox .material-layout .something-else .mdl-card__supporting-text{
+        background-color: #fff;
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/queue.js"></script>
+    
+
+    <!-- UC Browser Compatible -->
+    <script>
+        var agent = navigator.userAgent.toLowerCase();
+        if(agent.indexOf('ucbrowser')>0) {
+            document.write("<link rel=\"stylesheet\" href=\"/css/uc.css\">");
+            alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+        }
+    </script>
+
+    
+
+    
+
+
+    <!-- Bing Background -->
+    
+
+    <!-- Custom Head -->
+    
+</head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+    <!-- Left aligned menu below button -->
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#前言"><span class="post-toc-number">1.</span> <span class="post-toc-text">前言</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#使用引用计数的实质"><span class="post-toc-number">1.0.1.</span> <span class="post-toc-text">使用引用计数的实质</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#引用计数的实现"><span class="post-toc-number">2.</span> <span class="post-toc-text">引用计数的实现</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#PyObject-是什么"><span class="post-toc-number">3.</span> <span class="post-toc-text">PyObject* 是什么?</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#引用计数变量-ob-refcnt"><span class="post-toc-number">3.0.1.</span> <span class="post-toc-text">引用计数变量 ob_refcnt</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#如何操作-ob-refcnt-Py-INCREF-and-Py-DECREF"><span class="post-toc-number">3.0.2.</span> <span class="post-toc-text">如何操作 ob_refcnt (Py_INCREF and Py_DECREF)</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#什么时候操作引用计数"><span class="post-toc-number">4.</span> <span class="post-toc-text">什么时候操作引用计数</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#创建一个Object-对象"><span class="post-toc-number">4.0.1.</span> <span class="post-toc-text">创建一个Object* 对象</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#针对long类型变量分析"><span class="post-toc-number">4.0.2.</span> <span class="post-toc-text">针对long类型变量分析</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#处理函数返回的对象"><span class="post-toc-number">4.0.3.</span> <span class="post-toc-text">处理函数返回的对象</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#借用引用-borrow"><span class="post-toc-number">4.0.4.</span> <span class="post-toc-text">借用引用(borrow)</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#传递给函数的对象-borrow"><span class="post-toc-number">4.0.5.</span> <span class="post-toc-text">传递给函数的对象[borrow]</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#偷取引用-Steal"><span class="post-toc-number">5.</span> <span class="post-toc-text">偷取引用(Steal)</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#总结"><span class="post-toc-number">6.</span> <span class="post-toc-text">总结</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#常见问题"><span class="post-toc-number">7.</span> <span class="post-toc-text">常见问题</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#INCREF不可马虎"><span class="post-toc-number">7.0.1.</span> <span class="post-toc-text">INCREF不可马虎</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#偷取和借用对比在-build-list-or-tuple-方面"><span class="post-toc-number">7.0.2.</span> <span class="post-toc-text">偷取和借用对比在 build list or tuple 方面</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#举例说明"><span class="post-toc-number">8.</span> <span class="post-toc-text">举例说明</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#Example-1"><span class="post-toc-number">8.0.1.</span> <span class="post-toc-text">Example 1</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#Example-2"><span class="post-toc-number">8.0.2.</span> <span class="post-toc-text">Example 2</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#更新内容"><span class="post-toc-number">9.</span> <span class="post-toc-text">更新内容</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#弱引用"><span class="post-toc-number">9.0.1.</span> <span class="post-toc-text">弱引用</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#弱引用解决引用环问题"><span class="post-toc-number">9.0.2.</span> <span class="post-toc-text">弱引用解决引用环问题</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#弱引用对象使用"><span class="post-toc-number">9.0.3.</span> <span class="post-toc-text">弱引用对象使用</span></a></li></ol></li></ol></li></ol>
+
+        <!--
+        <li class="mdl-menu__item">
+            Some Action
+        </li>
+        -->
+    </ul>
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        
+            <!-- Random Thumbnail -->
+            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+            <script>
+    var randomNum = Math.floor(Math.random() * 19 + 1);
+
+    $('.post_thumbnail-random').attr('data-original', '/img/random/material-' + randomNum + '.png');
+    $('.post_thumbnail-random').addClass('lazy');
+</script>
+
+        
+    
+            <p class="article-headline-p">
+                python引用计数深度解析
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.jpeg" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>jmpews</strong>
+        <span>Dec 10, 2016</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/python/">python</a>
+    </ul>
+    
+
+    <!-- Share -->
+    <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=python引用计数深度解析&url=http://jmpews.github.com//2016/12/10/python/python引用计数深度解析/index.html&pic=&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Weibo
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+        <a class="post_share-link" href="https://twitter.com/intent/tweet?text=python引用计数深度解析&url=http://jmpews.github.com//2016/12/10/python/python引用计数深度解析/index.html&via=jmpews" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Twitter
+            </li>
+        </a>
+    
+
+    <!-- Share Facebook -->
+    
+        <a class="post_share-link" href="https://www.facebook.com/sharer/sharer.php?u=http://jmpews.github.com//2016/12/10/python/python引用计数深度解析/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Facebook
+            </li>
+        </a>
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://jmpews.github.com//2016/12/10/python/python引用计数深度解析/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>引用计数记录指向对象引用的个数，当变为0，则被释放。总结了引用计数的注意点和如何使用。更新：weakref(弱引用)、用弱引用解决引用环问题</p>
+<blockquote>
+<p>It counts how many different places there are that have a reference to an object.When an object’s reference count becomes zero, the object is deallocated</p>
+<p>记录指向对象引用的个数，当变为0，则被释放</p>
+</blockquote>
+<h4 id="使用引用计数的实质"><a href="#使用引用计数的实质" class="headerlink" title="使用引用计数的实质"></a>使用引用计数的实质</h4><blockquote>
+<p>The only real reason to use the reference count is to prevent the object from being deallocated as long as our variable is pointing to it</p>
+<p>使用引用计数的唯一理由就是只要还有变量指向就应当阻止对象被释放</p>
+</blockquote>
+<h2 id="引用计数的实现"><a href="#引用计数的实现" class="headerlink" title="引用计数的实现"></a>引用计数的实现</h2><ul>
+<li><code>PyObject*</code> 是什么?</li>
+<li>引用计数变量 <code>ob_refcnt</code></li>
+<li>如何操作 <code>ob_refcnt (Py_INCREF and Py_DECREF)</code></li>
+</ul>
+<h2 id="PyObject-是什么"><a href="#PyObject-是什么" class="headerlink" title="PyObject* 是什么?"></a><code>PyObject*</code> 是什么?</h2><blockquote>
+<p>This type is a pointer to an opaque data type representing an <strong>arbitrary Python object</strong>. Since all Python object types are treated <strong>the same way</strong> by the Python language in most situations (e.g., assignments, scope rules, and argument passing), it is only fitting that they should be represented by a single C type. Almost all <strong>Python objects live on the heap</strong>: you never declare an automatic or static variable of type PyObject, only pointer variables of type <strong>PyObject* </strong>can be declared.</p>
+<p>这种数据类型是可以表示任意Python对象的封装数据类型，因此Python对象类型在大多数情况下以相同方式处理。几乎全部的Python的对象存储在<strong>heap堆(由程序员分配malloc)</strong>，因此不可以声明一个PyObject的类型对象(局部变量值保存在stack)，只能是<strong>PyObject* </strong></p>
+</blockquote>
+<h4 id="引用计数变量-ob-refcnt"><a href="#引用计数变量-ob-refcnt" class="headerlink" title="引用计数变量 ob_refcnt"></a>引用计数变量 <code>ob_refcnt</code></h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">typedef struct _object &#123;</div><div class="line">    _PyObject_HEAD_EXTRA</div><div class="line">    Py_ssize_t ob_refcnt;</div><div class="line">    struct _typeobject *ob_type;</div><div class="line">&#125; PyObject;</div></pre></td></tr></table></figure>
+<h4 id="如何操作-ob-refcnt-Py-INCREF-and-Py-DECREF"><a href="#如何操作-ob-refcnt-Py-INCREF-and-Py-DECREF" class="headerlink" title="如何操作 ob_refcnt (Py_INCREF and Py_DECREF)"></a>如何操作 <code>ob_refcnt (Py_INCREF and Py_DECREF)</code></h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">#define Py_INCREF(op) (                         \</div><div class="line">    _Py_INC_REFTOTAL  _Py_REF_DEBUG_COMMA       \</div><div class="line">    ((PyObject *)(op))-&gt;ob_refcnt++)</div><div class="line"></div><div class="line">#define Py_DECREF(op)                                   \</div><div class="line">    do &#123;                                                \</div><div class="line">        PyObject *_py_decref_tmp = (PyObject *)(op);    \</div><div class="line">        if (_Py_DEC_REFTOTAL  _Py_REF_DEBUG_COMMA       \</div><div class="line">        --(_py_decref_tmp)-&gt;ob_refcnt != 0)             \</div><div class="line">            _Py_CHECK_REFCNT(_py_decref_tmp)            \</div><div class="line">        else                                            \</div><div class="line">        _Py_Dealloc(_py_decref_tmp);                    \</div><div class="line">    &#125; while (0)</div></pre></td></tr></table></figure>
+<h2 id="什么时候操作引用计数"><a href="#什么时候操作引用计数" class="headerlink" title="什么时候操作引用计数"></a>什么时候操作引用计数</h2><p><strong>仅有当你需要保护这个变量不被释放时才使用INCREF</strong></p>
+<p>具体：</p>
+<ul>
+<li>创建一个Object* 对象</li>
+<li>处理函数返回的对象</li>
+<li>借用引用(borrow)</li>
+<li>偷取引用(Steal)</li>
+</ul>
+<p>注: 不需要对每个<strong>本地变量(stack变量)</strong>的引用+1，因为当一个变量创建并且有一个指针指向时，默认INC，然而当变量失去作用范围(stack栈)又会DEC，两者抵消。</p>
+<h4 id="创建一个Object-对象"><a href="#创建一个Object-对象" class="headerlink" title="创建一个Object* 对象"></a>创建一个Object* 对象</h4><h4 id="针对long类型变量分析"><a href="#针对long类型变量分析" class="headerlink" title="针对long类型变量分析"></a>针对long类型变量分析</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">PyObject *l, *x;</div><div class="line">x = PyLong_FromLong(1L);</div></pre></td></tr></table></figure>
+<p>具体请参考 <code>PyLong_FromLong() [longobject.c]</code></p>
+<p>调用 <code>_PyLong_New()</code> 创建新long对象</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">PyObject *</div><div class="line">PyLong_FromLong(long ival)</div><div class="line">&#123;</div><div class="line">    PyLongObject *v;</div><div class="line">    ...</div><div class="line">    //something done</div><div class="line">        v = _PyLong_New(1);</div><div class="line">    ...</div><div class="line">    //something done</div><div class="line">    return (PyObject *)v;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>_PyLong_New() [longobject.c]</code> 的过程分析</p>
+<p>调用 <code>PyObject_MALLOC()</code> 分配内存，调用 <code>PyObject_INIT_VAR()</code> 初始化为 <code>PyLongOject*</code> 类型，完成 <code>PyObject*</code> 相关项的初始化，比如类型项等等。</p>
+<p><strong>注：</strong>关于 <code>PyObject_MALLOC()[obmalloc.c]</code>，采用内存池进行内存管理，此处不详细介绍</p>
+<p><a href="http://blog.csdn.net/dbzhang800/article/details/6685269" target="_blank" rel="external">Python内存管理</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">PyLongObject *</div><div class="line">_PyLong_New(Py_ssize_t size)</div><div class="line">&#123;</div><div class="line">    PyLongObject *result;</div><div class="line">    if (size &gt; (Py_ssize_t)MAX_LONG_DIGITS) &#123;</div><div class="line">        PyErr_SetString(PyExc_OverflowError,</div><div class="line">                        &quot;too many digits in integer&quot;);</div><div class="line">        return NULL;</div><div class="line">    &#125;</div><div class="line">    result = PyObject_MALLOC(offsetof(PyLongObject, ob_digit) +</div><div class="line">                             size*sizeof(digit));</div><div class="line">    if (!result) &#123;</div><div class="line">        PyErr_NoMemory();</div><div class="line">        return NULL;</div><div class="line">    &#125;</div><div class="line">    return (PyLongObject*)PyObject_INIT_VAR(result, &amp;PyLong_Type, size);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>PyObject_INIT_VAR() [objimp.h]</code> 分析过程</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">#define PyObject_INIT(op, typeobj) \</div><div class="line">    ( Py_TYPE(op) = (typeobj), _Py_NewReference((PyObject *)(op)), (op) )</div><div class="line">#define PyObject_INIT_VAR(op, typeobj, size) \</div><div class="line">    ( Py_SIZE(op) = (size), PyObject_INIT((op), (typeobj)) )</div></pre></td></tr></table></figure>
+<p>宏展开(Macro Expansion) <code>Py_TYPE() _Py_NewReference() [object.h]</code></p>
+<p>最终发现调用创建 <code>PyObject*</code> 变量时, 初始化 <code>op_refcnt</code> 为 1</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">#define Py_TYPE(ob)             (((PyObject*)(ob))-&gt;ob_type)</div><div class="line">#define Py_REFCNT(ob)           (((PyObject*)(ob))-&gt;ob_refcnt)</div><div class="line">#define _Py_NewReference(op) (                          \</div><div class="line">    _Py_INC_TPALLOCS(op) _Py_COUNT_ALLOCS_COMMA         \</div><div class="line">    _Py_INC_REFTOTAL  _Py_REF_DEBUG_COMMA               \</div><div class="line">    Py_REFCNT(op) = 1)</div></pre></td></tr></table></figure>
+<h4 id="处理函数返回的对象"><a href="#处理函数返回的对象" class="headerlink" title="处理函数返回的对象"></a>处理函数返回的对象</h4><p>很多函数在返回之前会调用 <code>Py_INCREF()</code>，因此该函数的 caller 需要调用 <code>Py_DECREF()</code>,以防内存泄露(memory leak)</p>
+<p><code>MyCode</code> 必须处理 <code>pyo</code>，调用 <code>Py_DECREF</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">void MyCode(arguments)</div><div class="line">&#123;</div><div class="line">    PyObject* pyo;</div><div class="line">    ...</div><div class="line">    pyo = Py_Something(args);</div><div class="line">    //Py_DECREF(pyo);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>如果 <code>MyCode</code> 传递 <code>pyo</code> 的所有权，则不能调用 <code>Py_DECREF</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">PyObject* MyCode(arguments) &#123;</div><div class="line">    PyObject* pyo;</div><div class="line">    ...</div><div class="line">    pyo = Py_Something(args);</div><div class="line">    ...</div><div class="line">    return pyo;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>注: 函数返回 None 则返回之前需要 <code>Py_INCREF(Py_None)</code></p>
+<p><a href="http://stackoverflow.com/questions/15287590/why-should-py-increfpy-none-be-required-before-returning-py-none-in-c" target="_blank" rel="external">Py_INCREF(Py_None) from stackoverflow</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Py_INCREF(Py_None);</div><div class="line">return Py_None;</div></pre></td></tr></table></figure>
+<h4 id="借用引用-borrow"><a href="#借用引用-borrow" class="headerlink" title="借用引用(borrow)"></a>借用引用(borrow)</h4><p><strong>仅获得拷贝，引用计数不增加</strong></p>
+<p>产生借用:</p>
+<ul>
+<li>返回借用引用对象的函数[borrow]</li>
+<li>传递给函数的对象[borrow]</li>
+</ul>
+<p>返回借用引用对象的函数[borrow]</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">PyTuple_GetItem()</div><div class="line">PyList_GetItem()</div><div class="line">PyList_GET_ITEM()</div><div class="line">PyList_SET_ITEM()</div><div class="line">PyDict_GetItem()</div><div class="line">PyDict_GetItemString()</div><div class="line">PyErr_Occurred()</div><div class="line">PyFile_Name()</div><div class="line">PyImport_GetModuleDict()</div><div class="line">PyModule_GetDict()</div><div class="line">PyImport_AddModule()</div><div class="line">PyObject_Init()</div><div class="line">Py_InitModule()</div><div class="line">Py_InitModule3()</div><div class="line">Py_InitModule4()</div><div class="line">PySequence_Fast_GET_ITEM()</div></pre></td></tr></table></figure>
+<p><code>PyList_GetItem</code> 仅获得对应项目拷贝，不增加引用计数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">long sum_list(PyObject *list)</div><div class="line">&#123;</div><div class="line"> int i, n;</div><div class="line"> long total = 0;</div><div class="line"> PyObject *item;</div><div class="line"></div><div class="line"> n = PyList_Size(list);</div><div class="line"> if (n &lt; 0)</div><div class="line">     return -1; /* Not a list */</div><div class="line">     /* Caller should use PyErr_Occurred() if a -1 is returned. */</div><div class="line"> for (i = 0; i &lt; n; i++) &#123;</div><div class="line">     /* PyList_GetItem does not INCREF &quot;item&quot;.</div><div class="line">        &quot;item&quot; is unprotected and borrowed. IMPORTANT!!! */</div><div class="line">     item = PyList_GetItem(list, i); /* Can&apos;t fail */</div><div class="line">     if (PyInt_Check(item))</div><div class="line">         total += PyInt_AsLong(item);</div><div class="line"> &#125;</div><div class="line"> return total;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>PySequence_GetItem</code> 获得对象所有权，其返回对象+1，因而每次循环后需要-1.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">long sum_sequence(PyObject *sequence)</div><div class="line">&#123;</div><div class="line"> int i, n;</div><div class="line"> long total = 0;</div><div class="line"> PyObject *item;</div><div class="line"> n = PySequence_Length(sequence);</div><div class="line"> if (n &lt; 0)</div><div class="line">     return -1; /* Has no length. */</div><div class="line">     /* Caller should use PyErr_Occurred() if a -1 is returned. */</div><div class="line"> for (i = 0; i &lt; n; i++) &#123;</div><div class="line">     /* PySequence_GetItem INCREFs item.  IMPORTANT!!!*/</div><div class="line">     item = PySequence_GetItem(sequence, i);</div><div class="line">     if (item == NULL)</div><div class="line">         return -1; /* Not a sequence, or other failure */</div><div class="line">     if (PyInt_Check(item))</div><div class="line">         total += PyInt_AsLong(item);</div><div class="line">     Py_DECREF(item);</div><div class="line"> &#125;</div><div class="line"> return total;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="传递给函数的对象-borrow"><a href="#传递给函数的对象-borrow" class="headerlink" title="传递给函数的对象[borrow]"></a>传递给函数的对象[borrow]</h4><blockquote>
+<p>Most functions assume that the arguments passed to them are already protected.Therefore Py_INCREF() is not called inside Function unless Function wants the argument to continue to exist after Caller exits. In the documentation, Function is said to borrow a reference:<br><strong>大多数函数假定传入函数的参数都是受保护的不需要INCREF，除非希望参数在函数exit后仍然存在。官方文档说法是函数借用引用</strong></p>
+<p>When you pass an object reference into another function, in general, the function borrows the reference from you   if it needs to store it, it will use Py_INCREF() to become an independent owner.<br><strong>你传递对象给一个函数，一般情况来说是函数借用引用，如果你希望保存那么请INCREF，将其变为独立拥有者。</strong></p>
+</blockquote>
+<p><code>PyTuple_SetItem()</code> 和 <code>PyList_SetItem()</code> 除外，它们接管传入对象所有权(take over responsibility) or 偷取引用(steal a reference)</p>
+<p>详细见下</p>
+<h2 id="偷取引用-Steal"><a href="#偷取引用-Steal" class="headerlink" title="偷取引用(Steal)"></a>偷取引用(Steal)</h2><p><code>PyTuple_SetItem(tuple,i,item)</code> 和 <code>PyList_SetItem()</code> 接管所有权(take over responsibility) or 偷取引用(steal a reference) item引用，but not to the tuple or list into which the item is put，即仅仅偷取item引用.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">PyDict_SetItem()非借用，既然是store变量到dict，因此PyDict_SetItem() INCREF它的kye和value</div><div class="line"></div><div class="line">但是PyTuple_SetItem()和PyList_SetItem()比较特殊，接管所有权(take over responsibility) or 偷取引用(steal a reference)</div><div class="line"></div><div class="line">PyTuple_SetItem(tuple,i,item)实现：如果tuple[i]存在PyObject则DECREF，然后tuple[i]设置为item。并且Item并没有INCREF</div><div class="line"></div><div class="line">PyTuple_SetItem(tuple,i,item)既然是steal，那么**Item之前必须有所有权**</div><div class="line"></div><div class="line">如果PyTuple_SetItem()插入item失败，则DECREF item引用计数</div><div class="line"></div><div class="line">PyTuple_SetItem()是设置Tuple中item的唯一方法</div></pre></td></tr></table></figure>
+<p>不需要调用 <code>DECREF(x)</code>，<code>PyTuple_SetItem()</code> 已经自动调用了,当 Tuple 被 DECREF 时，它的 item 也会被 DECREF</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">PyObjetc *t;</div><div class="line">PyObject *x;</div><div class="line">x=PyIntFromLong(1L);</div><div class="line">PyTuple_SetItem(t,0,x);</div></pre></td></tr></table></figure>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>许多从<strong>其他对象上提取子对象</strong>的函数，通过引用传递所有权，但有一些例外，<code>PyTuple_GetItem()</code>, <code>PyList_GetItem()</code>, <code>PyDict_GetItem()</code>，和 <code>PyDict_GetItemString()</code>，这些返回的引用是从 tuple，list 或 dict 中借用的.(借用仅获得拷贝，引用计数并不增加)</p>
+<p>当你传递一个对象引用给其他函数，这个函数会从借用这个引用，如果需要保存它应该使用Py_INCREF()转换为独立拥有者。但是有例外，<code>PyTuple_SetItem()</code> 和 <code>PyList_SetItem()</code>，直接传递对象所有权</p>
+<p>Python调用一个C函数的返回对象必须拥有引用所有权传递给它的调用者</p>
+<h2 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h2><h4 id="INCREF不可马虎"><a href="#INCREF不可马虎" class="headerlink" title="INCREF不可马虎"></a>INCREF不可马虎</h4><p>常见的情况是从 list 中提取对象，一些操作符可以能会替换或者移除 list 中某个对象，并且假如这个向对象是用户自定义的 calss，包含 <code>__del__</code>，然而这个 <code>__del__</code> 可以执行任意的code，但是这些操作可能会无意的 DEC 该 list[0] 的引用计数，导致free。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">bug(PyObject *list) &#123;</div><div class="line">/*item利用PyList_GetItem借用list引用*/</div><div class="line"> PyObject *item = PyList_GetItem(list, 0);</div><div class="line"> //修改措施Py_INCREF(item); /* Protect item. */</div><div class="line"> /* This function “steals” a reference to item and discards a reference to an item already in the list at the affected position.</div><div class="line"> 可能引起list中原list[1]中__del__，导致DEClist[0]*/</div><div class="line"> PyList_SetItem(list, 1, PyInt_FromLong(0L));</div><div class="line"> PyObject_Print(item, stdout, 0); /* BUG! */</div><div class="line"> //修改措施:Py_DECREF(item);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="偷取和借用对比在-build-list-or-tuple-方面"><a href="#偷取和借用对比在-build-list-or-tuple-方面" class="headerlink" title="偷取和借用对比在 build list or tuple 方面"></a>偷取和借用对比在 <code>build list or tuple</code> 方面</h4><p>Example1: steal a referfence(take over responsibilty)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">PyObjetc *t;</div><div class="line">PyObject *x;</div><div class="line">x=PyIntFromLong(1L);</div><div class="line">PyTuple_SetItem(t,0,x);</div><div class="line">//Dont&apos;t Need Py_DECREF()</div></pre></td></tr></table></figure>
+<p>Example2: borrow a reference</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">/*Better way*/</div><div class="line"></div><div class="line">PyObject *l, *x;</div><div class="line">l = PyList_New(3);</div><div class="line">x = PyInt_FromLong(1L);</div><div class="line">PySequence_SetItem(l, 0, x); Py_DECREF(x);</div><div class="line">x = PyInt_FromLong(2L);</div><div class="line">PySequence_SetItem(l, 1, x); Py_DECREF(x);</div><div class="line">x = PyString_FromString(&quot;three&quot;);</div><div class="line">PySequence_SetItem(l, 2, x); Py_DECREF(x);</div></pre></td></tr></table></figure>
+<p>注: 更常见的创建list和tuple的方法</p>
+<p>More Common Way to Populate a tuple or list</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">PyObject *t, *l;</div><div class="line">t = Py_BuildValue(&quot;(iis)&quot;, 1, 2, &quot;three&quot;);</div><div class="line">l = Py_BuildValue(&quot;[iis]&quot;, 1, 2, &quot;three&quot;);</div></pre></td></tr></table></figure>
+<p>参考链接:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[Reference Counting in Python](http://edcjones.tripod.com/refcount.html)</div><div class="line"></div><div class="line">[Extending Python with C or C++](http://www.incoding.org/admin/archives/808.html)</div></pre></td></tr></table></figure>
+<h2 id="举例说明"><a href="#举例说明" class="headerlink" title="举例说明"></a>举例说明</h2><h4 id="Example-1"><a href="#Example-1" class="headerlink" title="Example 1"></a>Example 1</h4><p>This is a pretty standard example of C code using the Python API.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">PyObject*</div><div class="line">    MyFunction(void)</div><div class="line">    &#123;</div><div class="line">        PyObject* temporary_list=NULL;</div><div class="line">        PyObject* return_this=NULL;</div><div class="line"></div><div class="line">        temporary_list = PyList_New(1);          /* Note 1 */</div><div class="line">        if (temporary_list == NULL)</div><div class="line">            return NULL;</div><div class="line"></div><div class="line">        return_this = PyList_New(1);             /* Note 1 */</div><div class="line">        if (return_this == NULL)</div><div class="line">            Py_DECREF(temporary_list);           /* Note 2 */</div><div class="line">            return NULL;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        Py_DECREF(temporary_list);               /* Note 2 */</div><div class="line">        return return_this;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Note 1: The object returned by PyList_New has a reference count of 1.</div><div class="line">Note 2: Since temporary_list should disappear when MyFunction exits, it must be DECREFed before any return from the function. If a return can be reached both before or after temporary_list is created, then initialize temporary_list to NULL and use Py_XDECREF().</div></pre></td></tr></table></figure>
+<h4 id="Example-2"><a href="#Example-2" class="headerlink" title="Example 2"></a>Example 2</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">This is the same as Example 1 except PyTuple_GetItem() is used.</div><div class="line">    PyObject*</div><div class="line">    MyFunction(void)</div><div class="line">    &#123;</div><div class="line">        PyObject* temporary=NULL;</div><div class="line">        PyObject* return_this=NULL;</div><div class="line">        PyObject* tup;</div><div class="line">        PyObject* num;</div><div class="line">        int err;</div><div class="line">        tup = PyTuple_New(2);</div><div class="line">        if (tup == NULL)</div><div class="line">            return NULL;</div><div class="line">        err = PyTuple_SetItem(tup, 0, PyInt_FromLong(222L));</div><div class="line">        /* Note 1 */</div><div class="line">        if (err) &#123;</div><div class="line">            Py_DECREF(tup);</div><div class="line">            return NULL;</div><div class="line">        &#125;</div><div class="line">        err = PyTuple_SetItem(tup, 1, PyInt_FromLong(333L));</div><div class="line">        /* Note 1 */</div><div class="line">        if (err) &#123;</div><div class="line">            Py_DECREF(tup);</div><div class="line">            return NULL;</div><div class="line">        &#125;</div><div class="line">        temporary = PyTuple_Getitem(tup, 0);</div><div class="line">        /* Note 2 */</div><div class="line">        if (temporary == NULL) &#123;</div><div class="line">            Py_DECREF(tup);</div><div class="line">            return NULL;</div><div class="line">        &#125;</div><div class="line">        return_this = PyTuple_Getitem(tup, 1);</div><div class="line">        /* Note 3 */</div><div class="line">        if (return_this == NULL) &#123;</div><div class="line">            Py_DECREF(tup);</div><div class="line">            /* Note 3 */</div><div class="line">            return NULL;</div><div class="line">        &#125;</div><div class="line">        /* Note 3 */</div><div class="line">        Py_DECREF(tup);</div><div class="line">        return return_this;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Note 1: If PyTuple_SetItem fails or if the tuple it created is DECREFed to 0, then the object returned by **PyInt_FromLong is DECREFed**.</div><div class="line"></div><div class="line">Note 2: PyTuple_Getitem does not increment the reference count for the object it returns.</div><div class="line"></div><div class="line">Note 3: You have no responsibility for DECFREFing temporary.</div></pre></td></tr></table></figure>
+<h2 id="更新内容"><a href="#更新内容" class="headerlink" title="更新内容"></a>更新内容</h2><h4 id="弱引用"><a href="#弱引用" class="headerlink" title="弱引用"></a>弱引用</h4><blockquote>
+<p>弱引用与强引用相对，指不能确保其引用对象不会被垃圾回收器回收，一个对象若只被弱引用所引用，则被认为是不可访问的。 –wiki</p>
+</blockquote>
+<h4 id="弱引用解决引用环问题"><a href="#弱引用解决引用环问题" class="headerlink" title="弱引用解决引用环问题"></a>弱引用解决引用环问题</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"># python2.x会出现，python3.x做了改进</div><div class="line">class LeakTest(object):</div><div class="line">   def __init__(self):</div><div class="line">     print &apos;Object with id %d born here.&apos; % id(self)</div><div class="line">   def __del__(self):</div><div class="line">     print &apos;Object with id %d dead here.&apos; % id(self)</div><div class="line"></div><div class="line">def foo():</div><div class="line">   A = LeakTest()</div><div class="line">   B = LeakTest()</div><div class="line">   A.b = B</div><div class="line">   B.a = A</div><div class="line">if __name__ = =&quot;__main__&quot;:</div><div class="line">  foo()</div><div class="line"></div><div class="line">RESULT:</div><div class="line">Object with id 10462448 born here.</div><div class="line">Object with id 10462832 born here.</div></pre></td></tr></table></figure>
+<p>相互引用导致形成环，当对象只有被弱引用时，同样会被回收,因此可做如下修改</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">import weakref</div><div class="line">class LeakTest(object):</div><div class="line">   def __init__(self):</div><div class="line">     print &apos;Object with id %d born here.&apos; % id(self)</div><div class="line">   def __del__(self):</div><div class="line">     print &apos;Object with id %d dead here.&apos; % id(self)</div><div class="line"></div><div class="line">def foo():</div><div class="line">   A = LeakTest()</div><div class="line">   B = LeakTest()</div><div class="line">   A.b = weakref.proxy(B)</div><div class="line">   B.a = weakref.proxy(A)</div><div class="line">if __name__ = =&quot;__main__&quot;:</div><div class="line">  foo()</div></pre></td></tr></table></figure>
+<h4 id="弱引用对象使用"><a href="#弱引用对象使用" class="headerlink" title="弱引用对象使用"></a>弱引用对象使用</h4><p>弱引用和代理对象都可以设置callback，在没有强引用时，python要进行销毁时调用。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">&gt;&gt;&gt; from socket import *</div><div class="line">&gt;&gt;&gt; import weakref</div><div class="line">&gt;&gt;&gt; s=socket(AF_INET,SOCK_STREAM)</div><div class="line">&gt;&gt;&gt; ref=weakref.ref(s) # 通过调用弱引用来获取被弱引用的对象</div><div class="line">&gt;&gt;&gt; pref=weakref.proxy(s) #代理对象就是弱引用对象</div><div class="line">&gt;&gt;&gt; s</div><div class="line">&lt;socket.socket fd=8, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=(&apos;0.0.0.0&apos;, 0)&gt;</div><div class="line">&gt;&gt;&gt; ref</div><div class="line">&lt;weakref at 0x103275598; to &apos;socket&apos; at 0x10325aee8&gt;</div><div class="line">&gt;&gt;&gt; ref()</div><div class="line">&lt;socket.socket fd=8, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=(&apos;0.0.0.0&apos;, 0)&gt;</div><div class="line">&gt;&gt;&gt; pref</div><div class="line">&lt;weakproxy at 0x103275548 to socket at 0x10325aee8&gt;</div></pre></td></tr></table></figure>
+
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+
+
+
+
+
+
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2016/12/10/python/python单元测试以及Mock/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            Newer
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2016/12/10/python/python技巧与笔记/" id="post_nav-older" class="next-content">
+            Older
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.jpeg" alt="jmpews's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        jmpews@email.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mailto: jmpews@gmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/" target="_self">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                Home
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    Archives
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2017/04/">April 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/03/">March 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/02/">February 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/01/">January 2017<span class="sidebar_archives-count">8</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/12/">December 2016<span class="sidebar_archives-count">42</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">chrome_reader_mode</i>
+                
+                Categories
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                <a class="sidebar_archives-link" href="/categories/backend/">backend<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/categories/darwin/">darwin<span class="sidebar_archives-count">6</span></a></li><li><a class="sidebar_archives-link" href="/categories/notes/">notes<span class="sidebar_archives-count">16</span></a></li><li><a class="sidebar_archives-link" href="/categories/pwn/">pwn<span class="sidebar_archives-count">15</span></a></li><li><a class="sidebar_archives-link" href="/categories/python/">python<span class="sidebar_archives-count">18</span></a></li><li><a class="sidebar_archives-link" href="/categories/test/">test<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="About">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                About
+            </a>
+        </li>
+        
+    
+        <li>
+            <a href="/tags" title="Tags">
+                
+                Tags
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+        <li>
+            <a href="/archives">
+                Number of articles
+                <span class="sidebar-badge">61</span>
+            </a>
+        </li>
+        
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+
+<!-- Theme Material -->
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+        <a href="https://twitter.com/jmpews" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-twitter.svg);">
+                <span class="visuallyhidden">Twitter</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+
+    <!-- Weibo -->
+    
+        <a href="https://weibo.com/winter1ife" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-weibo.svg);">
+                <span class="visuallyhidden">Weibo</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/jmpews" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-github.svg);">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;
+            <script type="text/javascript">
+                var fd = new Date();
+                document.write(fd.getFullYear());
+            </script>
+            &nbsp;Zz
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import File -->
+
+    <script src="/js/lazyload.min.js"></script>
+    <script src="/js/js.min.js"></script>
+
+
+
+    <script src="/js/nprogress.js"></script>
+
+
+<script type="text/javascript">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Window Load-->
+<script>
+    $(window).load(function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+</script>
+
+<!-- MathJax Load-->
+
+<script>
+    <!-- Offer LazyLoad -->
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    <!-- Start Queue -->
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+                </main>
+            </div>
+        </body>
+    
+</html>

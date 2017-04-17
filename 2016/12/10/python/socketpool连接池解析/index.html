@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.3.4 -->
+
+    <!-- Title -->
+    
+    <title>
+        
+            socketpool连接池解析 | 
+        
+        Zz
+    </title>
+
+    <!-- Meta & Info -->
+    <meta charset="utf-8">
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+    
+    
+    
+    
+    
+    
+
+    <meta http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0097A7">
+    <meta name="author" content="jmpews">
+    <meta name="description" content="pwn &amp; dev &amp; reverse">
+    <meta name="keywords" content="null,python">
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" sizes="192x192" href="/img/favicon.png">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!--iOS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-title" content="Title">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="480">
+
+    <!-- Add to homescreen for Chrome on Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- Add to homescreen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Zz">
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="http://jmpews.github.com">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="socketpool连接池解析 | Zz">
+    <meta property="og:description" content="pwn &amp; dev &amp; reverse">
+    <meta property="og:article:tag" content="python"> 
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.en.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import CSS & jQuery -->
+    
+        <link rel="stylesheet" href="/css/material.min.css">
+        <link rel="stylesheet" href="/css/style.min.css">
+        <!-- Config CSS -->
+
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #607D8B !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #607D8B !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #607D8B !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-color: #F5F5F5;
+      }
+
+      /* blog_info bottom background */
+      #scheme-Paradox .material-layout .something-else .mdl-card__supporting-text{
+        background-color: #fff;
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/queue.js"></script>
+    
+
+    <!-- UC Browser Compatible -->
+    <script>
+        var agent = navigator.userAgent.toLowerCase();
+        if(agent.indexOf('ucbrowser')>0) {
+            document.write("<link rel=\"stylesheet\" href=\"/css/uc.css\">");
+            alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+        }
+    </script>
+
+    
+
+    
+
+
+    <!-- Bing Background -->
+    
+
+    <!-- Custom Head -->
+    
+</head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+    <!-- Left aligned menu below button -->
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#前言"><span class="post-toc-number">1.</span> <span class="post-toc-text">前言</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#如何设计一个socket连接池"><span class="post-toc-number">2.</span> <span class="post-toc-text">如何设计一个socket连接池</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#pool-py-分析"><span class="post-toc-number">3.</span> <span class="post-toc-text">pool.py 分析</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#conn-py-分析"><span class="post-toc-number">4.</span> <span class="post-toc-text">conn.py 分析</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#backend-gevent-py-gevent模式分析"><span class="post-toc-number">5.</span> <span class="post-toc-text">backend_gevent.py gevent模式分析</span></a></li></ol>
+
+        <!--
+        <li class="mdl-menu__item">
+            Some Action
+        </li>
+        -->
+    </ul>
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        
+            <!-- Random Thumbnail -->
+            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+            <script>
+    var randomNum = Math.floor(Math.random() * 19 + 1);
+
+    $('.post_thumbnail-random').attr('data-original', '/img/random/material-' + randomNum + '.png');
+    $('.post_thumbnail-random').addClass('lazy');
+</script>
+
+        
+    
+            <p class="article-headline-p">
+                socketpool连接池解析
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.jpeg" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>jmpews</strong>
+        <span>Dec 10, 2016</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/python/">python</a>
+    </ul>
+    
+
+    <!-- Share -->
+    <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=socketpool连接池解析&url=http://jmpews.github.com//2016/12/10/python/socketpool连接池解析/index.html&pic=&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Weibo
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+        <a class="post_share-link" href="https://twitter.com/intent/tweet?text=socketpool连接池解析&url=http://jmpews.github.com//2016/12/10/python/socketpool连接池解析/index.html&via=jmpews" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Twitter
+            </li>
+        </a>
+    
+
+    <!-- Share Facebook -->
+    
+        <a class="post_share-link" href="https://www.facebook.com/sharer/sharer.php?u=http://jmpews.github.com//2016/12/10/python/socketpool连接池解析/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Facebook
+            </li>
+        </a>
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://jmpews.github.com//2016/12/10/python/socketpool连接池解析/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>项目链接地址: <a href="https://github.com/benoitc/socketpool" target="_blank" rel="external">https://github.com/benoitc/socketpool</a></p>
+<h2 id="如何设计一个socket连接池"><a href="#如何设计一个socket连接池" class="headerlink" title="如何设计一个socket连接池"></a>如何设计一个socket连接池</h2><ol>
+<li>首先连接池,必须具有一个queue来保存{连接}</li>
+<li>从连接池中get一个(ip,port)的连接，如果存在直接返回socket，如果不存在创建socket(创建socket可以对外提供一个接口factory,用户只需要继承接口并实现具体的方法)</li>
+<li>如果连接池满了直接关闭该socket</li>
+</ol>
+<h2 id="pool-py-分析"><a href="#pool-py-分析" class="headerlink" title="pool.py 分析"></a>pool.py 分析</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div><div class="line">175</div><div class="line">176</div><div class="line">177</div><div class="line">178</div><div class="line">179</div><div class="line">180</div><div class="line">181</div><div class="line">182</div><div class="line">183</div><div class="line">184</div><div class="line">185</div><div class="line">186</div><div class="line">187</div><div class="line">188</div><div class="line">189</div><div class="line">190</div><div class="line">191</div><div class="line">192</div><div class="line">193</div><div class="line">194</div><div class="line">195</div><div class="line">196</div><div class="line">197</div><div class="line">198</div><div class="line">199</div><div class="line">200</div><div class="line">201</div><div class="line">202</div><div class="line">203</div><div class="line">204</div><div class="line">205</div><div class="line">206</div><div class="line">207</div><div class="line">208</div></pre></td><td class="code"><pre><div class="line"># -*- coding: utf-8 -</div><div class="line">#</div><div class="line"># This file is part of socketpool.</div><div class="line"># See the NOTICE for more information.</div><div class="line"></div><div class="line">import contextlib</div><div class="line">import sys</div><div class="line">import time</div><div class="line"></div><div class="line">from socketpool.util import load_backend</div><div class="line"></div><div class="line">class MaxTriesError(Exception):</div><div class="line">    pass</div><div class="line"></div><div class="line">class MaxConnectionsError(Exception):</div><div class="line">    pass</div><div class="line"></div><div class="line">class ConnectionPool(object):</div><div class="line">    &quot;&quot;&quot;Pool of connections</div><div class="line"></div><div class="line">    This is the main object to maintain connection. Connections are</div><div class="line">    created using the factory instance passed as an option.</div><div class="line"></div><div class="line">    Options:</div><div class="line">    --------</div><div class="line"></div><div class="line">    :attr factory: Instance of socketpool.Connector. See</div><div class="line">        socketpool.conn.TcpConnector for an example</div><div class="line">    :attr retry_max: int, default 3. Numbr of times to retry a</div><div class="line">        connection before raising the MaxTriesError exception.</div><div class="line">    :attr max_lifetime: int, default 600. time in ms we keep a</div><div class="line">        connection in the pool</div><div class="line">    :attr max_size: int, default 10. Maximum number of connections we</div><div class="line">        keep in the pool.</div><div class="line">    :attr options: Options to pass to the factory</div><div class="line">    :attr reap_connection: boolean, default is true. If true a process</div><div class="line">        will be launched in background to kill idle connections.</div><div class="line">    :attr backend: string, default is thread. The socket pool can use</div><div class="line">        different backend to handle process and connections. For now</div><div class="line">        the backends &quot;thread&quot;, &quot;gevent&quot; and &quot;eventlet&quot; are supported. But</div><div class="line">        you can add your own backend if you want. For an example of backend,</div><div class="line">        look at the module socketpool.gevent_backend.</div><div class="line">    &quot;&quot;&quot;</div><div class="line"></div><div class="line">    def __init__(self, factory,</div><div class="line">                 retry_max=3, retry_delay=.1,</div><div class="line">                 timeout=-1, max_lifetime=600.,</div><div class="line">                 max_size=10, options=None,</div><div class="line">                 reap_connections=True, reap_delay=1,</div><div class="line">                 backend=&quot;thread&quot;):</div><div class="line"></div><div class="line">        if isinstance(backend, str):</div><div class="line">            self.backend_mod = load_backend(backend)</div><div class="line">            self.backend = backend</div><div class="line">        else:</div><div class="line">            self.backend_mod = backend</div><div class="line">            self.backend = str(getattr(backend, &apos;__name__&apos;, backend))</div><div class="line">        self.max_size = max_size</div><div class="line">        self.pool = getattr(self.backend_mod, &apos;PriorityQueue&apos;)()</div><div class="line">        self._free_conns = 0</div><div class="line">        self.factory = factory</div><div class="line">        self.retry_max = retry_max</div><div class="line">        self.retry_delay = retry_delay</div><div class="line">        self.timeout = timeout</div><div class="line">        self.max_lifetime = max_lifetime</div><div class="line">        if options is None:</div><div class="line">            self.options = &#123;&quot;backend_mod&quot;: self.backend_mod,</div><div class="line">                            &quot;pool&quot;: self&#125;</div><div class="line">        else:</div><div class="line">            self.options = options</div><div class="line">            self.options[&quot;backend_mod&quot;] = self.backend_mod</div><div class="line">            self.options[&quot;pool&quot;] = self</div><div class="line"></div><div class="line">        # bounded semaphore to make self._alive &apos;safe&apos;</div><div class="line">        self._sem = self.backend_mod.Semaphore(1)</div><div class="line"></div><div class="line">        self._reaper = None</div><div class="line">        # 循环定时调用murder_connections(),清除无效连接</div><div class="line">        if reap_connections:</div><div class="line">            self.reap_delay = reap_delay</div><div class="line">            self.start_reaper()</div><div class="line"></div><div class="line">    def too_old(self, conn):</div><div class="line">        return time.time() - conn.get_lifetime() &gt; self.max_lifetime</div><div class="line">    # 遍历清除无效连接</div><div class="line">    def murder_connections(self):</div><div class="line">        current_pool_size = self.pool.qsize()</div><div class="line">        if current_pool_size &gt; 0:</div><div class="line">            for priority, candidate in self.pool:</div><div class="line">                current_pool_size -= 1</div><div class="line">                if not self.too_old(candidate):</div><div class="line">                    self.pool.put((priority, candidate))</div><div class="line">                else:</div><div class="line">                    self._reap_connection(candidate)</div><div class="line">                if current_pool_size &lt;= 0:</div><div class="line">                    break</div><div class="line">    # 设置这个循环检测是线程(thread)、协程(gevent)还是其他</div><div class="line">    def start_reaper(self):</div><div class="line">        self._reaper = self.backend_mod.ConnectionReaper(self,</div><div class="line">                delay=self.reap_delay)</div><div class="line">        self._reaper.ensure_started()</div><div class="line"></div><div class="line">    def _reap_connection(self, conn):</div><div class="line">        if conn.is_connected():</div><div class="line">            conn.invalidate()</div><div class="line"></div><div class="line">    @property</div><div class="line">    def size(self):</div><div class="line">        return self.pool.qsize()</div><div class="line"></div><div class="line">    # 关闭连接池所有连接</div><div class="line">    def release_all(self):</div><div class="line">        if self.pool.qsize():</div><div class="line">            for priority, conn in self.pool:</div><div class="line">                self._reap_connection(conn)</div><div class="line"></div><div class="line">    # 释放无效连接或加入连接池，在socket使用完毕后调用</div><div class="line">    def release_connection(self, conn):</div><div class="line">        if self._reaper is not None:</div><div class="line">            self._reaper.ensure_started()</div><div class="line"></div><div class="line">        with self._sem:</div><div class="line">            if self.pool.qsize() &lt; self.max_size:</div><div class="line">                connected = conn.is_connected()</div><div class="line">                if connected and not self.too_old(conn):</div><div class="line">                    self.pool.put((conn.get_lifetime(), conn))</div><div class="line">                else:</div><div class="line">                    self._reap_connection(conn)</div><div class="line">            else:</div><div class="line">                self._reap_connection(conn)</div><div class="line">    # 核心函数，从连接池子获取符合条件的连接，如果不存在，那么根据backend(thread,gevent等)生成一个连接</div><div class="line">    def get(self, **options):</div><div class="line">        options.update(self.options)</div><div class="line"></div><div class="line">        found = None</div><div class="line">        i = self.pool.qsize()</div><div class="line">        tries = 0</div><div class="line">        last_error = None</div><div class="line"></div><div class="line">        unmatched = []</div><div class="line"></div><div class="line">        # 遍历连接查找符合条件的连接</div><div class="line">        while tries &lt; self.retry_max:</div><div class="line">            # first let&apos;s try to find a matching one from pool</div><div class="line"></div><div class="line">            if self.pool.qsize():</div><div class="line">                for priority, candidate in self.pool:</div><div class="line">                    i -= 1</div><div class="line">                    if self.too_old(candidate):</div><div class="line">                        # let&apos;s drop it</div><div class="line">                        self._reap_connection(candidate)</div><div class="line">                        continue</div><div class="line"></div><div class="line">                    matches = candidate.matches(**options)</div><div class="line">                    if not matches:</div><div class="line">                        # let&apos;s put it back</div><div class="line">                        unmatched.append((priority, candidate))</div><div class="line">                    else:</div><div class="line">                        if candidate.is_connected():</div><div class="line">                            found = candidate</div><div class="line">                            break</div><div class="line">                        else:</div><div class="line">                            # conn is dead for some reason.</div><div class="line">                            # reap it.</div><div class="line">                            self._reap_connection(candidate)</div><div class="line"></div><div class="line">                    if i &lt;= 0:</div><div class="line">                        break</div><div class="line"></div><div class="line">            if unmatched:</div><div class="line">                for candidate in unmatched:</div><div class="line">                    self.pool.put(candidate)</div><div class="line"></div><div class="line">            # we got one.. we use it</div><div class="line">            if found is not None:</div><div class="line">                return found</div><div class="line"></div><div class="line">            # 不存在则创建连接</div><div class="line">            try:</div><div class="line">                new_item = self.factory(**options)</div><div class="line">            except Exception as e:</div><div class="line">                last_error = e</div><div class="line">            else:</div><div class="line">                # we should be connected now</div><div class="line">                if new_item.is_connected():</div><div class="line">                    with self._sem:</div><div class="line">                        return new_item</div><div class="line"></div><div class="line">            tries += 1</div><div class="line">            self.backend_mod.sleep(self.retry_delay)</div><div class="line"></div><div class="line">        if last_error is None:</div><div class="line">            raise MaxTriesError()</div><div class="line">        else:</div><div class="line">            raise last_error</div><div class="line"></div><div class="line">    # 奇淫技巧 方便with使用</div><div class="line">    @contextlib.contextmanager</div><div class="line">    def connection(self, **options):</div><div class="line">        conn = self.get(**options)</div><div class="line">        try:</div><div class="line">            yield conn</div><div class="line">            # what to do in case of success</div><div class="line">        except Exception as e:</div><div class="line">            conn.handle_exception(e)</div><div class="line">        finally:</div><div class="line">            # 检查该连接是否关闭，如果没有关闭假如连接池</div><div class="line">            self.release_connection(conn)</div></pre></td></tr></table></figure>
+<h2 id="conn-py-分析"><a href="#conn-py-分析" class="headerlink" title="conn.py 分析"></a>conn.py 分析</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div></pre></td><td class="code"><pre><div class="line"># -*- coding: utf-8 -</div><div class="line">#</div><div class="line"># This file is part of socketpool.</div><div class="line"># See the NOTICE for more information.</div><div class="line"></div><div class="line">import select</div><div class="line">import socket</div><div class="line">import time</div><div class="line">import random</div><div class="line"></div><div class="line">from socketpool import util</div><div class="line"></div><div class="line">class Connector(object):</div><div class="line">    def matches(self, **match_options):</div><div class="line">        raise NotImplementedError()</div><div class="line"></div><div class="line">    def is_connected(self):</div><div class="line">        raise NotImplementedError()</div><div class="line"></div><div class="line">    def handle_exception(self, exception):</div><div class="line">        raise NotImplementedError()</div><div class="line"></div><div class="line">    def get_lifetime(self):</div><div class="line">        raise NotImplementedError()</div><div class="line"></div><div class="line">    def invalidate(self):</div><div class="line">        raise NotImplementedError()</div><div class="line"></div><div class="line"># Connect类，连接不存在时，创建该类的实例</div><div class="line">class TcpConnector(Connector):</div><div class="line"></div><div class="line">    def __init__(self, host, port, backend_mod, pool=None):</div><div class="line">        self._s = backend_mod.Socket(socket.AF_INET, socket.SOCK_STREAM)</div><div class="line">        self._s.connect((host, port))</div><div class="line">        self.host = host</div><div class="line">        self.port = port</div><div class="line">        self.backend_mod = backend_mod</div><div class="line">        self._connected = True</div><div class="line">        # use a &apos;jiggle&apos; value to make sure there is some</div><div class="line">        # randomization to expiry, to avoid many conns expiring very</div><div class="line">        # closely together.</div><div class="line">        self._life = time.time() - random.randint(0, 10)</div><div class="line">        self._pool = pool</div><div class="line"></div><div class="line">    def __del__(self):</div><div class="line">        self.release()</div><div class="line"></div><div class="line">    # 在连接池中查找</div><div class="line">    def matches(self, **match_options):</div><div class="line">        target_host = match_options.get(&apos;host&apos;)</div><div class="line">        target_port = match_options.get(&apos;port&apos;)</div><div class="line">        return target_host == self.host and target_port == self.port</div><div class="line"></div><div class="line">    def is_connected(self):</div><div class="line">        if self._connected:</div><div class="line">            return util.is_connected(self._s)</div><div class="line">        return False</div><div class="line"></div><div class="line">    def handle_exception(self, exception):</div><div class="line">        print(&apos;got an exception&apos;)</div><div class="line">        print(str(exception))</div><div class="line"></div><div class="line">    def get_lifetime(self):</div><div class="line">        return self._life</div><div class="line"></div><div class="line">    # 关闭连接，需要接着release()</div><div class="line">    def invalidate(self):</div><div class="line">        self._s.close()</div><div class="line">        self._connected = False</div><div class="line">        self._life = -1</div><div class="line"></div><div class="line">    def release(self):</div><div class="line">        if self._pool is not None:</div><div class="line">            if self._connected:</div><div class="line">                self._pool.release_connection(self)</div><div class="line">            else:</div><div class="line">                self._pool = None</div><div class="line"></div><div class="line">    def send(self, data):</div><div class="line">        return self._s.send(data)</div><div class="line"></div><div class="line">    def recv(self, size=1024):</div><div class="line">        return self._s.recv(size)</div></pre></td></tr></table></figure>
+<h2 id="backend-gevent-py-gevent模式分析"><a href="#backend-gevent-py-gevent模式分析" class="headerlink" title="backend_gevent.py gevent模式分析"></a>backend_gevent.py gevent模式分析</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div></pre></td><td class="code"><pre><div class="line"># -*- coding: utf-8 -</div><div class="line">#</div><div class="line"># This file is part of socketpool.</div><div class="line"># See the NOTICE for more information.</div><div class="line"></div><div class="line">import gevent</div><div class="line">from gevent import select</div><div class="line">from gevent import socket</div><div class="line">from gevent import queue</div><div class="line"></div><div class="line">from socketpool.pool import ConnectionPool</div><div class="line"></div><div class="line">try:</div><div class="line">    from gevent import lock</div><div class="line">except ImportError:</div><div class="line">    #gevent &lt; 1.0b2</div><div class="line">    from gevent import coros as lock</div><div class="line"></div><div class="line"></div><div class="line">sleep = gevent.sleep</div><div class="line">Semaphore = lock.BoundedSemaphore</div><div class="line">Socket = socket.socket</div><div class="line">Select = select.select</div><div class="line"></div><div class="line"># 连接池：采用queue实现</div><div class="line">class PriorityQueue(queue.PriorityQueue):</div><div class="line"></div><div class="line">    def __next__(self):</div><div class="line">        try:</div><div class="line">            result = self.get(block=False)</div><div class="line">        except queue.Empty:</div><div class="line">            raise StopIteration</div><div class="line">        return result</div><div class="line">    next = __next__</div><div class="line"></div><div class="line"># 循环清理连接池中的无效连接</div><div class="line">class ConnectionReaper(gevent.Greenlet):</div><div class="line"></div><div class="line">    running = False</div><div class="line"></div><div class="line">    def __init__(self, pool, delay=150):</div><div class="line">        self.pool = pool</div><div class="line">        self.delay = delay</div><div class="line">        gevent.Greenlet.__init__(self)</div><div class="line"></div><div class="line">    def _run(self):</div><div class="line">        self.running = True</div><div class="line">        while True:</div><div class="line">            gevent.sleep(self.delay)</div><div class="line">            self.pool.murder_connections()</div><div class="line"></div><div class="line">    def ensure_started(self):</div><div class="line">        if not self.running or self.ready():</div><div class="line">            self.start()</div></pre></td></tr></table></figure>
+
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+
+
+
+
+
+
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2016/12/10/python/python技巧与笔记/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            Newer
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2016/12/11/notes/使用goaccess进行日志分析/" id="post_nav-older" class="next-content">
+            Older
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.jpeg" alt="jmpews's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        jmpews@email.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mailto: jmpews@gmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/" target="_self">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                Home
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    Archives
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2017/04/">April 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/03/">March 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/02/">February 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/01/">January 2017<span class="sidebar_archives-count">8</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/12/">December 2016<span class="sidebar_archives-count">42</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">chrome_reader_mode</i>
+                
+                Categories
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                <a class="sidebar_archives-link" href="/categories/backend/">backend<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/categories/darwin/">darwin<span class="sidebar_archives-count">6</span></a></li><li><a class="sidebar_archives-link" href="/categories/notes/">notes<span class="sidebar_archives-count">16</span></a></li><li><a class="sidebar_archives-link" href="/categories/pwn/">pwn<span class="sidebar_archives-count">15</span></a></li><li><a class="sidebar_archives-link" href="/categories/python/">python<span class="sidebar_archives-count">18</span></a></li><li><a class="sidebar_archives-link" href="/categories/test/">test<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="About">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                About
+            </a>
+        </li>
+        
+    
+        <li>
+            <a href="/tags" title="Tags">
+                
+                Tags
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+        <li>
+            <a href="/archives">
+                Number of articles
+                <span class="sidebar-badge">61</span>
+            </a>
+        </li>
+        
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+
+<!-- Theme Material -->
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+        <a href="https://twitter.com/jmpews" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-twitter.svg);">
+                <span class="visuallyhidden">Twitter</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+
+    <!-- Weibo -->
+    
+        <a href="https://weibo.com/winter1ife" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-weibo.svg);">
+                <span class="visuallyhidden">Weibo</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/jmpews" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-github.svg);">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;
+            <script type="text/javascript">
+                var fd = new Date();
+                document.write(fd.getFullYear());
+            </script>
+            &nbsp;Zz
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import File -->
+
+    <script src="/js/lazyload.min.js"></script>
+    <script src="/js/js.min.js"></script>
+
+
+
+    <script src="/js/nprogress.js"></script>
+
+
+<script type="text/javascript">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Window Load-->
+<script>
+    $(window).load(function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+</script>
+
+<!-- MathJax Load-->
+
+<script>
+    <!-- Offer LazyLoad -->
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    <!-- Start Queue -->
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+                </main>
+            </div>
+        </body>
+    
+</html>

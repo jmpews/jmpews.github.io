@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.3.4 -->
+
+    <!-- Title -->
+    
+    <title>
+        
+            greenlet源码分析 | 
+        
+        Zz
+    </title>
+
+    <!-- Meta & Info -->
+    <meta charset="utf-8">
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+    
+    
+    
+    
+    
+    
+
+    <meta http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0097A7">
+    <meta name="author" content="jmpews">
+    <meta name="description" content="pwn &amp; dev &amp; reverse">
+    <meta name="keywords" content="null,python,greenlet">
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" sizes="192x192" href="/img/favicon.png">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!--iOS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-title" content="Title">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="480">
+
+    <!-- Add to homescreen for Chrome on Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- Add to homescreen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Zz">
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="http://jmpews.github.com">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="greenlet源码分析 | Zz">
+    <meta property="og:description" content="pwn &amp; dev &amp; reverse">
+    <meta property="og:article:tag" content="python"> <meta property="og:article:tag" content="greenlet"> 
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.en.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import CSS & jQuery -->
+    
+        <link rel="stylesheet" href="/css/material.min.css">
+        <link rel="stylesheet" href="/css/style.min.css">
+        <!-- Config CSS -->
+
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #607D8B !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #607D8B !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #607D8B !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-color: #F5F5F5;
+      }
+
+      /* blog_info bottom background */
+      #scheme-Paradox .material-layout .something-else .mdl-card__supporting-text{
+        background-color: #fff;
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/queue.js"></script>
+    
+
+    <!-- UC Browser Compatible -->
+    <script>
+        var agent = navigator.userAgent.toLowerCase();
+        if(agent.indexOf('ucbrowser')>0) {
+            document.write("<link rel=\"stylesheet\" href=\"/css/uc.css\">");
+            alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+        }
+    </script>
+
+    
+
+    
+
+
+    <!-- Bing Background -->
+    
+
+    <!-- Custom Head -->
+    
+</head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+    <!-- Left aligned menu below button -->
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#前言"><span class="post-toc-number">1.</span> <span class="post-toc-text">前言</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#为什么使用greenlet"><span class="post-toc-number">2.</span> <span class="post-toc-text">为什么使用greenlet?</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#怎么自建greenlet协程"><span class="post-toc-number">3.</span> <span class="post-toc-text">怎么自建greenlet协程?</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#怎么进行greenlet协程切换"><span class="post-toc-number">4.</span> <span class="post-toc-text">怎么进行greenlet协程切换?</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#关于调用栈的基本概念"><span class="post-toc-number">5.</span> <span class="post-toc-text">关于调用栈的基本概念</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#C层栈"><span class="post-toc-number">5.0.1.</span> <span class="post-toc-text">C层栈</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#Python层栈"><span class="post-toc-number">5.0.2.</span> <span class="post-toc-text">Python层栈</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#协程的切换"><span class="post-toc-number">6.</span> <span class="post-toc-text">协程的切换</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#特例-C语言中的函数调用-栈切换"><span class="post-toc-number">6.0.1.</span> <span class="post-toc-text">@特例:C语言中的函数调用(栈切换)</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#Python中进行栈切换"><span class="post-toc-number">6.0.2.</span> <span class="post-toc-text">@Python中进行栈切换</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#为什么要将dummymarker栈底设置于此处？"><span class="post-toc-number">6.0.2.1.</span> <span class="post-toc-text">为什么要将dummymarker栈底设置于此处？</span></a></li></ol></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#g-initialstub-分析"><span class="post-toc-number">6.0.3.</span> <span class="post-toc-text">g_initialstub 分析</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#g-switchstack-分析"><span class="post-toc-number">6.0.4.</span> <span class="post-toc-text">g_switchstack 分析</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#slp-switch-分析"><span class="post-toc-number">6.0.5.</span> <span class="post-toc-text">slp_switch 分析</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#greenlet的相关QA"><span class="post-toc-number">7.</span> <span class="post-toc-text">greenlet的相关QA?</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#应该开启多少greenlet协程"><span class="post-toc-number">7.0.1.</span> <span class="post-toc-text">@应该开启多少greenlet协程?</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#greenlet协程数受什么限制"><span class="post-toc-number">7.0.2.</span> <span class="post-toc-text">@greenlet协程数受什么限制?</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#参考资料："><span class="post-toc-number">8.</span> <span class="post-toc-text">参考资料：</span></a></li></ol>
+
+        <!--
+        <li class="mdl-menu__item">
+            Some Action
+        </li>
+        -->
+    </ul>
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        
+            <!-- Random Thumbnail -->
+            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+            <script>
+    var randomNum = Math.floor(Math.random() * 19 + 1);
+
+    $('.post_thumbnail-random').attr('data-original', '/img/random/material-' + randomNum + '.png');
+    $('.post_thumbnail-random').addClass('lazy');
+</script>
+
+        
+    
+            <p class="article-headline-p">
+                greenlet源码分析
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.jpeg" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>jmpews</strong>
+        <span>Dec 10, 2016</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/greenlet/">greenlet</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/python/">python</a>
+    </ul>
+    
+
+    <!-- Share -->
+    <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=greenlet源码分析&url=http://jmpews.github.com//2016/12/10/python/greenlet源码分析/index.html&pic=&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Weibo
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+        <a class="post_share-link" href="https://twitter.com/intent/tweet?text=greenlet源码分析&url=http://jmpews.github.com//2016/12/10/python/greenlet源码分析/index.html&via=jmpews" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Twitter
+            </li>
+        </a>
+    
+
+    <!-- Share Facebook -->
+    
+        <a class="post_share-link" href="https://www.facebook.com/sharer/sharer.php?u=http://jmpews.github.com//2016/12/10/python/greenlet源码分析/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Facebook
+            </li>
+        </a>
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://jmpews.github.com//2016/12/10/python/greenlet源码分析/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><blockquote>
+<p>2016-12-10 更新</p>
+</blockquote>
+<p>协程可以说是让程序员自己做控制的微线程.</p>
+<h2 id="为什么使用greenlet"><a href="#为什么使用greenlet" class="headerlink" title="为什么使用greenlet?"></a>为什么使用greenlet?</h2><p>可以同时开启多个微线程(准确说应该是依次开启, 当遇到需要 I/O 的地方, 自动切换到另一个协程), 从而可以实现超大并发.</p>
+<h2 id="怎么自建greenlet协程"><a href="#怎么自建greenlet协程" class="headerlink" title="怎么自建greenlet协程?"></a>怎么自建greenlet协程?</h2><p>借助系统调用相关函数, 形成调用栈, 保存父调用, 以便在函数执行完毕后返回.</p>
+<h2 id="怎么进行greenlet协程切换"><a href="#怎么进行greenlet协程切换" class="headerlink" title="怎么进行greenlet协程切换?"></a>怎么进行greenlet协程切换?</h2><p>先进行C层的栈切换, 将当前函数的栈保存到堆中, 之后进行 python 层的栈(<code>PyFrameObject</code>)切换</p>
+<h2 id="关于调用栈的基本概念"><a href="#关于调用栈的基本概念" class="headerlink" title="关于调用栈的基本概念"></a>关于调用栈的基本概念</h2><h4 id="C层栈"><a href="#C层栈" class="headerlink" title="C层栈"></a>C层栈</h4><ul>
+<li>栈是从高地址向低地址</li>
+<li>汇编用栈来传递过程参数, 存储返回信息, 保存寄存器用于以后恢复. 函数调用分配的那部分称为栈帧, 栈帧其实是两个指针寄存器, <code>%ebp</code> 为帧指针(栈底,高地址), 而 <code>%esp</code> 为栈指针(栈顶, 低地址). 一般来说以 <code>%ebp</code> 作为基址进行参数等相关寻址, 因为 <code>%esp</code> 为变址.</li>
+<li><code>%eip</code> 指向当前执行</li>
+</ul>
+<h4 id="Python层栈"><a href="#Python层栈" class="headerlink" title="Python层栈"></a>Python层栈</h4><blockquote>
+<p>Python虚拟机有一个栈帧的调用栈，其中栈帧的是 <code>PyFrameObject</code>，位于 <code>Include/frameobject.h</code>, 栈帧保存了给出代码的的信息和上下文，其中包含最后执行的指令，全局和局部命名空间，异常状态等信息。<code>f_valueblock</code> 保存了数据， <code>b_blockstack</code> 保存了异常和循环控制方法。每一个栈帧都拥有自己的数据栈和block栈，独立的数据栈和block栈使得解释器可以中断和恢复栈帧。</p>
+<p>Python代码首先被编译为字节码，再由Python虚拟机来执行。一般来说，一条Python语句对应着多条字节码（由于每条字节码对应着一条C语句，而不是一个机器指令，所以不能按照字节码的数量来判断代码性能）。</p>
+<p>许多个 <code>PyFrameObject</code> 通过 <code>f_back</code> 连成一串链表，表示了帧与帧之间的先后、调用顺序。Python中帧在运行时需要额外的内存，比如a = b + c这段代码，那么需要先请读入b、c，再算a，除此之外还有局部变量等需要保存在栈中，因此最后有一个 <code>f_localsplus</code> 指向这块多出来的内存，大小则在编译时计算出来保存在 <code>f_stacksize中</code>，这块内存具体用来依次保存 <code>locals</code>(局部变量), <code>cellvars</code>, <code>freevars</code>(后两个和闭包的实现有关), 动态栈(<code>f_valuestack</code> 指向栈底, <code>f_stacktop</code> 则维持栈顶）。</p>
+<p><code>yield</code> 协程(<code>object/genobject.c</code>)实现: <code>PyGen_New(PyFrameObject *f)</code> -&gt; <code>gen_iternext(PyGenObject *gen)</code> -&gt; <code>gen_send_ex(PyGenObject *gen, PyObject *arg, int exc)</code> -&gt; <code>PyEval_EvalFrameEx</code>, 整个过程的两个核心函数 <code>gen_send_ex</code> 和 <code>PyEval_EvalFrameEx</code>, <code>gen_send_ex</code> 用于设置生成器的状态和返回栈(<code>f-&gt;f_back = tstate-&gt;frame(当前线程状态的执行栈)</code>), 以及对于执行结果的判断和异常处理, <code>PyEval_EvalFrameEx</code> 则是执行字节码, 当遇到 <code>YIELD_VALUE</code> 则利用 <code>goto</code> 跳出 <code>for(;;)</code> 至 <code>fast_yield</code> 返回结果(对比C层栈考虑, 如果需要继续某个函数的继续执行, 不仅需要保存之前的执行位置, 还要保存参数变量栈, 所以返回前使用(<code>f-&gt;f_stacktop = stack_pointer</code>) 保存了栈顶指针, 默认来说对于一个Frame栈来说, 在其执行完后 <code>f-&gt;f_stacktop</code> 应该为 <code>NULL</code>, 但是对于 <code>yield</code> 当以后再次调用 <code>PyEval_EvalFrameEx</code>, 会根据之前保存的 <code>f-&gt;f_stacktop</code> 恢复 <code>stack_pointer</code>, 所以需要保存 <code>f-&gt;f_stacktop</code>)</p>
+</blockquote>
+<h2 id="协程的切换"><a href="#协程的切换" class="headerlink" title="协程的切换"></a>协程的切换</h2><h4 id="特例-C语言中的函数调用-栈切换"><a href="#特例-C语言中的函数调用-栈切换" class="headerlink" title="@特例:C语言中的函数调用(栈切换)"></a>@特例:C语言中的函数调用(栈切换)</h4><p>其实协程的一个很特殊的例子，就是函数调用。下面这个例子在 <code>main</code> 中调用 <code>func</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">#include&lt;stdio.h&gt;</div><div class="line">int func(int arg)</div><div class="line">&#123;</div><div class="line">    int d=4;</div><div class="line">    int e=5;</div><div class="line">    int f;</div><div class="line">    f=d+e+arg;</div><div class="line">    return f;</div><div class="line">&#125;</div><div class="line"></div><div class="line">int main()</div><div class="line">&#123;</div><div class="line">    int a=1;</div><div class="line">    int b=2;</div><div class="line">    int c=3;</div><div class="line">    func(c);</div><div class="line">    c=a+b;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>用gcc生成汇编代码(建议在redhat或centos下`</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line">.file   &quot;stackpointer.c&quot;</div><div class="line">.text</div><div class="line">.globl func</div><div class="line">.type   func, @function</div><div class="line">func:</div><div class="line">pushl   %ebp</div><div class="line">movl    %esp, %ebp</div><div class="line">subl    $16, %esp</div><div class="line">movl    $4, -12(%ebp)</div><div class="line">movl    $5, -8(%ebp)</div><div class="line">movl    -8(%ebp), %eax</div><div class="line">movl    -12(%ebp), %edx</div><div class="line">leal    (%edx,%eax), %eax</div><div class="line">addl    8(%ebp), %eax</div><div class="line">movl    %eax, -4(%ebp)</div><div class="line">movl    -4(%ebp), %eax</div><div class="line">leave</div><div class="line">ret</div><div class="line">.size   func, .-func</div><div class="line">.globl main</div><div class="line">.type   main, @function</div><div class="line">main:</div><div class="line">pushl   %ebp</div><div class="line">movl    %esp, %ebp</div><div class="line">subl    $20, %esp</div><div class="line">movl    $1, -12(%ebp)</div><div class="line">movl    $2, -8(%ebp)</div><div class="line">movl    $3, -4(%ebp)</div><div class="line">movl    -4(%ebp), %eax</div><div class="line">movl    %eax, (%esp)</div><div class="line">call    func</div><div class="line">movl    -8(%ebp), %eax</div><div class="line">movl    -12(%ebp), %edx</div><div class="line">leal    (%edx,%eax), %eax</div><div class="line">movl    %eax, -4(%ebp)</div><div class="line">leave</div><div class="line">ret</div><div class="line">.size   main, .-main</div><div class="line">.ident  &quot;GCC: (GNU) 4.4.7 20120313 (Red Hat 4.4.7-11)&quot;</div><div class="line">.section        .note.GNU-stack,&quot;&quot;,@progbits</div></pre></td></tr></table></figure>
+<p>栈的切换发生在函数调用, 从 <code>main</code> 函数进入 <code>func</code>.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">1. 首先将需要传入func的参数入栈。</div><div class="line">2. push &lt;func 的下一条指令&gt;</div><div class="line">3. 进入func</div><div class="line">4. push bp (保存栈底)</div><div class="line">5. mov sp,bp (设置新栈顶)</div><div class="line"></div><div class="line">---至此为止的栈，属于上一个栈</div><div class="line"></div><div class="line">6. 开始为局部变量分配地址</div><div class="line">8. 执行func</div><div class="line">7. leave = mov bp,sp,pop bp (恢复 main 函数栈)</div><div class="line">8. ret (返回 func 的下一条指令继续执行)</div></pre></td></tr></table></figure>
+<h4 id="Python中进行栈切换"><a href="#Python中进行栈切换" class="headerlink" title="@Python中进行栈切换"></a>@Python中进行栈切换</h4><p><strong>Python的栈和C栈不同, Python栈建立在虚拟机上</strong>, 关于具体原理请参考 《Python源码剖析》</p>
+<p>总体上说, 就是先进行C栈切换, 对于 <code>%eip</code> 设置(即执行位置的切换, 如何switch到另一个协程执行, 如何在协程执行完毕后返回父协程继续执行)需要设置 <code>top_frame</code>.</p>
+<p>关于 python 中的 <code>PyFrameObject</code> 在 <code>Include/frameobject.h</code> 定义, </p>
+<p>greenlet 的结构</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">typedef struct _greenlet &#123;</div><div class="line">  PyObject_HEAD</div><div class="line">  char* stack_start;</div><div class="line">  char* stack_stop;</div><div class="line">  char* stack_copy;</div><div class="line">  intptr_t stack_saved;</div><div class="line">  struct _greenlet* stack_prev;</div><div class="line">  struct _greenlet* parent;</div><div class="line">  PyObject* run_info;</div><div class="line">  struct _frame* top_frame;</div><div class="line">  int recursion_depth;</div><div class="line">  PyObject* weakreflist;</div><div class="line">  PyObject* exc_type;</div><div class="line">  PyObject* exc_value;</div><div class="line">  PyObject* exc_traceback;</div><div class="line">  PyObject* dict;</div><div class="line">&#125; PyGreenlet;</div></pre></td></tr></table></figure>
+<p>下面分析 greenlet 的具体调用过程</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">from greenlet import greenlet</div><div class="line"></div><div class="line">def func1(arg):</div><div class="line">    print (arg)</div><div class="line">    gr2.switch()</div><div class="line">    print (&quot;func1 end&quot;)</div><div class="line"></div><div class="line">def func2():</div><div class="line">    print (&quot;fun2 come&quot;)</div><div class="line"></div><div class="line">#设置parent为main_greenlet</div><div class="line">gr1 = greenlet(func1)</div><div class="line">gr2 = greenlet(func2)</div><div class="line">value = gr1.switch(&quot;fun1 come&quot;)</div><div class="line">print (value)</div></pre></td></tr></table></figure>
+<p>首先: <code>gr1.switch(&quot;func1&quot;)</code> 会调用 <code>g_switch</code> 函数, 其中 <code>target=gr1,args=(&#39;func1&#39;)</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">static PyObject *</div><div class="line">g_switch(PyGreenlet* target, PyObject* args, PyObject* kwargs)</div><div class="line">&#123;</div><div class="line">  ...</div><div class="line">  while (target) &#123;</div><div class="line">  if (PyGreenlet_ACTIVE(target)) &#123;</div><div class="line">    ts_target = target;</div><div class="line">    err = g_switchstack();</div><div class="line">    break;</div><div class="line">  &#125;</div><div class="line">  if (!PyGreenlet_STARTED(target)) &#123;</div><div class="line">    void* dummymarker;</div><div class="line">    ts_target = target;</div><div class="line">    err = g_initialstub(&amp;dummymarker);</div><div class="line">    if (err == 1) &#123;</div><div class="line">      continue; /* retry the switch */</div><div class="line">    &#125;</div><div class="line">    break;</div><div class="line">  &#125;</div><div class="line">  target = target-&gt;parent;</div><div class="line">  &#125;</div><div class="line">  ...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>gr1(new_greenlet)</code>, 默认 <code>stack_start = NULL(没有运行)</code> ,<code>stack_stop = NULL(没有启动)</code>, 因而执行<code>g_initialstub()</code></p>
+<p>dummymarker设置为栈底</p>
+<h5 id="为什么要将dummymarker栈底设置于此处？"><a href="#为什么要将dummymarker栈底设置于此处？" class="headerlink" title="为什么要将dummymarker栈底设置于此处？"></a>为什么要将dummymarker栈底设置于此处？</h5><p><code>g_initialstub</code>的栈中包含函数需要的参数等数据，然而<code>&amp;dummymarker</code>的位置恰为<code>g_initialstub</code>栈的ebp。</p>
+<h4 id="g-initialstub-分析"><a href="#g-initialstub-分析" class="headerlink" title="g_initialstub 分析"></a><code>g_initialstub</code> 分析</h4><p>代码已简化</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line">static int GREENLET_NOINLINE(g_initialstub)(void* mark))</div><div class="line">&#123;</div><div class="line">  ...</div><div class="line">  /* 设置stack_stop，表明start该greenlet */</div><div class="line">  self-&gt;stack_start = NULL;</div><div class="line">  self-&gt;stack_stop = (char*) mark;</div><div class="line"></div><div class="line">  /* 设置target的上一个活动栈 */</div><div class="line">  /* Example:g1_greenlet.stack_prev=main_greenlet */</div><div class="line">  if (ts_current-&gt;stack_start == NULL) &#123;</div><div class="line">    /* ts_current is dying */</div><div class="line">    self-&gt;stack_prev = ts_current-&gt;stack_prev;</div><div class="line">  &#125;</div><div class="line">  else &#123;</div><div class="line">    self-&gt;stack_prev = ts_current;</div><div class="line">  &#125;</div><div class="line">  /* 核心代码，进行栈切换 */</div><div class="line">  err = g_switchstack();</div><div class="line"></div><div class="line">  /* 标志greenlet正在运行，将要运行PyEval_CallObjectWithKeywords */</div><div class="line">  self-&gt;stack_start = (char*) 1;  /* running</div><div class="line"></div><div class="line">  /* 设置当前运行参数为parent参数 */</div><div class="line">  self-&gt;run_info = green_statedict(self-&gt;parent);</div><div class="line">  /* 开始执行函数 */</div><div class="line">  /* 注意:可能在该函数运行过程中，存在switch其他的greenlet，否则运行到函数结束 */</div><div class="line">  result = PyEval_CallObjectWithKeywords(</div><div class="line">    run, args, kwargs);</div><div class="line"></div><div class="line">  /* 标志函数结束 */</div><div class="line">  self-&gt;stack_start = NULL;  /* dead */</div><div class="line"></div><div class="line">  /* 函数结束切换到parent运行 */</div><div class="line">  for (parent = self-&gt;parent; parent != NULL; parent = parent-&gt;parent) &#123;</div><div class="line">    result = g_switch(parent, result, NULL);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>设置当前greenlet的 <code>stack_prev</code> 为 <code>ts_current</code>, 即上一个正在运行的栈</p>
+<p><code>PyEval_CallObjectWithKeywords</code> 过程中可能会切换另一个greenlet, 否则函数运行到结束</p>
+<h4 id="g-switchstack-分析"><a href="#g-switchstack-分析" class="headerlink" title="g_switchstack 分析"></a><code>g_switchstack</code> 分析</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div></pre></td><td class="code"><pre><div class="line">static int g_switchstack(void)</div><div class="line">&#123;</div><div class="line">  int err;</div><div class="line">  &#123;</div><div class="line">    /* save state */</div><div class="line">    /* 保存状态(%EIP), 进行Python层的frame状态保存 */</div><div class="line">    PyGreenlet* current = ts_current;</div><div class="line">    PyThreadState* tstate = PyThreadState_GET();</div><div class="line">    current-&gt;recursion_depth = tstate-&gt;recursion_depth;</div><div class="line">    current-&gt;top_frame = tstate-&gt;frame;</div><div class="line">    current-&gt;exc_type = tstate-&gt;exc_type;</div><div class="line">    current-&gt;exc_value = tstate-&gt;exc_value;</div><div class="line">    current-&gt;exc_traceback = tstate-&gt;exc_traceback;</div><div class="line">  &#125;</div><div class="line">  /* 汇编实现C层栈切换, 分不同平台 */</div><div class="line">  err = slp_switch();</div><div class="line">  if (err &lt; 0) &#123;   /* error */</div><div class="line">    PyGreenlet* current = ts_current;</div><div class="line">    current-&gt;top_frame = NULL;</div><div class="line">    current-&gt;exc_type = NULL;</div><div class="line">    current-&gt;exc_value = NULL;</div><div class="line">    current-&gt;exc_traceback = NULL;</div><div class="line"></div><div class="line">    assert(ts_origin == NULL);</div><div class="line">    ts_target = NULL;</div><div class="line">  &#125;</div><div class="line">  else &#123;</div><div class="line">    /* 恢复状态(%EIP), 进行Python层的frame状态恢复 */</div><div class="line">    PyGreenlet* target = ts_target;</div><div class="line">    PyGreenlet* origin = ts_current;</div><div class="line">    PyThreadState* tstate = PyThreadState_GET();</div><div class="line">    tstate-&gt;recursion_depth = target-&gt;recursion_depth;</div><div class="line">    tstate-&gt;frame = target-&gt;top_frame;</div><div class="line">    target-&gt;top_frame = NULL;</div><div class="line">    tstate-&gt;exc_type = target-&gt;exc_type;</div><div class="line">    target-&gt;exc_type = NULL;</div><div class="line">    tstate-&gt;exc_value = target-&gt;exc_value;</div><div class="line">    target-&gt;exc_value = NULL;</div><div class="line">    tstate-&gt;exc_traceback = target-&gt;exc_traceback;</div><div class="line">    target-&gt;exc_traceback = NULL;</div><div class="line"></div><div class="line">    assert(ts_origin == NULL);</div><div class="line">    Py_INCREF(target);</div><div class="line">    ts_current = target;</div><div class="line">    ts_origin = origin;</div><div class="line">    ts_target = NULL;</div><div class="line">  &#125;</div><div class="line">  return err;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="slp-switch-分析"><a href="#slp-switch-分析" class="headerlink" title="slp_switch 分析"></a><code>slp_switch</code> 分析</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div></pre></td><td class="code"><pre><div class="line">static int</div><div class="line">slp_switch(void)</div><div class="line">&#123;</div><div class="line">    /* 下面变量保存在栈(current)中 */</div><div class="line">    int err;</div><div class="line">    void* rbp;</div><div class="line">    void* rbx;</div><div class="line">    unsigned int csr;</div><div class="line">    unsigned short cw;</div><div class="line">    register long *stackref, stsizediff;</div><div class="line">    /* 这里save的是current线程的状态，变量保存在栈中 */</div><div class="line">    __asm__ volatile (&quot;&quot; : : : REGS_TO_SAVE);</div><div class="line">    __asm__ volatile (&quot;fstcw %0&quot; : &quot;=m&quot; (cw));</div><div class="line">    __asm__ volatile (&quot;stmxcsr %0&quot; : &quot;=m&quot; (csr));</div><div class="line">    __asm__ volatile (&quot;movq %%rbp, %0&quot; : &quot;=m&quot; (rbp));</div><div class="line">    __asm__ volatile (&quot;movq %%rbx, %0&quot; : &quot;=m&quot; (rbx));</div><div class="line">    __asm__ (&quot;movq %%rsp, %0&quot; : &quot;=g&quot; (stackref));</div><div class="line">    &#123;</div><div class="line">        /* 保存当前线程的数据，包括上面的那些寄存器等等数据 */</div><div class="line">        /* 当为new_greenlet直接返回1，无栈可切换 */</div><div class="line">        SLP_SAVE_STATE(stackref, stsizediff);</div><div class="line"></div><div class="line">        /* 重要! current在此暂停，target从此处继续之前的状态之前 */</div><div class="line">        __asm__ volatile (</div><div class="line">            &quot;addq %0, %%rsp\n&quot;</div><div class="line">            &quot;addq %0, %%rbp\n&quot;</div><div class="line">            :</div><div class="line">            : &quot;r&quot; (stsizediff)</div><div class="line">            );</div><div class="line">        /* 恢复栈(target)中数据 */</div><div class="line">        SLP_RESTORE_STATE();</div><div class="line">        __asm__ volatile (&quot;xorq %%rax, %%rax&quot; : &quot;=a&quot; (err));</div><div class="line">    &#125;</div><div class="line">    /* 恢复寄存器变量，这里恢复的是之前保存在target栈中的变量 */</div><div class="line">    /* 恢复了target的esp和ebp，因为变量的保存是以ebp进行偏移寻址中，所以当进行恢复时，进行相同偏移，但是因为ebp为已变为之前的target栈，因而恢复的寄存器也仍为之前的状态。 */</div><div class="line">    __asm__ volatile (&quot;movq %0, %%rbx&quot; : : &quot;m&quot; (rbx));</div><div class="line">    __asm__ volatile (&quot;movq %0, %%rbp&quot; : : &quot;m&quot; (rbp));</div><div class="line">    __asm__ volatile (&quot;ldmxcsr %0&quot; : : &quot;m&quot; (csr));</div><div class="line">    __asm__ volatile (&quot;fldcw %0&quot; : : &quot;m&quot; (cw));</div><div class="line">    __asm__ volatile (&quot;&quot; : : : REGS_TO_SAVE);</div><div class="line">    return err;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>很重要的一点，当从恢复ebp和esp开始，current暂停，target继续之前运行，恢复之前数据，恢复的寄存器也仍为之前保存的状态，因为他们是基于ebp的偏移寻址，寻址方式不变，只受ebp的控制。</p>
+<h2 id="greenlet的相关QA"><a href="#greenlet的相关QA" class="headerlink" title="greenlet的相关QA?"></a>greenlet的相关QA?</h2><h4 id="应该开启多少greenlet协程"><a href="#应该开启多少greenlet协程" class="headerlink" title="@应该开启多少greenlet协程?"></a>@应该开启多少greenlet协程?</h4><p>应该根据具体的带宽和机器配置</p>
+<h4 id="greenlet协程数受什么限制"><a href="#greenlet协程数受什么限制" class="headerlink" title="@greenlet协程数受什么限制?"></a>@greenlet协程数受什么限制?</h4><p>因为greenlet是用户自控制的微线程, 保存greenlet栈状态是将栈状态保存在堆中, 所以是受内存大小的限制. 但是即使开启了很多的线程去并发, 但由于带宽不足, 扫描速度依然不会快.</p>
+<h2 id="参考资料："><a href="#参考资料：" class="headerlink" title="参考资料："></a>参考资料：</h2><p><a href="http://www.cnblogs.com/coder2012/p/4990834.html" target="_blank" rel="external">http://www.cnblogs.com/coder2012/p/4990834.html</a></p>
+<p><a href="http://simple-is-better.com/news/677" target="_blank" rel="external">http://simple-is-better.com/news/677</a></p>
+<p><a href="http://cyrusin.github.io/2016/07/28/greenlet-20150728/" target="_blank" rel="external">http://cyrusin.github.io/2016/07/28/greenlet-20150728/</a></p>
+<p><a href="http://rootk.com/post/Python-greenlet.html" target="_blank" rel="external">http://rootk.com/post/Python-greenlet.html</a></p>
+<p><a href="http://114.215.135.238:8001/?p=108" target="_blank" rel="external">http://114.215.135.238:8001/?p=108</a></p>
+<p><a href="http://www.cnblogs.com/alan-babyblog/p/5353152.html" target="_blank" rel="external">http://www.cnblogs.com/alan-babyblog/p/5353152.html</a></p>
+<p><a href="http://devrel.qiniucdn.com/data/20110704093648/index.html" target="_blank" rel="external">http://devrel.qiniucdn.com/data/20110704093648/index.html</a></p>
+
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+
+
+
+
+
+
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2016/12/10/python/tornado中ioloop-yield-Future与thread的配合/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            Newer
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2016/12/10/python/python中的元类/" id="post_nav-older" class="next-content">
+            Older
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.jpeg" alt="jmpews's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        jmpews@email.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mailto: jmpews@gmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/" target="_self">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                Home
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    Archives
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2017/04/">April 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/03/">March 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/02/">February 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/01/">January 2017<span class="sidebar_archives-count">8</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/12/">December 2016<span class="sidebar_archives-count">42</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">chrome_reader_mode</i>
+                
+                Categories
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                <a class="sidebar_archives-link" href="/categories/backend/">backend<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/categories/darwin/">darwin<span class="sidebar_archives-count">6</span></a></li><li><a class="sidebar_archives-link" href="/categories/notes/">notes<span class="sidebar_archives-count">16</span></a></li><li><a class="sidebar_archives-link" href="/categories/pwn/">pwn<span class="sidebar_archives-count">15</span></a></li><li><a class="sidebar_archives-link" href="/categories/python/">python<span class="sidebar_archives-count">18</span></a></li><li><a class="sidebar_archives-link" href="/categories/test/">test<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="About">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                About
+            </a>
+        </li>
+        
+    
+        <li>
+            <a href="/tags" title="Tags">
+                
+                Tags
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+        <li>
+            <a href="/archives">
+                Number of articles
+                <span class="sidebar-badge">61</span>
+            </a>
+        </li>
+        
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+
+<!-- Theme Material -->
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+        <a href="https://twitter.com/jmpews" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-twitter.svg);">
+                <span class="visuallyhidden">Twitter</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+
+    <!-- Weibo -->
+    
+        <a href="https://weibo.com/winter1ife" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-weibo.svg);">
+                <span class="visuallyhidden">Weibo</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/jmpews" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-github.svg);">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;
+            <script type="text/javascript">
+                var fd = new Date();
+                document.write(fd.getFullYear());
+            </script>
+            &nbsp;Zz
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import File -->
+
+    <script src="/js/lazyload.min.js"></script>
+    <script src="/js/js.min.js"></script>
+
+
+
+    <script src="/js/nprogress.js"></script>
+
+
+<script type="text/javascript">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Window Load-->
+<script>
+    $(window).load(function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+</script>
+
+<!-- MathJax Load-->
+
+<script>
+    <!-- Offer LazyLoad -->
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    <!-- Start Queue -->
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+                </main>
+            </div>
+        </body>
+    
+</html>
