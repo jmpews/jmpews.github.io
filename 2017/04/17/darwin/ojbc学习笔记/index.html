@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.3.4 -->
+
+    <!-- Title -->
+    
+    <title>
+        
+            objc学习笔记 | 
+        
+        Zz
+    </title>
+
+    <!-- Meta & Info -->
+    <meta charset="utf-8">
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+    
+    
+    
+    
+    
+    
+
+    <meta http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0097A7">
+    <meta name="author" content="jmpews">
+    <meta name="description" content="pwn &amp; dev &amp; reverse">
+    <meta name="keywords" content="null,darwin,objc">
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" sizes="192x192" href="/img/favicon.png">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!--iOS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-title" content="Title">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="480">
+
+    <!-- Add to homescreen for Chrome on Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- Add to homescreen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Zz">
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="http://jmpews.github.com">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="objc学习笔记 | Zz">
+    <meta property="og:description" content="pwn &amp; dev &amp; reverse">
+    <meta property="og:article:tag" content="darwin"> <meta property="og:article:tag" content="objc"> 
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.en.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import CSS & jQuery -->
+    
+        <link rel="stylesheet" href="/css/material.min.css">
+        <link rel="stylesheet" href="/css/style.min.css">
+        <!-- Config CSS -->
+
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #607D8B !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #607D8B !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #607D8B !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-color: #F5F5F5;
+      }
+
+      /* blog_info bottom background */
+      #scheme-Paradox .material-layout .something-else .mdl-card__supporting-text{
+        background-color: #fff;
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/queue.js"></script>
+    
+
+    <!-- UC Browser Compatible -->
+    <script>
+        var agent = navigator.userAgent.toLowerCase();
+        if(agent.indexOf('ucbrowser')>0) {
+            document.write("<link rel=\"stylesheet\" href=\"/css/uc.css\">");
+            alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+        }
+    </script>
+
+    
+
+    
+
+
+    <!-- Bing Background -->
+    
+
+    <!-- Custom Head -->
+    
+</head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+    <!-- Left aligned menu below button -->
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#前言"><span class="post-toc-number">1.</span> <span class="post-toc-text">前言</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#常见对象"><span class="post-toc-number">2.</span> <span class="post-toc-text">常见对象</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#NSSortDescriptor"><span class="post-toc-number">2.0.1.</span> <span class="post-toc-text">NSSortDescriptor</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#NSDate"><span class="post-toc-number">2.0.2.</span> <span class="post-toc-text">NSDate</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#NSFileManager"><span class="post-toc-number">2.0.3.</span> <span class="post-toc-text">NSFileManager</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#NSString-NSData-NSMutableString"><span class="post-toc-number">2.0.4.</span> <span class="post-toc-text">NSString NSData NSMutableString</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#NSArray-NSMutableArray"><span class="post-toc-number">2.0.5.</span> <span class="post-toc-text">NSArray NSMutableArray</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#NSDictionary"><span class="post-toc-number">2.0.6.</span> <span class="post-toc-text">NSDictionary</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#常见设计模式"><span class="post-toc-number">3.</span> <span class="post-toc-text">常见设计模式</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#单例设计模式"><span class="post-toc-number">3.0.1.</span> <span class="post-toc-text">单例设计模式</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#委托"><span class="post-toc-number">3.0.2.</span> <span class="post-toc-text">委托</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#OC特性"><span class="post-toc-number">4.</span> <span class="post-toc-text">OC特性</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#类"><span class="post-toc-number">4.0.1.</span> <span class="post-toc-text">类</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#内存管理"><span class="post-toc-number">4.0.2.</span> <span class="post-toc-text">内存管理</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#属性"><span class="post-toc-number">4.0.3.</span> <span class="post-toc-text">属性</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#多态"><span class="post-toc-number">4.0.4.</span> <span class="post-toc-text">多态</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#plist文件"><span class="post-toc-number">4.0.5.</span> <span class="post-toc-text">plist文件</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#异常"><span class="post-toc-number">4.0.6.</span> <span class="post-toc-text">异常</span></a></li></ol></li></ol></li></ol>
+
+        <!--
+        <li class="mdl-menu__item">
+            Some Action
+        </li>
+        -->
+    </ul>
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        
+            <!-- Random Thumbnail -->
+            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+            <script>
+    var randomNum = Math.floor(Math.random() * 19 + 1);
+
+    $('.post_thumbnail-random').attr('data-original', '/img/random/material-' + randomNum + '.png');
+    $('.post_thumbnail-random').addClass('lazy');
+</script>
+
+        
+    
+            <p class="article-headline-p">
+                objc学习笔记
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.jpeg" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>jmpews</strong>
+        <span>Apr 17, 2017</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/darwin/">darwin</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/objc/">objc</a>
+    </ul>
+    
+
+    <!-- Share -->
+    <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=objc学习笔记&url=http://jmpews.github.com//2017/04/17/darwin/ojbc学习笔记/index.html&pic=&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Weibo
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+        <a class="post_share-link" href="https://twitter.com/intent/tweet?text=objc学习笔记&url=http://jmpews.github.com//2017/04/17/darwin/ojbc学习笔记/index.html&via=jmpews" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Twitter
+            </li>
+        </a>
+    
+
+    <!-- Share Facebook -->
+    
+        <a class="post_share-link" href="https://www.facebook.com/sharer/sharer.php?u=http://jmpews.github.com//2017/04/17/darwin/ojbc学习笔记/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Facebook
+            </li>
+        </a>
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://jmpews.github.com//2017/04/17/darwin/ojbc学习笔记/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                Share to Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>做逆向还是要对 ojbc 要熟悉才行.</p>
+<h2 id="常见对象"><a href="#常见对象" class="headerlink" title="常见对象"></a>常见对象</h2><h4 id="NSSortDescriptor"><a href="#NSSortDescriptor" class="headerlink" title="NSSortDescriptor"></a>NSSortDescriptor</h4><p>对对象进行排序</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">// 这里对对象中的 age 关键字进行排序</div><div class="line">NSSortDescriptor* ageDesc = [NSSortDescriptor sortDescriptorWithKey:@&quot;age&quot; ascending:YES];</div><div class="line">[dataSource sortUsingDescriptors:@[ageDesc]];</div></pre></td></tr></table></figure>
+<h4 id="NSDate"><a href="#NSDate" class="headerlink" title="NSDate"></a>NSDate</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">// 当前时间</div><div class="line">NSDate* now = [NSDate date];</div><div class="line">NSLog(@&quot;now %@&quot;, now);</div><div class="line"></div><div class="line">// 某个时间点之后的时间</div><div class="line">NSDate* myDate = [now dateByAddingTimeInterval:16*60*60];</div><div class="line">NSLog(@&quot;myDate %@&quot;, myDate);</div><div class="line"></div><div class="line">// 计算时间差</div><div class="line">NSTimeInterval interval = [myDate timeIntervalSinceDate:now];</div><div class="line">NSLog(@&quot;%g&quot;, interval);</div><div class="line"></div><div class="line">// 时间格式化</div><div class="line">NSDateFormatter* dateFormat = [[NSDateFormatter alloc] init];</div><div class="line">[dateFormat setDateFormat:@&quot;hh时mm分ss秒&quot;];</div><div class="line">NSString* dateString = [dateFormat stringFromDate:now];</div></pre></td></tr></table></figure>
+<h4 id="NSFileManager"><a href="#NSFileManager" class="headerlink" title="NSFileManager"></a>NSFileManager</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">// 文件管理对象, 单例</div><div class="line">NSFileManager* fm = [NSFileManager defaultManager];</div><div class="line"></div><div class="line">// 判断文件是否存在</div><div class="line">if([fm fileExistsAtPath:@&quot;/path&quot;]) &#123;</div><div class="line">    NSLog(@&quot;not exist.&quot;);</div><div class="line">&#125;</div><div class="line"></div><div class="line">// 创建文件</div><div class="line">NSData* strData = [NSData dataWithBytes:&quot;test&quot; length:10];</div><div class="line">[fm createFileAtPath:@&quot;/path&quot; contents:strData attributes:nil];</div><div class="line"></div><div class="line">// 文件对象</div><div class="line">NSFileHandle* fh = [NSFileHandle fileHandleForWritingAtPath:@&quot;/path&quot;];</div><div class="line">NSData* data = [@&quot;test&quot; dataUsingEncoding:NSUTF8StringEncoding];</div><div class="line">[fh writeData:strData];</div></pre></td></tr></table></figure>
+<h4 id="NSString-NSData-NSMutableString"><a href="#NSString-NSData-NSMutableString" class="headerlink" title="NSString NSData NSMutableString"></a>NSString NSData NSMutableString</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">// NSString</div><div class="line">NSString* dataString = [[NSString alloc] initWithData:strData encoding:NSUTF8StringEncoding];</div><div class="line"></div><div class="line">// 其他类型转NSString</div><div class="line">NSStringFromRange(range);</div><div class="line"></div><div class="line">// NSString转其他类型</div><div class="line">int value = [str intValue];</div><div class="line"></div><div class="line">// NSMutableString</div><div class="line">NSMutableString* muStr = [[NSMutableString alloc] initWithCapacity:1];</div><div class="line">NSMutableString* muStr0 = [NSMutableString stringWithString:@&quot;test&quot;];</div><div class="line">[muStr insertString:@&quot;test&quot; atIndex:0];</div><div class="line">[muStr appendFormat:@&quot;%s&quot;, &quot;test&quot;];</div></pre></td></tr></table></figure>
+<h4 id="NSArray-NSMutableArray"><a href="#NSArray-NSMutableArray" class="headerlink" title="NSArray NSMutableArray"></a>NSArray NSMutableArray</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">NSArray* dataList = @[@&quot;aaa&quot;, @&quot;bbb&quot;, @&quot;ccc&quot;];</div><div class="line">NSArray* newArr = [dataList arrayByAddingObject:@&quot;ddd&quot;];</div></pre></td></tr></table></figure>
+<h4 id="NSDictionary"><a href="#NSDictionary" class="headerlink" title="NSDictionary"></a>NSDictionary</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">NSDictionary* dic = @&#123;@&quot;key1&quot;:@&quot;value1&quot;&#125;;</div><div class="line"></div><div class="line">NSArray* keys = dic.allKeys;</div><div class="line">for(id value in dic.allValues) &#123;</div><div class="line">    </div><div class="line">&#125;</div><div class="line">// plist文件进行初始化</div><div class="line">NSDictionary* dic2 = [[NSDictionary alloc] initWithContentsOfFile:@&quot;/path&quot;];</div><div class="line"></div><div class="line">// 使用两个数组进行初始化</div><div class="line">NSDictionary* dic3 = [[NSDictionary alloc</div></pre></td></tr></table></figure>
+<h2 id="常见设计模式"><a href="#常见设计模式" class="headerlink" title="常见设计模式"></a>常见设计模式</h2><h4 id="单例设计模式"><a href="#单例设计模式" class="headerlink" title="单例设计模式"></a>单例设计模式</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">+ (Person *)sharedPerson &#123;</div><div class="line">    static Person* p = nil;</div><div class="line">    static dispatch_once_t onceToken;</div><div class="line">    dispatch_once(&amp;onceToken, ^&#123;</div><div class="line">        if (p == nil) &#123;</div><div class="line">            p = [[Person alloc] init];</div><div class="line">        &#125;</div><div class="line">    &#125;);</div><div class="line">    return p;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="委托"><a href="#委托" class="headerlink" title="委托"></a>委托</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">@protocol GuardAnimalDelegate &lt;NSObject&gt;</div><div class="line"></div><div class="line">- (void)wang;</div><div class="line">@end</div><div class="line"></div><div class="line">@interface Dog : NSObject &lt;GuardAnimalDelegate&gt;</div><div class="line">- (void)wang;</div><div class="line">@end</div><div class="line"></div><div class="line">@implementation Dog</div><div class="line">- (void)wang &#123;</div><div class="line">    NSLog(@&quot;dog 汪汪汪...&quot;);</div><div class="line">&#125;</div><div class="line">@end</div><div class="line"></div><div class="line">@interface Person : NSObject</div><div class="line"></div><div class="line">@property (strong, nonatomic) id &lt;GuardAnimalDelegate&gt; GuardianAnimal;</div><div class="line"></div><div class="line">- (void)guardEntrance;</div><div class="line"></div><div class="line">@end</div><div class="line"></div><div class="line">@implementation Person</div><div class="line"></div><div class="line">- (void)guardEntrance &#123;</div><div class="line">    Dog* dog = [[Dog alloc] init];</div><div class="line">    self.GuardianAnimal = dog;</div><div class="line">    [self.GuardianAnimal wang];</div><div class="line">&#125;</div><div class="line">@end</div></pre></td></tr></table></figure>
+<h2 id="OC特性"><a href="#OC特性" class="headerlink" title="OC特性"></a>OC特性</h2><h4 id="类"><a href="#类" class="headerlink" title="类"></a>类</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">类对象格式化打印</div><div class="line">- (NSString *)description</div><div class="line">&#123;</div><div class="line">    return [NSString stringWithFormat:@&quot;aget: %ld&quot;, self.age];</div><div class="line">&#125;</div><div class="line"></div><div class="line">// 重写对象的比较方法</div><div class="line">- (BOOL)isEqual:(id)other &#123;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="内存管理"><a href="#内存管理" class="headerlink" title="内存管理"></a>内存管理</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">// MRC模式下</div><div class="line">retain 引用计数+1</div><div class="line">seter/geter 引用计数+1</div></pre></td></tr></table></figure>
+<h4 id="属性"><a href="#属性" class="headerlink" title="属性"></a>属性</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">@property(assign, nonatomic) NSInteger weight;</div><div class="line"></div><div class="line">// 在实现文件里 指定成员变量名 否则默认为 _weight </div><div class="line">@synthesize weight=__weight;</div></pre></td></tr></table></figure>
+<h4 id="多态"><a href="#多态" class="headerlink" title="多态"></a>多态</h4><p>动态类型识别, 并不是在编译时进行, 而是在运行时进行.</p>
+<p>动态判断对象所属类型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">id v = [Person new];</div><div class="line"></div><div class="line">// 1. 判断对象是否是某个类的对象</div><div class="line">[v isMemberOfClass:[Person class]];</div><div class="line"></div><div class="line">// 2. 判断对象是否是某个类的对象或其子类</div><div class="line">[v isKindOfClass:[Person class]];</div></pre></td></tr></table></figure>
+<p>判断对象方法是否存在</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">id v = [Person new];</div><div class="line">if ([v respondsToSelector:@selector(length)]) &#123;</div><div class="line">    [v length];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>判断类是否实现了某个方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[Person instancesRespondToSelector:@selector(test)];</div></pre></td></tr></table></figure>
+<p>隐式调用未声明的方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[v performSelector:@selector(length)];</div></pre></td></tr></table></figure>
+<h4 id="plist文件"><a href="#plist文件" class="headerlink" title="plist文件"></a>plist文件</h4><p>对于路径的可读写属性如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">// 应用树, mac下可读可写, ios只读</div><div class="line">NSString *filePath = [[NSBundle mainBundle] pathForResource:@&quot;dataList&quot; ofType:@&quot;plist&quot;];</div><div class="line"></div><div class="line">        </div><div class="line">// 沙盒路径, 可读可写, 默认包含 Documents, Library</div><div class="line">NSString* documentPath = [NSHomeDirectory() stringByAppendingPathComponent:@&quot;Documents&quot;];</div></pre></td></tr></table></figure>
+<p>基本的 plist 使用, 使用 plist 默认支持的数据结构</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">NSArray* myData = @[@&quot;aaa&quot;, @&quot;bbb&quot;, @&quot;ccc&quot;];</div><div class="line">BOOL result = [myData writeToFile:filePath atomically:YES];</div></pre></td></tr></table></figure>
+<p>自定义对象的解档和归档</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line">// 实现协议</div><div class="line">@interface Person : NSObject&lt;NSCoding&gt; &#123;</div><div class="line">    NSInteger _age;</div><div class="line"></div><div class="line">&#125;</div><div class="line">@end</div><div class="line"></div><div class="line">@implementation Person</div><div class="line"></div><div class="line">// 实现归档的方法</div><div class="line">- (void)encodeWithCoder:(NSCoder *)coder</div><div class="line">&#123;</div><div class="line">    [coder encodeInteger:self.age forKey:@&quot;age&quot;];</div><div class="line">&#125;</div><div class="line">// 实现解档方法</div><div class="line">- (instancetype)initWithCoder:(NSCoder *)aDecoder &#123;</div><div class="line">    self.age = [aDecoder decodeIntegerForKey:@&quot;age&quot;];</div><div class="line">    return self;</div><div class="line">&#125;</div><div class="line">@end</div><div class="line"></div><div class="line">// 进行归档操作</div><div class="line">NSData* data1 = [NSKeyedArchiver archivedDataWithRootObject:v];</div><div class="line">NSArray* array = @[data1];</div><div class="line">BOOL result = [array wrioteToFile:filePath atomically:YES]</div><div class="line"></div><div class="line">// 进行解档操作</div><div class="line">NSArray* arrayx = [NSArray arrayWithContentsOfFile:filePath]</div><div class="line">for(int i=0; i&lt;array.count; i++) &#123;</div><div class="line">    NSData* data = array[i];</div><div class="line">    Person* p = [NSKeyedUnarchiver unarchiveObjectWithData:data];</div><div class="line">    NSLog(@&quot;%@&quot;, p);</div><div class="line">    </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="异常"><a href="#异常" class="headerlink" title="异常"></a>异常</h4><p>处理异常</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">@try &#123;</div><div class="line">    [v length];</div><div class="line">&#125; @catch (NSException *exception) &#123;</div><div class="line">    NSLog(@&quot;name:%@, reason:%@&quot;, exception.name, exception.reason);</div><div class="line">&#125; @finally &#123;</div><div class="line">    NSLog(@&quot;normal&quot;);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>自定义异常</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">@interface SomeThingException: NSException &#123;</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">SomeThingException* e = [SomeThingException exceptionWithName:@&quot;test&quot; reason:@&quot;test&quot; userInfo:nill];</div><div class="line">@throw e;</div></pre></td></tr></table></figure>
+
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+
+
+
+
+
+
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2017/04/16/hello-world/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            Newer
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.jpeg" alt="jmpews's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        jmpews@email.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mailto: jmpews@gmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/" target="_self">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                Home
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    Archives
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2017/04/">April 2017<span class="sidebar_archives-count">5</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/03/">March 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/02/">February 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/01/">January 2017<span class="sidebar_archives-count">8</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/12/">December 2016<span class="sidebar_archives-count">42</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">chrome_reader_mode</i>
+                
+                Categories
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                <a class="sidebar_archives-link" href="/categories/backend/">backend<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/categories/darwin/">darwin<span class="sidebar_archives-count">7</span></a></li><li><a class="sidebar_archives-link" href="/categories/notes/">notes<span class="sidebar_archives-count">16</span></a></li><li><a class="sidebar_archives-link" href="/categories/pwn/">pwn<span class="sidebar_archives-count">15</span></a></li><li><a class="sidebar_archives-link" href="/categories/python/">python<span class="sidebar_archives-count">18</span></a></li><li><a class="sidebar_archives-link" href="/categories/test/">test<span class="sidebar_archives-count">1</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="About">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                About
+            </a>
+        </li>
+        
+    
+        <li>
+            <a href="/tags" title="Tags">
+                
+                Tags
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+        <li>
+            <a href="/archives">
+                Number of articles
+                <span class="sidebar-badge">62</span>
+            </a>
+        </li>
+        
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+
+<!-- Theme Material -->
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+        <a href="https://twitter.com/jmpews" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-twitter.svg);">
+                <span class="visuallyhidden">Twitter</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+
+    <!-- Weibo -->
+    
+        <a href="https://weibo.com/winter1ife" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-weibo.svg);">
+                <span class="visuallyhidden">Weibo</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/jmpews" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-github.svg);">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;
+            <script type="text/javascript">
+                var fd = new Date();
+                document.write(fd.getFullYear());
+            </script>
+            &nbsp;Zz
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import File -->
+
+    <script src="/js/lazyload.min.js"></script>
+    <script src="/js/js.min.js"></script>
+
+
+
+    <script src="/js/nprogress.js"></script>
+
+
+<script type="text/javascript">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Window Load-->
+<script>
+    $(window).load(function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+</script>
+
+<!-- MathJax Load-->
+
+<script>
+    <!-- Offer LazyLoad -->
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    <!-- Start Queue -->
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+                </main>
+            </div>
+        </body>
+    
+</html>
