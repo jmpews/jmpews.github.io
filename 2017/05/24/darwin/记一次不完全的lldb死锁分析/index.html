@@ -379,7 +379,7 @@
                 <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
     
         <h2 id="记一次不完全的-lldb-死锁分析"><a href="#记一次不完全的-lldb-死锁分析" class="headerlink" title="记一次不完全的 lldb 死锁分析"></a>记一次不完全的 lldb 死锁分析</h2><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>当使用 lldb attach 到一个进程后, 使用 <code>po dlopen(&quot;/Users/jmpews/Desktop/SpiderZz/project/evilHOOK/Modules/build/x64/libobjcmsgsend.dylib&quot;, 0x1)</code> 经导致进程死锁. 复现场景如下.</p>
-<p><img src="../../images/lldb-dlopen-deadlock.png" alt=""></p>
+<p><img src="/images/lldb-dlopen-deadlock.png" alt=""></p>
 <p>上方是测试代码, 下方是死锁是的调用栈.</p>
 <h2 id="分析思路"><a href="#分析思路" class="headerlink" title="分析思路"></a>分析思路</h2><p>直接找到 <code>objc4-709/runtime/objc-runtime-new.mm</code>  对应源码</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">IMP lookUpImpOrForward(Class cls, SEL sel, id inst, </div><div class="line">                       bool initialize, bool cache, bool resolver)</div><div class="line">&#123;</div><div class="line">    Class curClass;</div><div class="line">    IMP imp = nil;</div><div class="line">    Method meth;</div><div class="line">    bool triedResolver = NO;</div><div class="line"></div><div class="line">    runtimeLock.assertUnlocked();</div><div class="line"></div><div class="line">    // Optimistic cache lookup</div><div class="line">    if (cache) &#123;</div><div class="line">        imp = cache_getImp(cls, sel);</div><div class="line">        if (imp) return imp;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    if (!cls-&gt;isRealized()) &#123;</div><div class="line">        rwlock_writer_t lock(runtimeLock);</div><div class="line">        realizeClass(cls);</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
@@ -422,7 +422,7 @@
             <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
     <!-- Prev Nav -->
     
-        <a href="/2017/05/19/darwin/Inlinehook的对抗/" id="post_nav-newer" class="prev-content">
+        <a href="/2017/05/19/pwn/Inlinehook的对抗/" id="post_nav-newer" class="prev-content">
             <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
                 <i class="material-icons">arrow_back</i>
             </button>

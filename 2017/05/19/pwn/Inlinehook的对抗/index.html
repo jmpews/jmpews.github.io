@@ -10,7 +10,7 @@
     
     <title>
         
-            gdb调试笔记 | 
+            inlinehook的对抗 | 
         
         Zz
     </title>
@@ -32,7 +32,7 @@
     <meta name="theme-color" content="#0097A7">
     <meta name="author" content="jmpews">
     <meta name="description" content="pwn &amp; dev &amp; reverse">
-    <meta name="keywords" content="null,gdb">
+    <meta name="keywords" content="null,hook,pwn,inlinehook">
 
     <!-- Favicons -->
     <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
@@ -58,9 +58,9 @@
     <!-- The Open Graph protocol -->
     <meta property="og:url" content="http://jmpews.github.com">
     <meta property="og:type" content="blog">
-    <meta property="og:title" content="gdb调试笔记 | Zz">
+    <meta property="og:title" content="inlinehook的对抗 | Zz">
     <meta property="og:description" content="pwn &amp; dev &amp; reverse">
-    <meta property="og:article:tag" content="gdb"> 
+    <meta property="og:article:tag" content="hook"> <meta property="og:article:tag" content="pwn"> <meta property="og:article:tag" content="inlinehook"> 
 
     <!--[if lte IE 9]>
         <link rel="stylesheet" href="/css/ie-blocker.css">
@@ -231,7 +231,7 @@
     </button>
 
     <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
-        <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#命令集锦"><span class="post-toc-number">1.</span> <span class="post-toc-text">命令集锦</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#where-bt"><span class="post-toc-number">1.0.1.</span> <span class="post-toc-text">where/bt</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#info-program"><span class="post-toc-number">1.0.2.</span> <span class="post-toc-text">info program</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#f-N"><span class="post-toc-number">1.0.3.</span> <span class="post-toc-text">f N</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#info-args"><span class="post-toc-number">1.0.4.</span> <span class="post-toc-text">info args</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#info-locals"><span class="post-toc-number">1.0.5.</span> <span class="post-toc-text">info locals</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#gdb-attach-pid"><span class="post-toc-number">1.0.6.</span> <span class="post-toc-text">gdb attach pid</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#disassemble-function-name"><span class="post-toc-number">1.0.7.</span> <span class="post-toc-text">disassemble function_name</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#x-16xw-eip"><span class="post-toc-number">1.0.8.</span> <span class="post-toc-text">x/16xw $eip</span></a></li></ol></li></ol></li></ol>
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#InlineHook-的对抗"><span class="post-toc-number">1.</span> <span class="post-toc-text">InlineHook 的对抗</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#前言"><span class="post-toc-number">2.</span> <span class="post-toc-text">前言</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#0-禁止-DYLD-INSERT-LIBRARIES-注入"><span class="post-toc-number">2.0.1.</span> <span class="post-toc-text">0. 禁止 DYLD_INSERT_LIBRARIES 注入</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#1-检测-libsubstrate-dylib-是否加载"><span class="post-toc-number">2.0.2.</span> <span class="post-toc-text">1. 检测 libsubstrate.dylib 是否加载</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#2-检测特殊函数名"><span class="post-toc-number">2.0.3.</span> <span class="post-toc-text">2. 检测特殊函数名</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#3-检测关键函数的前几条指令内容"><span class="post-toc-number">2.0.4.</span> <span class="post-toc-text">3. 检测关键函数的前几条指令内容</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#4-函数完整性校验"><span class="post-toc-number">2.0.5.</span> <span class="post-toc-text">4. 函数完整性校验</span></a></li></ol></li></ol></li></ol>
 
         <!--
         <li class="mdl-menu__item">
@@ -268,7 +268,7 @@
         
     
             <p class="article-headline-p">
-                gdb调试笔记
+                inlinehook的对抗
             </p>
         </div>
 
@@ -287,7 +287,7 @@
     <!-- Author Name & Date -->
     <div>
         <strong>jmpews</strong>
-        <span>Dec 10, 2016</span>
+        <span>May 19, 2017</span>
     </div>
 
     <div class="section-spacer"></div>
@@ -311,7 +311,7 @@
     </button>
     <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
         <li class="mdl-menu__item">
-        <a class="post_tag-link" href="/tags/gdb/">gdb</a>
+        <a class="post_tag-link" href="/tags/hook/">hook</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/inlinehook/">inlinehook</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/pwn/">pwn</a>
     </ul>
     
 
@@ -327,7 +327,7 @@
 
     <!-- Share Weibo -->
     
-        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=gdb调试笔记&url=http://jmpews.github.com//2016/12/10/notes/gdb调试笔记/index.html&pic=&searchPic=false&style=simple" target="_blank">
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=inlinehook的对抗&url=http://jmpews.github.com//2017/05/19/pwn/Inlinehook的对抗/index.html&pic=&searchPic=false&style=simple" target="_blank">
             <li class="mdl-menu__item">
                 Share to Weibo
             </li>
@@ -336,7 +336,7 @@
 
     <!-- Share Twitter -->
     
-        <a class="post_share-link" href="https://twitter.com/intent/tweet?text=gdb调试笔记&url=http://jmpews.github.com//2016/12/10/notes/gdb调试笔记/index.html&via=jmpews" target="_blank">
+        <a class="post_share-link" href="https://twitter.com/intent/tweet?text=inlinehook的对抗&url=http://jmpews.github.com//2017/05/19/pwn/Inlinehook的对抗/index.html&via=jmpews" target="_blank">
             <li class="mdl-menu__item">
                 Share to Twitter
             </li>
@@ -345,7 +345,7 @@
 
     <!-- Share Facebook -->
     
-        <a class="post_share-link" href="https://www.facebook.com/sharer/sharer.php?u=http://jmpews.github.com//2016/12/10/notes/gdb调试笔记/index.html" target="_blank">
+        <a class="post_share-link" href="https://www.facebook.com/sharer/sharer.php?u=http://jmpews.github.com//2017/05/19/pwn/Inlinehook的对抗/index.html" target="_blank">
             <li class="mdl-menu__item">
                 Share to Facebook
             </li>
@@ -354,7 +354,7 @@
 
     <!-- Share Google+ -->
     
-        <a class="post_share-link" href="https://plus.google.com/share?url=http://jmpews.github.com//2016/12/10/notes/gdb调试笔记/index.html" target="_blank">
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://jmpews.github.com//2017/05/19/pwn/Inlinehook的对抗/index.html" target="_blank">
             <li class="mdl-menu__item">
                 Share to Google+
             </li>
@@ -378,14 +378,25 @@
                 <!-- Post Content -->
                 <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
     
-        <h2 id="命令集锦"><a href="#命令集锦" class="headerlink" title="命令集锦"></a>命令集锦</h2><h4 id="where-bt"><a href="#where-bt" class="headerlink" title="where/bt"></a>where/bt</h4><p>查看当前运行堆栈列表</p>
-<h4 id="info-program"><a href="#info-program" class="headerlink" title="info program"></a>info program</h4><p>来查看程序的是否在运行，进程号，被暂停的原因。</p>
-<h4 id="f-N"><a href="#f-N" class="headerlink" title="f N"></a>f N</h4><p>切换到特定栈帧</p>
-<h4 id="info-args"><a href="#info-args" class="headerlink" title="info args"></a>info args</h4><p>查看当前栈的参数</p>
-<h4 id="info-locals"><a href="#info-locals" class="headerlink" title="info locals"></a>info locals</h4><p>查看当前栈的局部变量</p>
-<h4 id="gdb-attach-pid"><a href="#gdb-attach-pid" class="headerlink" title="gdb attach pid"></a>gdb attach pid</h4><p>挂载特定pid进行调试</p>
-<h4 id="disassemble-function-name"><a href="#disassemble-function-name" class="headerlink" title="disassemble function_name"></a>disassemble function_name</h4><p>对一段函数进行反汇编</p>
-<h4 id="x-16xw-eip"><a href="#x-16xw-eip" class="headerlink" title="x/16xw $eip"></a>x/16xw $eip</h4><p>dump出来对应地址内容</p>
+        <h2 id="InlineHook-的对抗"><a href="#InlineHook-的对抗" class="headerlink" title="InlineHook 的对抗"></a>InlineHook 的对抗</h2><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>现在绝大部分 tweak 的工作都是基于 <a href="http://www.cydiasubstrate.com/" target="_blank" rel="external">Cydia Substrate</a>, 它的实现本质就是 InlineHook, 这就涉及到如何检测 InlineHook, 如何绕过检测.</p>
+<p>需要前置的知识:</p>
+<ol>
+<li>InlineHook 原理</li>
+<li>libsubstrate.dylib 加载时间(DYLD_INSERT_LIBRARIES)</li>
+<li>Cydia Substrate 原理</li>
+</ol>
+<h4 id="0-禁止-DYLD-INSERT-LIBRARIES-注入"><a href="#0-禁止-DYLD-INSERT-LIBRARIES-注入" class="headerlink" title="0. 禁止 DYLD_INSERT_LIBRARIES 注入"></a>0. 禁止 DYLD_INSERT_LIBRARIES 注入</h4><p>防御:</p>
+<p>使用 <code>__RESTRICT/__restrict</code> </p>
+<p>绕过:</p>
+<p>修改文件, 去掉该 section</p>
+<h4 id="1-检测-libsubstrate-dylib-是否加载"><a href="#1-检测-libsubstrate-dylib-是否加载" class="headerlink" title="1. 检测 libsubstrate.dylib 是否加载"></a>1. 检测 libsubstrate.dylib 是否加载</h4><p>这里是针对 Cydia Substrate 而言.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">uint32_t</span> count =_dyld_image_count();</div><div class="line"><span class="keyword">for</span>(<span class="keyword">uint32_t</span> i =<span class="number">0</span>; i &lt; count; i++)</div><div class="line">&#123;</div><div class="line">  <span class="comment">//Name of image (includes full path)</span></div><div class="line">  constchar*dyld =_dyld_get_image_name(i);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>绕过:</p>
+<p>直接 hook, 因为 Cydia Substrate 加载时间早.</p>
+<h4 id="2-检测特殊函数名"><a href="#2-检测特殊函数名" class="headerlink" title="2. 检测特殊函数名"></a>2. 检测特殊函数名</h4><p>这里是针对 Cydia Substrate 而言, 比如 MSHookFunction.</p>
+<h4 id="3-检测关键函数的前几条指令内容"><a href="#3-检测关键函数的前几条指令内容" class="headerlink" title="3. 检测关键函数的前几条指令内容"></a>3. 检测关键函数的前几条指令内容</h4><p>一般来说使用 inlinehook 进行 hook 函数, 修改函数的前几条指令为跳转指令. </p>
+<p>可以通过这个进行校验.</p>
+<h4 id="4-函数完整性校验"><a href="#4-函数完整性校验" class="headerlink" title="4. 函数完整性校验"></a>4. 函数完整性校验</h4><p>类似迅雷</p>
 
     
 
@@ -412,7 +423,7 @@
             <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
     <!-- Prev Nav -->
     
-        <a href="/2016/12/10/notes/go基础笔记/" id="post_nav-newer" class="prev-content">
+        <a href="/2017/05/17/pwn/解析ARM和x86_x64指令格式/" id="post_nav-newer" class="prev-content">
             <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
                 <i class="material-icons">arrow_back</i>
             </button>
@@ -426,7 +437,7 @@
 
     <!-- Next Nav -->
     
-        <a href="/2016/12/11/notes/使用goaccess进行日志分析/" id="post_nav-older" class="next-content">
+        <a href="/2017/05/24/darwin/记一次不完全的lldb死锁分析/" id="post_nav-older" class="next-content">
             Older
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
