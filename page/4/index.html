@@ -8,23 +8,22 @@ rop 有四个关键点.
 ELF 解析在解释ELF结构时以下面源码为例子:
 123456789101112#include &lt;stdio.h&gt;int helloWor...</p></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2016-12-14</span><i class="fa fa-tag"></i><a href="/categories/pwn/" title="pwn" class="tag">pwn </a><a href="/tags/pwn/" title="pwn" class="tag">pwn </a><a href="/tags/elf/" title="elf" class="tag">elf </a></div></div></div></div><div class="post animated fadeInDown"><div class="post-title"><h3><a href="/2016/12/11/notes/使用goaccess进行日志分析/"></a></h3></div><div class="post-content"><p>Title: 使用goaccess进行日志分析Date: 2016-12-27 03:43Author: jmpewsCategory: toolsTags: nginxSlug: rgoaccess
 安装1sudo apt-get install goaccess
-配置配置文件应该在 /etc/goaccess...</p></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2016-12-11</span><i class="fa fa-tag"></i></div></div></div></div><div class="post animated fadeInDown"><div class="post-title"><h3><a href="/2016/12/10/python/Tornado源码总结/">Tornado源码总结</a></h3></div><div class="post-content"><p>application
-基本配置初始化，关键是对路由规则的配置
-Httpserver的初始化，继承于Configurable，工厂方法设计模式，，基本参数初始化，初始化父类tcpserver(同样也是进行基本参数初始化)
-Httpserver监听(是指是穿透到tcp进行监听),建立监听socket
+配置配置文件应该在 /etc/goaccess...</p></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2016-12-11</span><i class="fa fa-tag"></i></div></div></div></div><div class="post animated fadeInDown"><div class="post-title"><h3><a href="/2016/12/10/notes/IPSecVPN搭建/">IPSec VPN搭建</a></h3></div><div class="post-content"><p>安装依赖12yum updateyum install pam-devel openssl-devel make gcc
+安装strongswan1yum -y install strongswan (strongswan-libipsec,openvz架构需要)
+生成CA证书12strongswan pki -...</p></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2016-12-10</span><i class="fa fa-tag"></i><a href="/categories/notes/" title="notes" class="tag">notes </a><a href="/tags/vpn/" title="vpn" class="tag">vpn </a></div></div></div></div><div class="post animated fadeInDown"><div class="post-title"><h3><a href="/2016/12/10/notes/Redis备忘笔记/">Redis备忘笔记</a></h3></div><div class="post-content"><p>Pipelines
+Pipelines are a subclass of the base Redis class that provide support for buffering multiple commands to the server in a single request.
 
-ioloop...</p></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2016-12-10</span><i class="fa fa-tag"></i><a href="/categories/python/" title="python" class="tag">python </a><a href="/tags/python/" title="python" class="tag">python </a><a href="/tags/tornado/" title="tornado" class="tag">tornado </a></div></div></div></div><div class="post animated fadeInDown"><div class="post-title"><h3><a href="/2016/12/10/notes/后端网络底层开发知识笔记/">后端网络底层开发知识笔记</a></h3></div><div class="post-content"><p>socket关闭的流程socket关闭TIME_WAIT详细解释TIME_WAIT详解
-主动发起关闭的才会存在TIME_WAIT
-TIME_WAIT状态会持续2MSL的时间才会转换到CLOSE状态，一般是1-4分钟。
-当一端收到一个FIN，内核让read返回0来通知应用层另一端已经终止了向本端的数据传送
-处理服务...</p></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2016-12-10</span><i class="fa fa-tag"></i><a href="/categories/notes/" title="notes" class="tag">notes </a><a href="/tags/backend/" title="backend" class="tag">backend </a></div></div></div></div><div class="post animated fadeInDown"><div class="post-title"><h3><a href="/2016/12/10/notes/服务器安全配置/">服务器安全配置</a></h3></div><div class="post-content"><p>修改默认端口123456vim /etc/ssh/sshd_config---Port 2333PermitRootLogin No---service sshd restart
-添加新用户并加入sudo权限12345678useradd -s /bin/bash -d /home/jmpews -m jmpew...</p></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2016-12-10</span><i class="fa fa-tag"></i><a href="/categories/notes/" title="notes" class="tag">notes </a><a href="/tags/backend/" title="backend" class="tag">backend </a></div></div></div></div><div class="post animated fadeInDown"><div class="post-title"><h3><a href="/2016/12/10/notes/tcp.ip阅读笔记/">TCP/IP备忘笔记</a></h3></div><div class="post-content"><p>数据链路层以太网
-默认采用RFC894定义
-IP数据部分长度46~1500
+1234567pi...</p></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2016-12-10</span><i class="fa fa-tag"></i><a href="/categories/notes/" title="notes" class="tag">notes </a><a href="/tags/redis/" title="redis" class="tag">redis </a></div></div></div></div><div class="post animated fadeInDown"><div class="post-title"><h3><a href="/2016/12/10/notes/SYNcookie原理/">SYNcookie原理</a></h3></div><div class="post-content"><p>前言在研究syncookie的时候首先需要明确需要搞清的问题.
 
-SLIP串行线路IP
-每一方都必须知道对方IP地址
-如果一条串行线路用于SLIP，则不用于其他协议
-没有校验，上层协议提供
+syncookie是为了解决什么问题? 
 
-PPP协议0x7d作为转义字符，当它它出现在PPP数据帧中时，那么紧接着的字符的第6个比特位要取其补码。(就像...</p></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2016-12-10</span><i class="fa fa-tag"></i><a href="/categories/notes/" title="notes" class="tag">notes </a><a href="/tags/tcp-ip/" title="tcp/ip" class="tag">tcp/ip </a></div></div></div></div><div class="pagination"><ul class="clearfix"><li class="pre pagbuttons"><a role="navigation" href="/page/3/" class="btn">上一页</a></li><li class="next pagbuttons"><a role="navigation" href="/page/5/" class="btn">下一页</a></li></ul></div></div></div></div><script src="/js/jquery.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script></body></html>
+syncookie是怎么解决的? 
+
+
+syncookie解决了什么问题?SYN flood(SYN洪水攻击, 不断发送伪造的SYN给服务器), 导致服务器上半连接队列满, 丢弃之后正常请求的SYN.
+s...</p></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2016-12-10</span><i class="fa fa-tag"></i><a href="/categories/notes/" title="notes" class="tag">notes </a><a href="/tags/SYNcookie/" title="SYNcookie" class="tag">SYNcookie </a></div></div></div></div><div class="post animated fadeInDown"><div class="post-title"><h3><a href="/2016/12/10/notes/Zmap笔记/">Zmap备忘笔记</a></h3></div><div class="post-content"><p>前言
+https://github.com/zmap/zmap
+https://zmap.io/documentation.html
+
+安装1cmake -DWITH_REDIS=OFF -DENABLE_DEVELOPMENT=ON .
+扫描基本的扫描方式1sudo zmap -p 80 -o results....</p></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2016-12-10</span><i class="fa fa-tag"></i><a href="/categories/notes/" title="notes" class="tag">notes </a><a href="/tags/zmap/" title="zmap" class="tag">zmap </a></div></div></div></div><div class="pagination"><ul class="clearfix"><li class="pre pagbuttons"><a role="navigation" href="/page/3/" class="btn">上一页</a></li><li class="next pagbuttons"><a role="navigation" href="/page/5/" class="btn">下一页</a></li></ul></div></div></div></div><script src="/js/jquery.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script></body></html>
