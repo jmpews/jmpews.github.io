@@ -11,23 +11,14 @@ rop 有四个关键点.
 ELF 解析在解释ELF结构时以下面源码为例子:
 123456789101112#include &lt;stdio.h&gt;int helloWor...</p></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2016-12-14</span><i class="fa fa-tag"></i><a href="/categories/pwn/" title="pwn" class="tag">pwn </a><a href="/tags/pwn/" title="pwn" class="tag">pwn </a><a href="/tags/elf/" title="elf" class="tag">elf </a></div></div></div></div><div class="post animated fadeInDown"><div class="post-title"><h3><a href="/2016/12/11/notes/使用goaccess进行日志分析/"></a></h3></div><div class="post-content"><p>Title: 使用goaccess进行日志分析Date: 2016-12-27 03:43Author: jmpewsCategory: toolsTags: nginxSlug: rgoaccess
 安装1sudo apt-get install goaccess
-配置配置文件应该在 /etc/goaccess...</p></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2016-12-11</span><i class="fa fa-tag"></i></div></div></div></div><div class="post animated fadeInDown"><div class="post-title"><h3><a href="/2016/12/10/python/Tornado和Websocket建立实时通讯/">Tornado和Websocket建立实时通讯</a></h3></div><div class="post-content"><p>前言:需要在 web 上建立实时通讯的一个 Widget, 找了一些 Tornado 和 Websocket结合的方案, 发现都很简单, 然后就结合具体实现了一个方案.
-Feature:
-支持通讯记录
-支持多人的通讯
-支持sessionStorage缓存
-界面上显示聊天列表(待)
-
-Tornado &amp; W...</p></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2016-12-10</span><i class="fa fa-tag"></i><a href="/categories/python/" title="python" class="tag">python </a><a href="/tags/python/" title="python" class="tag">python </a><a href="/tags/tornado/" title="tornado" class="tag">tornado </a></div></div></div></div><div class="post animated fadeInDown"><div class="post-title"><h3><a href="/2016/12/10/notes/tcp.ip阅读笔记/">TCP/IP备忘笔记</a></h3></div><div class="post-content"><p>数据链路层以太网
-默认采用RFC894定义
-IP数据部分长度46~1500
-
-SLIP串行线路IP
-每一方都必须知道对方IP地址
-如果一条串行线路用于SLIP，则不用于其他协议
-没有校验，上层协议提供
-
-PPP协议0x7d作为转义字符，当它它出现在PPP数据帧中时，那么紧接着的字符的第6个比特位要取其补码。(就像...</p></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2016-12-10</span><i class="fa fa-tag"></i><a href="/categories/notes/" title="notes" class="tag">notes </a><a href="/tags/tcp-ip/" title="tcp/ip" class="tag">tcp/ip </a></div></div></div></div><div class="post animated fadeInDown"><div class="post-title"><h3><a href="/2016/12/10/notes/开发环境快速配置/">开发环境快速配置</a></h3></div><div class="post-content"><p>服务器安全配置查看 [服务器安全配置.md]
-Ubuntu基本配置ssh-public-key免密码登陆
-1复制本地~/.ssh/id_rsa.pub到服务器的~/.ssh/authorized_keys
-切换为xfce桌面12sudo apt-get remove unity &amp;&amp; sudo a...</p></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2016-12-10</span><i class="fa fa-tag"></i><a href="/categories/notes/" title="notes" class="tag">notes </a><a href="/tags/backend/" title="backend" class="tag">backend </a></div></div></div></div><div class="pagination"><ul class="clearfix"><li class="pre pagbuttons"><a role="navigation" href="/page/3/" class="btn">上一页</a></li><li class="next pagbuttons"><a role="navigation" href="/page/5/" class="btn">下一页</a></li></ul></div></div></div></div><script src="/js/jquery.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script></body></html>
+配置配置文件应该在 /etc/goaccess...</p></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2016-12-11</span><i class="fa fa-tag"></i></div></div></div></div><div class="post animated fadeInDown"><div class="post-title"><h3><a href="/2016/12/10/notes/gdb调试笔记/">gdb调试笔记</a></h3></div><div class="post-content"><p>命令集锦where/bt查看当前运行堆栈列表
+info program来查看程序的是否在运行，进程号，被暂停的原因。
+f N切换到特定栈帧
+info args查看当前栈的参数
+info locals查看当前栈的局部变量
+gdb attach pid挂载特定pid进行调试
+disassemble function_...</p></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2016-12-10</span><i class="fa fa-tag"></i><a href="/categories/notes/" title="notes" class="tag">notes </a><a href="/tags/gdb/" title="gdb" class="tag">gdb </a></div></div></div></div><div class="post animated fadeInDown"><div class="post-title"><h3><a href="/2016/12/10/notes/nginx备忘笔记/">nginx备忘笔记</a></h3></div><div class="post-content"><p>nginx设置日志格式1234567# log_format 日志名字 日志格式log_format  torweb  &apos;$host $remote_addr - $remote_user [$time_local] &quot;$request&quot; &apos;					&apos;$stat...</p></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2016-12-10</span><i class="fa fa-tag"></i><a href="/categories/notes/" title="notes" class="tag">notes </a><a href="/tags/nginx/" title="nginx" class="tag">nginx </a></div></div></div></div><div class="post animated fadeInDown"><div class="post-title"><h3><a href="/2016/12/10/notes/后端网络底层开发知识笔记/">后端网络底层开发知识笔记</a></h3></div><div class="post-content"><p>socket关闭的流程socket关闭TIME_WAIT详细解释TIME_WAIT详解
+主动发起关闭的才会存在TIME_WAIT
+TIME_WAIT状态会持续2MSL的时间才会转换到CLOSE状态，一般是1-4分钟。
+当一端收到一个FIN，内核让read返回0来通知应用层另一端已经终止了向本端的数据传送
+处理服务...</p></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2016-12-10</span><i class="fa fa-tag"></i><a href="/categories/notes/" title="notes" class="tag">notes </a><a href="/tags/backend/" title="backend" class="tag">backend </a></div></div></div></div><div class="pagination"><ul class="clearfix"><li class="pre pagbuttons"><a role="navigation" href="/page/3/" class="btn">上一页</a></li><li class="next pagbuttons"><a role="navigation" href="/page/5/" class="btn">下一页</a></li></ul></div></div></div></div><script src="/js/jquery.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script></body></html>
